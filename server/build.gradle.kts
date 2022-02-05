@@ -89,6 +89,24 @@ tasks.asciidoctor {
     dependsOn(tasks.test)
 }
 
+tasks.register("installGitHooks") {
+    group = "build setup"
+    description = "Install git hooks"
+    doLast {
+        val gitHooksDir = File(project.rootDir, ".git/hooks")
+        val gitHookFile = File(gitHooksDir, "pre-commit")
+        if (!gitHookFile.exists()) {
+            val gitHook = File(project.rootDir, "scripts/pre-commit.sh")
+            gitHook.copyTo(gitHookFile, true)
+            gitHookFile.setExecutable(true)
+        }
+    }
+}
+
+tasks.named("build") {
+    dependsOn("installGitHooks")
+}
+
 configure<com.diffplug.gradle.spotless.SpotlessExtension> {
     kotlin {
         target("**/*.kt")
