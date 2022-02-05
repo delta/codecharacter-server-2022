@@ -19,6 +19,7 @@ $ openapi-generator-cli generate \
 
 - [Specification](spec/index.html)
 
-### Project Coverage:
+### Project Test/Coverage details:
 
-- [Coverage Summary](coverage/index.html)
+- [Gradle Test Summary](test/index.html)
+- [JaCoCo Coverage Summary](coverage/index.html)

@@ -21,7 +21,9 @@ jobs:
         with:
           arguments: test
       - name: Move directory
-        run: mv server/build/coverage docs/coverage
+        run: |
+          mv server/build/coverage docs/coverage
+          mv server/build/reports/tests/test docs/test
       - name: Push coverage report
         run: |
           git config --local user.email "github-actions@github.com"
