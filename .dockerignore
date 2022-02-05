@@ -1,0 +1,10 @@
+.git
+.idea
+.gradle
+docker-compose.yml
+Dockerfile
+build
+config
+storage
+data
+*.sh

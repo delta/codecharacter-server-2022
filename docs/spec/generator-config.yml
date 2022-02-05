@@ -1,0 +1,23 @@
+apiPackage: delta.codecharacter.core
+artifactId: codecharacter-core
+artifactVersion: 2022.0.1
+basePackage: delta.codecharacter
+delegatePattern: false
+enumPropertyNaming: UPPERCASE
+exceptionHandler: true
+gradleBuildFile: true
+groupId: delta.codecharacter
+interfaceOnly: true
+modelMutable: false
+modelPackage: delta.codecharacter.dtos
+packageName: delta.codecharacter
+reactive: false
+serializableModel: true
+serializationLibrary: moshi
+serverPort: "8080"
+serviceInterface: false
+serviceImplementation: false
+swaggerAnnotations: true
+title: CodeCharacter Core API
+useBeanValidation: true
+useTags: true

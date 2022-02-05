@@ -1,0 +1,16 @@
+spring:
+  data:
+    mongodb:
+      host: localhost
+      auto-index-creation: true
+  mongodb:
+    embedded:
+      version: 4.4.4
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+
+debug: false
