@@ -4,7 +4,6 @@ import delta.codecharacter.server.code.LanguageEnum
 import delta.codecharacter.server.user.UserEntity
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
-import org.springframework.data.mongodb.core.mapping.DocumentReference
 import java.time.Instant
 
 /**
@@ -17,7 +16,7 @@ import java.time.Instant
  */
 @Document(collection = "latest_code")
 data class LatestCodeEntity(
-    @Id @DocumentReference(lazy = true) val user: UserEntity,
+    @Id val user: UserEntity,
     val code: String,
     val language: LanguageEnum,
     val lastSavedAt: Instant,
