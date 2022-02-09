@@ -15,8 +15,9 @@ data class UserEntity(
     @Indexed(unique = true) private val username: String,
     private val password: String,
     private val isEnabled: Boolean = false,
-    private val isCredentialsNonExpired: Boolean,
-    private val isAccountNonLocked: Boolean,
+    private val isCredentialsNonExpired: Boolean = true,
+    private val isAccountNonExpired: Boolean = true,
+    private val isAccountNonLocked: Boolean = true,
 ) : UserDetails {
     override fun getAuthorities(): Set<GrantedAuthority> {
         return setOf(SimpleGrantedAuthority("ROLE_USER"))

@@ -1,6 +1,5 @@
 package delta.codecharacter.server.config
 
-import delta.codecharacter.server.user.UserService
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
@@ -12,13 +11,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 class WebSecurityConfiguration : WebSecurityConfigurerAdapter() {
 
     override fun configure(http: HttpSecurity?) {
-        http {
-            authorizeRequests { authorize("/**", permitAll) }
-            csrf { disable() }
-        }
+        http { csrf { disable() } }
     }
 
     @Bean fun passwordEncoder() = BCryptPasswordEncoder()
-
-    @Bean fun userDetailService() = UserService()
 }

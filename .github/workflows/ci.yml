@@ -1,0 +1,63 @@
+name: CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up JDK 17
+        uses: actions/setup-java@v2
+        with:
+          java-version: '17'
+          distribution: 'adopt'
+      - name: Copy config
+        run: cp ./server/src/main/resources/application.example.yml ./server/src/main/resources/application.yml
+      - name: Run lint
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: spotlessCheck
+
+  build:
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up JDK 17
+        uses: actions/setup-java@v2
+        with:
+          java-version: '17'
+          distribution: 'adopt'
+      - name: Copy config
+        run: cp ./server/src/main/resources/application.example.yml ./server/src/main/resources/application.yml
+      - name: Run build
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: build -x test
+
+  test:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up JDK 17
+        uses: actions/setup-java@v2
+        with:
+          java-version: '17'
+          distribution: 'adopt'
+      - name: Copy config
+        run: cp ./server/src/main/resources/application.example.yml ./server/src/main/resources/application.yml
+      - name: Run test
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: test
+      - name: Upload coverage
+        uses: codecov/codecov-action@v2
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./server/build/reports/jacoco/test/jacocoTestReport.xml

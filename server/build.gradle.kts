@@ -8,6 +8,7 @@ plugins {
     jacoco
     kotlin("jvm")
     kotlin("plugin.spring")
+    kotlin("plugin.allopen")
     id("com.diffplug.spotless") version "6.2.1"
 }
 
@@ -52,11 +53,15 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test:2.6.3") {
         exclude(module = "mockito-core")
     }
-    testImplementation("de.flapdoodle.embed:de.flapdoodle.embed.mongo:3.3.1")
+    testRuntimeOnly("de.flapdoodle.embed:de.flapdoodle.embed.mongo:3.3.1")
     testImplementation("org.springframework.amqp:spring-rabbit-test:2.4.2")
     testImplementation("org.springframework.restdocs:spring-restdocs-mockmvc:2.0.6.RELEASE")
     testImplementation("org.springframework.security:spring-security-test:5.5.1")
     testAnnotationProcessor("org.mapstruct:mapstruct-processor:$mapstructVersion")
+}
+
+allOpen {
+    annotation("org.springframework.data.mongodb.core.mapping.Document")
 }
 
 tasks.withType<KotlinCompile> {
@@ -78,7 +83,7 @@ tasks.test {
 tasks.jacocoTestReport {
     dependsOn(tasks.test)
     reports {
-        xml.required.set(false)
+        xml.required.set(true)
         csv.required.set(false)
         html.outputLocation.set(layout.buildDirectory.dir("coverage"))
     }
@@ -87,6 +92,24 @@ tasks.jacocoTestReport {
 tasks.asciidoctor {
     inputs.dir(snippetsDir)
     dependsOn(tasks.test)
+}
+
+tasks.register("installGitHooks") {
+    group = "build setup"
+    description = "Install git hooks"
+    doLast {
+        val gitHooksDir = File(project.rootDir, ".git/hooks")
+        val gitHookFile = File(gitHooksDir, "pre-commit")
+        if (!gitHookFile.exists()) {
+            val gitHook = File(project.rootDir, "scripts/pre-commit.sh")
+            gitHook.copyTo(gitHookFile, true)
+            gitHookFile.setExecutable(true)
+        }
+    }
+}
+
+tasks.named("build") {
+    dependsOn("installGitHooks")
 }
 
 configure<com.diffplug.gradle.spotless.SpotlessExtension> {

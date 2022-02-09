@@ -13,7 +13,7 @@ modelPackage: delta.codecharacter.dtos
 packageName: delta.codecharacter
 reactive: false
 serializableModel: true
-serializationLibrary: moshi
+serializationLibrary: jackson
 serverPort: "8080"
 serviceInterface: false
 serviceImplementation: false
