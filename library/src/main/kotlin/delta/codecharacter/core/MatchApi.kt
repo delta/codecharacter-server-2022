@@ -50,7 +50,10 @@ interface MatchApi {
         consumes = ["application/json"]
     )
     fun createMatch(
-        @ApiParam(value = "") @Valid @RequestBody(required = false) createMatchRequestDto: CreateMatchRequestDto?
+        @ApiParam(
+            value = "",
+            required = true
+        ) @Valid @RequestBody createMatchRequestDto: CreateMatchRequestDto
     ): ResponseEntity<Unit> {
         return ResponseEntity(HttpStatus.NOT_IMPLEMENTED)
     }

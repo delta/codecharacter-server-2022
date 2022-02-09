@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="DB" type="docker-deploy" factoryName="docker-compose.yml" server-name="Docker">
+  <configuration default="false" name="DB &amp; RabbitMQ" type="docker-deploy" factoryName="docker-compose.yml" server-name="Docker">
     <deployment type="docker-compose.yml">
       <settings>
         <option name="buildKitEnabledForCompose" value="true" />
@@ -7,6 +7,7 @@
         <option name="services">
           <list>
             <option value="db" />
+            <option value="rabbitmq" />
           </list>
         </option>
         <option name="sourceFilePath" value="docker-compose.dev.yml" />

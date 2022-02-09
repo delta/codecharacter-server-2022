@@ -12,11 +12,11 @@ class LockedCodeService(
     @Autowired private val lockedCodeRepository: LockedCodeRepository,
 ) {
 
-    fun getLockedCode(userEntity: UserEntity): String {
+    fun getLockedCode(userEntity: UserEntity): Pair<LanguageEnum, String> {
         return lockedCodeRepository
             .findById(userEntity)
-            .orElseThrow { throw Exception("Latest code not found for user ${userEntity.id}") }
-            .code
+            .orElseThrow { throw Exception("Locked code not found for user ${userEntity.id}") }
+            .let { Pair(it.language, it.code) }
     }
 
     fun updateLockedCode(

@@ -1,6 +1,10 @@
 package delta.codecharacter.server
 
 import delta.codecharacter.server.user.UserEntity
+import org.springframework.amqp.rabbit.connection.ConnectionFactory
+import org.springframework.amqp.rabbit.core.RabbitAdmin
+import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContext
@@ -17,7 +21,18 @@ class TestAttributes {
                 username = "user",
                 password = "password",
                 email = "user@test.com",
+                isEnabled = true,
+                isAccountNonExpired = true,
+                isAccountNonLocked = true,
             )
+    }
+}
+
+@Configuration
+class SecurityTestConfiguration {
+    @Bean
+    fun rabbitAdmin(connectionFactory: ConnectionFactory): RabbitAdmin {
+        return RabbitAdmin(connectionFactory)
     }
 }
 

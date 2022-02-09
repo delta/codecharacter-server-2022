@@ -7,11 +7,10 @@ import javax.validation.Valid
 /**
  * Game model
  * @param id
- * @param points1
- * @param points2
+ * @param destruction
+ * @param coinsUsed
  * @param status
  * @param gameVerdict
- * @param map
  */
 data class GameDto(
 
@@ -23,10 +22,13 @@ data class GameDto(
     @field:JsonProperty("id", required = true) val id: java.util.UUID,
 
     @ApiModelProperty(example = "100", required = true, value = "")
-    @field:JsonProperty("points1", required = true) val points1: Int,
+    @field:JsonProperty(
+        "destruction",
+        required = true
+    ) val destruction: java.math.BigDecimal,
 
-    @ApiModelProperty(example = "90", required = true, value = "")
-    @field:JsonProperty("points2", required = true) val points2: Int,
+    @ApiModelProperty(example = "null", required = true, value = "")
+    @field:JsonProperty("coinsUsed", required = true) val coinsUsed: Int,
 
     @field:Valid
     @ApiModelProperty(example = "null", required = true, value = "")
@@ -37,8 +39,5 @@ data class GameDto(
     @field:JsonProperty(
         "gameVerdict",
         required = true
-    ) val gameVerdict: VerdictDto,
-
-    @ApiModelProperty(example = "0000\n0010\n0100\n1000\n", value = "")
-    @field:JsonProperty("map") val map: String? = null
+    ) val gameVerdict: VerdictDto
 )

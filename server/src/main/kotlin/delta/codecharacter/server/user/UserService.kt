@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.stereotype.Service
+import java.util.UUID
 
 @Service
 class UserService : UserDetailsService {
@@ -23,6 +24,15 @@ class UserService : UserDetailsService {
             throw CustomException(HttpStatus.UNAUTHORIZED, "Email not verified")
         } else if (!user.get().isAccountNonExpired) {
             throw CustomException(HttpStatus.UNAUTHORIZED, "Account expired")
+        } else {
+            return user.get()
+        }
+    }
+
+    fun getUserById(id: UUID): UserEntity {
+        val user = userRepository.findById(id)
+        if (user.isEmpty || !user.get().isEnabled || !user.get().isAccountNonExpired) {
+            throw CustomException(HttpStatus.BAD_REQUEST, "User not found")
         } else {
             return user.get()
         }

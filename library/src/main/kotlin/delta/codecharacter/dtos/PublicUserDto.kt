@@ -14,8 +14,12 @@ import io.swagger.annotations.ApiModelProperty
  */
 data class PublicUserDto(
 
-    @ApiModelProperty(example = "1", required = true, value = "")
-    @field:JsonProperty("userId", required = true) val userId: Int,
+    @ApiModelProperty(
+        example = "123e4567-e89b-12d3-a456-426614174003",
+        required = true,
+        value = ""
+    )
+    @field:JsonProperty("userId", required = true) val userId: java.util.UUID,
 
     @ApiModelProperty(example = "test", required = true, value = "")
     @field:JsonProperty(

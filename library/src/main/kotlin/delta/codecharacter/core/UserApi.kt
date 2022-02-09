@@ -57,7 +57,7 @@ interface UserApi {
         @ApiParam(
             value = "ID of the user",
             required = true
-        ) @PathVariable("userId") userId: kotlin.Int,
+        ) @PathVariable("userId") userId: Int,
         @ApiParam(
             value = "",
             required = true
@@ -97,7 +97,7 @@ interface UserApi {
         @ApiParam(
             value = "ID of the user",
             required = true
-        ) @PathVariable("userId") userId: kotlin.Int
+        ) @PathVariable("userId") userId: Int
     ): ResponseEntity<List<RatingHistoryDto>> {
         return ResponseEntity(HttpStatus.NOT_IMPLEMENTED)
     }

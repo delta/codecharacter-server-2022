@@ -27,6 +27,7 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.post
 import java.time.Instant
+import java.time.temporal.ChronoUnit
 import java.util.UUID
 
 @AutoConfigureMockMvc
@@ -75,7 +76,7 @@ internal class CodeControllerIntegrationTest(@Autowired val mockMvc: MockMvc) {
                 language = LanguageEnum.CPP,
                 user = TestAttributes.user,
                 parentRevision = null,
-                createdAt = Instant.now().truncatedTo(java.time.temporal.ChronoUnit.MILLIS)
+                createdAt = Instant.now().truncatedTo(ChronoUnit.MILLIS)
             )
         mongoTemplate.insert<CodeRevisionEntity>(codeRevisionEntity)
 
@@ -103,7 +104,7 @@ internal class CodeControllerIntegrationTest(@Autowired val mockMvc: MockMvc) {
                 user = TestAttributes.user,
                 code = "code",
                 language = LanguageEnum.CPP,
-                lastSavedAt = Instant.now().truncatedTo(java.time.temporal.ChronoUnit.MILLIS)
+                lastSavedAt = Instant.now().truncatedTo(ChronoUnit.MILLIS)
             )
         mongoTemplate.insert<LatestCodeEntity>(latestCodeEntity)
 
@@ -128,7 +129,7 @@ internal class CodeControllerIntegrationTest(@Autowired val mockMvc: MockMvc) {
                 user = TestAttributes.user,
                 code = "#include <iostream>",
                 language = LanguageEnum.CPP,
-                lastSavedAt = Instant.now().truncatedTo(java.time.temporal.ChronoUnit.MILLIS)
+                lastSavedAt = Instant.now().truncatedTo(ChronoUnit.MILLIS)
             )
         mongoTemplate.insert<LatestCodeEntity>(oldCodeEntity)
 
@@ -155,7 +156,7 @@ internal class CodeControllerIntegrationTest(@Autowired val mockMvc: MockMvc) {
                 user = TestAttributes.user,
                 code = "#include <iostream>",
                 language = LanguageEnum.CPP,
-                lastSavedAt = Instant.now().truncatedTo(java.time.temporal.ChronoUnit.MILLIS)
+                lastSavedAt = Instant.now().truncatedTo(ChronoUnit.MILLIS)
             )
         mongoTemplate.insert<LatestCodeEntity>(oldCodeEntity)
 
