@@ -77,6 +77,7 @@ internal class RabbitIntegrationTest(@Autowired val mockMvc: MockMvc) {
                     id = UUID.randomUUID(),
                     userId = TestAttributes.user.id,
                     code = "code",
+                    message = "message",
                     language = LanguageEnum.PYTHON,
                     createdAt = Instant.now(),
                     parentRevision = null
@@ -89,6 +90,7 @@ internal class RabbitIntegrationTest(@Autowired val mockMvc: MockMvc) {
                     id = UUID.randomUUID(),
                     userId = TestAttributes.user.id,
                     map = "map",
+                    message = "message",
                     createdAt = Instant.now(),
                     parentRevision = null
                 )

@@ -19,6 +19,7 @@ import java.util.UUID
 data class MapRevisionEntity(
     @Id val id: UUID,
     val map: String,
+    val message: String,
     @DocumentReference(lazy = true) val parentRevision: MapRevisionEntity?,
     val userId: UUID,
     val createdAt: Instant

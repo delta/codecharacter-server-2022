@@ -47,7 +47,7 @@ internal class GameMapControllerIntegrationTest(@Autowired val mockMvc: MockMvc)
     @WithMockCustomUser
     fun `should create map revision`() {
 
-        val dto = CreateMapRevisionRequestDto(map = "map")
+        val dto = CreateMapRevisionRequestDto(map = "map", message = "message")
 
         mockMvc
             .post("/user/map/revisions") {
@@ -71,6 +71,7 @@ internal class GameMapControllerIntegrationTest(@Autowired val mockMvc: MockMvc)
             MapRevisionEntity(
                 id = UUID.randomUUID(),
                 map = "map",
+                message = "message",
                 userId = TestAttributes.user.id,
                 parentRevision = null,
                 createdAt = Instant.now().truncatedTo(ChronoUnit.MILLIS)
@@ -82,6 +83,7 @@ internal class GameMapControllerIntegrationTest(@Autowired val mockMvc: MockMvc)
                 GameMapRevisionDto(
                     id = mapRevisionEntity.id,
                     map = mapRevisionEntity.map,
+                    message = "message",
                     createdAt = mapRevisionEntity.createdAt
                 )
             )

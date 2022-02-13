@@ -27,6 +27,7 @@ internal class MapRevisionServiceTest {
         val createMapRevisionRequestDto =
             CreateMapRevisionRequestDto(
                 map = "map",
+                message = "message",
             )
         val mapRevisionEntity = mockk<MapRevisionEntity>()
 
@@ -50,6 +51,7 @@ internal class MapRevisionServiceTest {
                 id = UUID.randomUUID(),
                 userId = userId,
                 map = "map",
+                message = "message",
                 parentRevision = null,
                 createdAt = Instant.now(),
             )

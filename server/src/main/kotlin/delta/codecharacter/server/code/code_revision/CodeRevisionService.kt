@@ -14,13 +14,14 @@ import java.util.UUID
 class CodeRevisionService(@Autowired private val codeRevisionRepository: CodeRevisionRepository) {
 
     fun createCodeRevision(userId: UUID, createCodeRevisionRequestDto: CreateCodeRevisionRequestDto) {
-        val (code, language) = createCodeRevisionRequestDto
+        val (code, message, language) = createCodeRevisionRequestDto
         val parentCodeRevision =
             codeRevisionRepository.findFirstByUserIdOrderByCreatedAtDesc(userId).orElse(null)
         codeRevisionRepository.save(
             CodeRevisionEntity(
                 id = UUID.randomUUID(),
                 code = code,
+                message = message,
                 language = LanguageEnum.valueOf(language.name),
                 userId = userId,
                 parentRevision = parentCodeRevision,
@@ -34,6 +35,7 @@ class CodeRevisionService(@Autowired private val codeRevisionRepository: CodeRev
             CodeRevisionDto(
                 id = it.id,
                 code = it.code,
+                message = it.message,
                 language = LanguageDto.valueOf(it.language.name),
                 createdAt = it.createdAt,
                 parentRevision = it.parentRevision?.id

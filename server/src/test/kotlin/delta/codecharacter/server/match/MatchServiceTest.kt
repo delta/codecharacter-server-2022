@@ -96,9 +96,10 @@ internal class MatchServiceTest {
     fun `should throw bad request if code revision doesn't belong to the user`() {
         val userId = UUID.randomUUID()
         val codeRevisionId = UUID.randomUUID()
-        val codeRevision = CodeRevisionDto(codeRevisionId, "code", LanguageDto.CPP, Instant.now())
+        val codeRevision =
+            CodeRevisionDto(codeRevisionId, "code", "message", LanguageDto.CPP, Instant.now())
         val mapRevisionId = UUID.randomUUID()
-        val mapRevision = GameMapRevisionDto(mapRevisionId, "map", Instant.now())
+        val mapRevision = GameMapRevisionDto(mapRevisionId, "map", Instant.now(), "message")
 
         val createMatchRequestDto =
             CreateMatchRequestDto(
@@ -122,9 +123,10 @@ internal class MatchServiceTest {
     fun `should throw bad request if map revision doesn't belong to the user`() {
         val userId = UUID.randomUUID()
         val codeRevisionId = UUID.randomUUID()
-        val codeRevision = CodeRevisionDto(codeRevisionId, "code", LanguageDto.CPP, Instant.now())
+        val codeRevision =
+            CodeRevisionDto(codeRevisionId, "code", "message", LanguageDto.CPP, Instant.now())
         val mapRevisionId = UUID.randomUUID()
-        val mapRevision = GameMapRevisionDto(mapRevisionId, "map", Instant.now())
+        val mapRevision = GameMapRevisionDto(mapRevisionId, "map", Instant.now(), "message")
 
         val createMatchRequestDto =
             CreateMatchRequestDto(
@@ -147,9 +149,10 @@ internal class MatchServiceTest {
     fun `should create self match`() {
         val userId = UUID.randomUUID()
         val codeRevisionId = UUID.randomUUID()
-        val codeRevision = CodeRevisionDto(codeRevisionId, "code", LanguageDto.CPP, Instant.now())
+        val codeRevision =
+            CodeRevisionDto(codeRevisionId, "code", "message", LanguageDto.CPP, Instant.now())
         val mapRevisionId = UUID.randomUUID()
-        val mapRevision = GameMapRevisionDto(mapRevisionId, "map", Instant.now())
+        val mapRevision = GameMapRevisionDto(mapRevisionId, "map", Instant.now(), "message")
         val game = mockk<GameEntity>()
 
         val createMatchRequestDto =

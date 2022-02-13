@@ -1,7 +1,5 @@
 package delta.codecharacter.server.match
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import delta.codecharacter.dtos.CreateMatchRequestDto
 import delta.codecharacter.dtos.GameDto
 import delta.codecharacter.dtos.GameStatusDto
@@ -38,10 +36,8 @@ class MatchService(
     @Autowired private val publicUserService: PublicUserService,
     @Autowired private val verdictAlgorithm: VerdictAlgorithm,
 ) {
-    private var mapper = ObjectMapper().registerKotlinModule()
-
     private fun createSelfMatch(userId: UUID, codeRevisionId: UUID, mapRevisionId: UUID) {
-        val (_, code, language) =
+        val (_, code, _, language) =
             codeRevisionService.getCodeRevisions(userId).find { it.id == codeRevisionId }
                 ?: throw CustomException(HttpStatus.BAD_REQUEST, "Invalid revision ID")
         val map =

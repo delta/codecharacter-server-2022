@@ -21,6 +21,7 @@ import java.util.UUID
 data class CodeRevisionEntity(
     @Id val id: UUID,
     val code: String,
+    val message: String,
     val language: LanguageEnum,
     @DocumentReference(lazy = true) val parentRevision: CodeRevisionEntity?,
     val userId: UUID,

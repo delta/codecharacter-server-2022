@@ -29,6 +29,7 @@ internal class CodeRevisionServiceTest {
         val createCodeRevisionRequestDto =
             CreateCodeRevisionRequestDto(
                 code = "code",
+                message = "message",
                 language = LanguageDto.C,
             )
         val codeRevisionEntity = mockk<CodeRevisionEntity>()
@@ -53,6 +54,7 @@ internal class CodeRevisionServiceTest {
                 id = UUID.randomUUID(),
                 userId = userId,
                 code = "code",
+                message = "message",
                 language = LanguageEnum.C,
                 parentRevision = null,
                 createdAt = Instant.now(),

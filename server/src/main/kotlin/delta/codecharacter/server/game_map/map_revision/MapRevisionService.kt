@@ -12,13 +12,14 @@ import java.util.UUID
 class MapRevisionService(@Autowired private val mapRevisionRepository: MapRevisionRepository) {
 
     fun createMapRevision(userId: UUID, createMapRevisionRequestDto: CreateMapRevisionRequestDto) {
-        val (map) = createMapRevisionRequestDto
+        val (map, message) = createMapRevisionRequestDto
         val parentCodeRevision =
             mapRevisionRepository.findFirstByUserIdOrderByCreatedAtDesc(userId).orElse(null)
         mapRevisionRepository.save(
             MapRevisionEntity(
                 id = UUID.randomUUID(),
                 map = map,
+                message = message,
                 userId = userId,
                 parentRevision = parentCodeRevision,
                 createdAt = Instant.now()
@@ -31,6 +32,7 @@ class MapRevisionService(@Autowired private val mapRevisionRepository: MapRevisi
             GameMapRevisionDto(
                 id = it.id,
                 map = it.map,
+                message = it.message,
                 parentRevision = it.parentRevision?.id,
                 createdAt = it.createdAt
             )

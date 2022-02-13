@@ -48,7 +48,8 @@ internal class CodeControllerIntegrationTest(@Autowired val mockMvc: MockMvc) {
     @WithMockCustomUser
     fun `should create code revision`() {
 
-        val dto = CreateCodeRevisionRequestDto(code = "code", language = LanguageDto.CPP)
+        val dto =
+            CreateCodeRevisionRequestDto(code = "code", message = "message", language = LanguageDto.CPP)
 
         mockMvc
             .post("/user/code/revisions") {
@@ -73,6 +74,7 @@ internal class CodeControllerIntegrationTest(@Autowired val mockMvc: MockMvc) {
             CodeRevisionEntity(
                 id = UUID.randomUUID(),
                 code = "code",
+                message = "message",
                 language = LanguageEnum.CPP,
                 userId = TestAttributes.user.id,
                 parentRevision = null,
@@ -85,6 +87,7 @@ internal class CodeControllerIntegrationTest(@Autowired val mockMvc: MockMvc) {
                 CodeRevisionDto(
                     id = codeRevisionEntity.id,
                     code = codeRevisionEntity.code,
+                    message = codeRevisionEntity.message,
                     language = LanguageDto.CPP,
                     createdAt = codeRevisionEntity.createdAt
                 )
