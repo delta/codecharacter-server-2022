@@ -1,6 +1,5 @@
 package delta.codecharacter.server.game_map.map_revision
 
-import delta.codecharacter.server.user.UserEntity
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
 import org.springframework.data.mongodb.core.mapping.DocumentReference
@@ -13,7 +12,7 @@ import java.util.UUID
  * @param id
  * @param map
  * @param parentRevision
- * @param user
+ * @param userId
  * @param createdAt
  */
 @Document(collection = "map_revision")
@@ -21,6 +20,6 @@ data class MapRevisionEntity(
     @Id val id: UUID,
     val map: String,
     @DocumentReference(lazy = true) val parentRevision: MapRevisionEntity?,
-    @DocumentReference(lazy = true) val user: UserEntity,
+    val userId: UUID,
     val createdAt: Instant
 )

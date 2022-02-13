@@ -39,7 +39,7 @@ internal class GameControllerIntegrationTest(@Autowired val mockMvc: MockMvc) {
         val gameEntity =
             GameEntity(
                 id = UUID.randomUUID(),
-                destruction = 100F,
+                destruction = 100.0,
                 coinsUsed = 100,
                 status = GameStatusEnum.EXECUTED,
                 verdict = GameVerdictEnum.TIE,

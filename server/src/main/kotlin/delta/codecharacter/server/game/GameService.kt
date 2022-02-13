@@ -7,7 +7,6 @@ import delta.codecharacter.server.exception.CustomException
 import delta.codecharacter.server.game.queue.entities.GameRequestEntity
 import delta.codecharacter.server.game.queue.entities.GameStatusUpdateEntity
 import delta.codecharacter.server.params.GameParameters
-import org.springframework.amqp.rabbit.annotation.RabbitListener
 import org.springframework.amqp.rabbit.core.RabbitTemplate
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
@@ -33,7 +32,7 @@ class GameService(
             GameEntity(
                 id = UUID.randomUUID(),
                 coinsUsed = 0,
-                destruction = 0.0F,
+                destruction = 0.0,
                 verdict = GameVerdictEnum.TIE,
                 status = GameStatusEnum.IDLE,
                 matchId = matchId,
@@ -53,23 +52,22 @@ class GameService(
         rabbitTemplate.convertAndSend("gameRequestQueue", mapper.writeValueAsString(gameRequest))
     }
 
-    @RabbitListener(queues = ["gameStatusUpdateQueue"], ackMode = "AUTO")
-    fun receiveGameResult(gameStatusUpdate: String) {
+    fun updateGameStatus(gameStatusUpdateJson: String): GameEntity {
         val gameStatusUpdateEntity =
-            mapper.readValue(gameStatusUpdate, GameStatusUpdateEntity::class.java)
+            mapper.readValue(gameStatusUpdateJson, GameStatusUpdateEntity::class.java)
+
         val oldGameEntity =
             gameRepository.findById(gameStatusUpdateEntity.gameId).orElseThrow {
                 throw CustomException(HttpStatus.NOT_FOUND, "Game not found")
             }
         if (gameStatusUpdateEntity.gameResult == null) {
             val newGameEntity = oldGameEntity.copy(status = gameStatusUpdateEntity.gameStatus)
-            gameRepository.save(newGameEntity)
-            return
+            return gameRepository.save(newGameEntity)
         }
 
         val gameResult = gameStatusUpdateEntity.gameResult
 
-        val (_, destructionPercentage, coinsUsed) = gameResult
+        val (destructionPercentage, coinsUsed) = gameResult
         val winner =
             if (destructionPercentage > 50F) {
                 GameVerdictEnum.PLAYER1
@@ -92,6 +90,6 @@ class GameService(
                 verdict = winner,
                 status = gameStatus
             )
-        gameRepository.save(newGameEntity)
+        return gameRepository.save(newGameEntity)
     }
 }

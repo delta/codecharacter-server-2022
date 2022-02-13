@@ -1,7 +1,7 @@
 package delta.codecharacter.server.match
 
 import delta.codecharacter.server.game.GameEntity
-import delta.codecharacter.server.user.UserEntity
+import delta.codecharacter.server.user.public_user.PublicUserEntity
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
 import org.springframework.data.mongodb.core.mapping.DocumentReference
@@ -16,6 +16,6 @@ data class MatchEntity(
     val verdict: MatchVerdictEnum,
     val createdAt: Instant,
     val totalPoints: Int,
-    @DocumentReference(lazy = true) val player1: UserEntity,
-    @DocumentReference(lazy = true) val player2: UserEntity,
+    @DocumentReference(lazy = true) val player1: PublicUserEntity,
+    @DocumentReference(lazy = true) val player2: PublicUserEntity,
 )

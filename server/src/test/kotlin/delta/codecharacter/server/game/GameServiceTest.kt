@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import delta.codecharacter.server.code.LanguageEnum
 import delta.codecharacter.server.exception.CustomException
 import delta.codecharacter.server.game.queue.entities.GameRequestEntity
+import delta.codecharacter.server.game.queue.entities.GameResultEntity
+import delta.codecharacter.server.game.queue.entities.GameStatusUpdateEntity
 import delta.codecharacter.server.params.GameConfiguration
 import delta.codecharacter.server.params.GameParameters
 import io.mockk.confirmVerified
@@ -28,8 +30,8 @@ internal class GameServiceTest {
 
     @BeforeEach
     fun setUp() {
-        gameRepository = mockk()
-        rabbitTemplate = mockk()
+        gameRepository = mockk(relaxed = true)
+        rabbitTemplate = mockk(relaxed = true)
         mapper = ObjectMapper()
         val gameConfiguration = GameConfiguration()
         gameParameters = gameConfiguration.gameParameters()
@@ -109,5 +111,108 @@ internal class GameServiceTest {
             )
         }
         confirmVerified(rabbitTemplate)
+    }
+
+    @Test
+    fun `should receive game status update`() {
+        val game =
+            GameEntity(
+                id = UUID.randomUUID(),
+                coinsUsed = 0,
+                destruction = 0.0,
+                status = GameStatusEnum.IDLE,
+                verdict = GameVerdictEnum.TIE,
+                matchId = UUID.randomUUID(),
+            )
+        val gameStatusUpdate =
+            GameStatusUpdateEntity(
+                gameId = game.id,
+                gameStatus = GameStatusEnum.EXECUTING,
+                gameResult = null,
+            )
+
+        every { gameRepository.findById(game.id) } returns Optional.of(game)
+        every {
+            gameRepository.save(
+                GameEntity(
+                    game.id,
+                    game.coinsUsed,
+                    game.destruction,
+                    GameStatusEnum.EXECUTING,
+                    game.verdict,
+                    game.matchId
+                )
+            )
+        } returns mockk()
+
+        gameService.updateGameStatus(mapper.writeValueAsString(gameStatusUpdate))
+
+        verify { gameRepository.findById(game.id) }
+        verify {
+            gameRepository.save(
+                GameEntity(
+                    game.id,
+                    game.coinsUsed,
+                    game.destruction,
+                    GameStatusEnum.EXECUTING,
+                    game.verdict,
+                    game.matchId
+                )
+            )
+        }
+        confirmVerified(gameRepository)
+    }
+
+    @Test
+    fun `should receive game status update with result`() {
+        val game =
+            GameEntity(
+                id = UUID.randomUUID(),
+                coinsUsed = 0,
+                destruction = 0.0,
+                status = GameStatusEnum.IDLE,
+                verdict = GameVerdictEnum.TIE,
+                matchId = UUID.randomUUID(),
+            )
+        val gameStatusUpdate =
+            GameStatusUpdateEntity(
+                gameId = game.id,
+                gameStatus = GameStatusEnum.EXECUTED,
+                gameResult =
+                GameResultEntity(
+                    coinsUsed = 0, destructionPercentage = 0.0, hasErrors = false, log = "log"
+                ),
+            )
+
+        every { gameRepository.findById(game.id) } returns Optional.of(game)
+        every {
+            gameRepository.save(
+                GameEntity(
+                    game.id,
+                    gameStatusUpdate.gameResult!!.coinsUsed,
+                    gameStatusUpdate.gameResult!!.destructionPercentage,
+                    GameStatusEnum.EXECUTED,
+                    GameVerdictEnum.PLAYER2,
+                    game.matchId
+                )
+            )
+        } returns mockk()
+
+        gameService.updateGameStatus(mapper.writeValueAsString(gameStatusUpdate))
+
+        verify { gameRepository.findById(game.id) }
+        verify {
+            gameRepository.save(
+                GameEntity(
+                    game.id,
+                    gameStatusUpdate.gameResult!!.coinsUsed,
+                    gameStatusUpdate.gameResult!!.destructionPercentage,
+                    GameStatusEnum.EXECUTED,
+                    GameVerdictEnum.PLAYER2,
+                    game.matchId
+                )
+            )
+        }
+        confirmVerified(gameRepository)
     }
 }

@@ -1,7 +1,6 @@
 package delta.codecharacter.server.game_map.latest_map
 
 import delta.codecharacter.dtos.UpdateLatestMapRequestDto
-import delta.codecharacter.server.user.UserEntity
 import io.mockk.confirmVerified
 import io.mockk.every
 import io.mockk.mockk
@@ -11,6 +10,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.Instant
 import java.util.Optional
+import java.util.UUID
 
 internal class LatestMapServiceTest {
     private lateinit var latestMapRepository: LatestMapRepository
@@ -24,27 +24,29 @@ internal class LatestMapServiceTest {
 
     @Test
     fun `should return latest map`() {
-        val user = mockk<UserEntity>()
-        val latestMapEntity = LatestMapEntity(map = "[[0]]", user = user, lastSavedAt = Instant.now())
+        val userId = UUID.randomUUID()
+        val latestMapEntity =
+            LatestMapEntity(map = "[[0]]", userId = userId, lastSavedAt = Instant.now())
 
-        every { latestMapRepository.findById(user) } returns Optional.of(latestMapEntity)
+        every { latestMapRepository.findById(userId) } returns Optional.of(latestMapEntity)
 
-        val latestMap = latestMapService.getLatestMap(user)
+        val latestMap = latestMapService.getLatestMap(userId)
 
-        verify { latestMapRepository.findById(user) }
+        verify { latestMapRepository.findById(userId) }
         confirmVerified(latestMapRepository)
         assertNotNull(latestMap)
     }
 
     @Test
     fun `should update latest map`() {
-        val user = mockk<UserEntity>()
-        val latestMapEntity = LatestMapEntity(map = "[[0]]", user = user, lastSavedAt = Instant.now())
+        val userId = UUID.randomUUID()
+        val latestMapEntity =
+            LatestMapEntity(map = "[[0]]", userId = userId, lastSavedAt = Instant.now())
         val mapDto = UpdateLatestMapRequestDto(map = latestMapEntity.map)
 
         every { latestMapRepository.save(any()) } returns latestMapEntity
 
-        latestMapService.updateLatestMap(user, mapDto)
+        latestMapService.updateLatestMap(userId, mapDto)
 
         verify { latestMapRepository.save(any()) }
         confirmVerified(latestMapRepository)

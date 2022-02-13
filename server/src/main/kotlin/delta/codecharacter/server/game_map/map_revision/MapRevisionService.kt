@@ -2,7 +2,6 @@ package delta.codecharacter.server.game_map.map_revision
 
 import delta.codecharacter.dtos.CreateMapRevisionRequestDto
 import delta.codecharacter.dtos.GameMapRevisionDto
-import delta.codecharacter.server.user.UserEntity
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.time.Instant
@@ -12,26 +11,23 @@ import java.util.UUID
 @Service
 class MapRevisionService(@Autowired private val mapRevisionRepository: MapRevisionRepository) {
 
-    fun createMapRevision(
-        userEntity: UserEntity,
-        createMapRevisionRequestDto: CreateMapRevisionRequestDto
-    ) {
+    fun createMapRevision(userId: UUID, createMapRevisionRequestDto: CreateMapRevisionRequestDto) {
         val (map) = createMapRevisionRequestDto
         val parentCodeRevision =
-            mapRevisionRepository.findFirstByUserOrderByCreatedAtDesc(userEntity).orElse(null)
+            mapRevisionRepository.findFirstByUserIdOrderByCreatedAtDesc(userId).orElse(null)
         mapRevisionRepository.save(
             MapRevisionEntity(
                 id = UUID.randomUUID(),
                 map = map,
-                user = userEntity,
+                userId = userId,
                 parentRevision = parentCodeRevision,
                 createdAt = Instant.now()
             )
         )
     }
 
-    fun getMapRevisions(userEntity: UserEntity): List<GameMapRevisionDto> {
-        return mapRevisionRepository.findAllByUserOrderByCreatedAtDesc(userEntity).map {
+    fun getMapRevisions(userId: UUID): List<GameMapRevisionDto> {
+        return mapRevisionRepository.findAllByUserIdOrderByCreatedAtDesc(userId).map {
             GameMapRevisionDto(
                 id = it.id,
                 map = it.map,

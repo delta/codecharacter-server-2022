@@ -61,7 +61,7 @@ internal class GameMapControllerIntegrationTest(@Autowired val mockMvc: MockMvc)
 
         val mapRevision = mapRevisions.first()
         assert(mapRevision.map == dto.map)
-        assert(mapRevision.user.id == TestAttributes.user.id)
+        assert(mapRevision.userId == TestAttributes.user.id)
     }
 
     @Test
@@ -71,7 +71,7 @@ internal class GameMapControllerIntegrationTest(@Autowired val mockMvc: MockMvc)
             MapRevisionEntity(
                 id = UUID.randomUUID(),
                 map = "map",
-                user = TestAttributes.user,
+                userId = TestAttributes.user.id,
                 parentRevision = null,
                 createdAt = Instant.now().truncatedTo(ChronoUnit.MILLIS)
             )
@@ -97,7 +97,7 @@ internal class GameMapControllerIntegrationTest(@Autowired val mockMvc: MockMvc)
     fun `should get latest map`() {
         val latestMapEntity =
             LatestMapEntity(
-                user = TestAttributes.user,
+                userId = TestAttributes.user.id,
                 map = "map",
                 lastSavedAt = Instant.now().truncatedTo(ChronoUnit.MILLIS)
             )
@@ -117,7 +117,7 @@ internal class GameMapControllerIntegrationTest(@Autowired val mockMvc: MockMvc)
     fun `should update latest map`() {
         val oldMapEntity =
             LatestMapEntity(
-                user = TestAttributes.user,
+                userId = TestAttributes.user.id,
                 map = "[[0]]",
                 lastSavedAt = Instant.now().truncatedTo(ChronoUnit.MILLIS)
             )
@@ -142,7 +142,7 @@ internal class GameMapControllerIntegrationTest(@Autowired val mockMvc: MockMvc)
     fun `should update latest map with lock`() {
         val oldMapEntity =
             LatestMapEntity(
-                user = TestAttributes.user,
+                userId = TestAttributes.user.id,
                 map = "[[0]]",
                 lastSavedAt = Instant.now().truncatedTo(ChronoUnit.MILLIS)
             )

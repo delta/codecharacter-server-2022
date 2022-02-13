@@ -22,17 +22,18 @@ class MatchController(@Autowired private val matchService: MatchService) : Match
             throw CustomException(HttpStatus.BAD_REQUEST, "Users cannot create auto match")
         }
         val user = SecurityContextHolder.getContext().authentication.principal as UserEntity
-        matchService.createMatch(user, createMatchRequestDto)
+        matchService.createMatch(user.id, createMatchRequestDto)
         return ResponseEntity.ok().build()
     }
 
     @Secured("ROLE_USER")
     override fun getTopMatches(): ResponseEntity<List<MatchDto>> {
-        TODO("Not yet implemented: Waiting for user API")
+        return ResponseEntity.ok(matchService.getTopMatches())
     }
 
     @Secured("ROLE_USER")
     override fun getUserMatches(): ResponseEntity<List<MatchDto>> {
-        TODO("Not yet implemented: Waiting for user API")
+        val user = SecurityContextHolder.getContext().authentication.principal as UserEntity
+        return ResponseEntity.ok(matchService.getUserMatches(user.id))
     }
 }

@@ -27,20 +27,20 @@ class GameMapController(
         createMapRevisionRequestDto: CreateMapRevisionRequestDto
     ): ResponseEntity<Unit> {
         val user = SecurityContextHolder.getContext().authentication.principal as UserEntity
-        mapRevisionService.createMapRevision(user, createMapRevisionRequestDto)
+        mapRevisionService.createMapRevision(user.id, createMapRevisionRequestDto)
         return ResponseEntity.ok().build()
     }
 
     @Secured(value = ["ROLE_USER"])
     override fun getMapRevisions(): ResponseEntity<List<GameMapRevisionDto>> {
         val user = SecurityContextHolder.getContext().authentication.principal as UserEntity
-        return ResponseEntity.ok(mapRevisionService.getMapRevisions(user))
+        return ResponseEntity.ok(mapRevisionService.getMapRevisions(user.id))
     }
 
     @Secured(value = ["ROLE_USER"])
     override fun getLatestMap(): ResponseEntity<GameMapDto> {
         val user = SecurityContextHolder.getContext().authentication.principal as UserEntity
-        return ResponseEntity.ok(latestMapService.getLatestMap(user))
+        return ResponseEntity.ok(latestMapService.getLatestMap(user.id))
     }
 
     @Secured(value = ["ROLE_USER"])
@@ -48,9 +48,9 @@ class GameMapController(
         updateLatestMapRequestDto: UpdateLatestMapRequestDto
     ): ResponseEntity<Unit> {
         val user = SecurityContextHolder.getContext().authentication.principal as UserEntity
-        latestMapService.updateLatestMap(user, updateLatestMapRequestDto)
+        latestMapService.updateLatestMap(user.id, updateLatestMapRequestDto)
         if (updateLatestMapRequestDto.lock == true) {
-            lockedMapService.updateLockedMap(user, updateLatestMapRequestDto)
+            lockedMapService.updateLockedMap(user.id, updateLatestMapRequestDto)
         }
         return ResponseEntity.ok().build()
     }

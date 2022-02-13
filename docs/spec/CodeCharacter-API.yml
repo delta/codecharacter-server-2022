@@ -353,6 +353,174 @@ paths:
                         country: IN
                         college: NIT Trichy
                         avatarId: 0
+                    - id: 497f6eca-6276-4993-bfeb-53cbbbba6f09
+                      games:
+                        - id: 497f6eca-6276-4993-bfeb-53cbbbba6f08
+                          coinsUsed: 100
+                          destruction: 45
+                          status: IDLE
+                          gameVerdict: PLAYER1
+                      matchMode: SELF
+                      matchVerdict: PLAYER1
+                      createdAt: '2019-08-24T14:15:22Z'
+                      user1:
+                        userId: 123e4567-e89b-12d3-a456-426614174001
+                        username: testUser
+                        name: Test User
+                        country: IN
+                        college: NIT Trichy
+                        avatarId: 0
+                      user2:
+                        userId: 123e4567-e89b-12d3-a456-426614174002
+                        username: testUser
+                        name: Test User
+                        country: IN
+                        college: NIT Trichy
+                        avatarId: 0
+                    - id: 497f6eca-6276-4993-bfeb-53cbbbba6f07
+                      games:
+                        - id: 497f6eca-6276-4993-bfeb-53cbbbba6f08
+                          coinsUsed: 100
+                          destruction: 45
+                          status: IDLE
+                          gameVerdict: PLAYER1
+                      matchMode: SELF
+                      matchVerdict: PLAYER1
+                      createdAt: '2019-08-24T14:15:22Z'
+                      user1:
+                        userId: 123e4567-e89b-12d3-a456-426614174001
+                        username: testUser
+                        name: Test User
+                        country: IN
+                        college: NIT Trichy
+                        avatarId: 0
+                      user2:
+                        userId: 123e4567-e89b-12d3-a456-426614174002
+                        username: testUser
+                        name: Test User
+                        country: IN
+                        college: NIT Trichy
+                        avatarId: 0
+                    - id: 497f6eca-6276-4993-bfeb-53cbbbba6f06
+                      games:
+                        - id: 497f6eca-6276-4993-bfeb-53cbbbba6f08
+                          coinsUsed: 100
+                          destruction: 45
+                          status: IDLE
+                          gameVerdict: PLAYER1
+                      matchMode: SELF
+                      matchVerdict: PLAYER1
+                      createdAt: '2019-08-24T14:15:22Z'
+                      user1:
+                        userId: 123e4567-e89b-12d3-a456-426614174001
+                        username: testUser
+                        name: Test User
+                        country: IN
+                        college: NIT Trichy
+                        avatarId: 0
+                      user2:
+                        userId: 123e4567-e89b-12d3-a456-426614174002
+                        username: testUser
+                        name: Test User
+                        country: IN
+                        college: NIT Trichy
+                        avatarId: 0
+                    - id: 497f6eca-6276-4993-bfeb-53cbbbba6f05
+                      games:
+                        - id: 497f6eca-6276-4993-bfeb-53cbbbba6f08
+                          coinsUsed: 100
+                          destruction: 45
+                          status: IDLE
+                          gameVerdict: PLAYER1
+                      matchMode: SELF
+                      matchVerdict: PLAYER1
+                      createdAt: '2019-08-24T14:15:22Z'
+                      user1:
+                        userId: 123e4567-e89b-12d3-a456-426614174001
+                        username: testUser
+                        name: Test User
+                        country: IN
+                        college: NIT Trichy
+                        avatarId: 0
+                      user2:
+                        userId: 123e4567-e89b-12d3-a456-426614174002
+                        username: testUser
+                        name: Test User
+                        country: IN
+                        college: NIT Trichy
+                        avatarId: 0
+                    - id: 497f6eca-6276-4993-bfeb-53cbbbba6f04
+                      games:
+                        - id: 497f6eca-6276-4993-bfeb-53cbbbba6f08
+                          coinsUsed: 100
+                          destruction: 45
+                          status: IDLE
+                          gameVerdict: PLAYER1
+                      matchMode: SELF
+                      matchVerdict: PLAYER1
+                      createdAt: '2019-08-24T14:15:22Z'
+                      user1:
+                        userId: 123e4567-e89b-12d3-a456-426614174001
+                        username: testUser
+                        name: Test User
+                        country: IN
+                        college: NIT Trichy
+                        avatarId: 0
+                      user2:
+                        userId: 123e4567-e89b-12d3-a456-426614174002
+                        username: testUser
+                        name: Test User
+                        country: IN
+                        college: NIT Trichy
+                        avatarId: 0
+                    - id: 497f6eca-6276-4993-bfeb-53cbbbba6f03
+                      games:
+                        - id: 497f6eca-6276-4993-bfeb-53cbbbba6f08
+                          coinsUsed: 100
+                          destruction: 45
+                          status: IDLE
+                          gameVerdict: PLAYER1
+                      matchMode: SELF
+                      matchVerdict: PLAYER1
+                      createdAt: '2019-08-24T14:15:22Z'
+                      user1:
+                        userId: 123e4567-e89b-12d3-a456-426614174001
+                        username: testUser
+                        name: Test User
+                        country: IN
+                        college: NIT Trichy
+                        avatarId: 0
+                      user2:
+                        userId: 123e4567-e89b-12d3-a456-426614174002
+                        username: testUser
+                        name: Test User
+                        country: IN
+                        college: NIT Trichy
+                        avatarId: 0
+                    - id: 497f6eca-6276-4993-bfeb-53cbbbba6f02
+                      games:
+                        - id: 497f6eca-6276-4993-bfeb-53cbbbba6f08
+                          coinsUsed: 100
+                          destruction: 45
+                          status: IDLE
+                          gameVerdict: PLAYER1
+                      matchMode: SELF
+                      matchVerdict: PLAYER1
+                      createdAt: '2019-08-24T14:15:22Z'
+                      user1:
+                        userId: 123e4567-e89b-12d3-a456-426614174001
+                        username: testUser
+                        name: Test User
+                        country: IN
+                        college: NIT Trichy
+                        avatarId: 0
+                      user2:
+                        userId: 123e4567-e89b-12d3-a456-426614174002
+                        username: testUser
+                        name: Test User
+                        country: IN
+                        college: NIT Trichy
+                        avatarId: 0
         '401':
           description: Unauthorized
       operationId: getTopMatches
@@ -688,6 +856,18 @@ paths:
                       parentRevision: 123e4567-e89b-12d3-a456-426614174113
                       createdAt: '2019-08-24T14:15:22Z'
                     - id: 123e4567-e89b-12d3-a456-426614174003
+                      map: 0000\n0010\n0100\n1000\n\n1003
+                      parentRevision: 123e4567-e89b-12d3-a456-426614174114
+                      createdAt: '2019-08-24T14:15:22Z'
+                    - id: 123e4567-e89b-12d3-a456-426614174004
+                      map: 0000\n0010\n0100\n1000\n\n1001
+                      parentRevision: 123e4567-e89b-12d3-a456-426614174112
+                      createdAt: '2019-08-24T14:15:22Z'
+                    - id: 123e4567-e89b-12d3-a456-426614174005
+                      map: 0000\n0010\n0100\n1000\n\n1002
+                      parentRevision: 123e4567-e89b-12d3-a456-426614174113
+                      createdAt: '2019-08-24T14:15:22Z'
+                    - id: 123e4567-e89b-12d3-a456-426614174006
                       map: 0000\n0010\n0100\n1000\n\n1003
                       parentRevision: 123e4567-e89b-12d3-a456-426614174114
                       createdAt: '2019-08-24T14:15:22Z'
@@ -1611,8 +1791,9 @@ components:
       in: path
       required: true
       schema:
-        type: integer
-        example: 1
+        type: string
+        format: uuid
+        example: 123e4567-e89b-12d3-a456-426614174002
       description: ID of the user
     gameId:
       name: gameId

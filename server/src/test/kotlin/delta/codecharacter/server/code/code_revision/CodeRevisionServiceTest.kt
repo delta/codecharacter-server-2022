@@ -3,7 +3,6 @@ package delta.codecharacter.server.code.code_revision
 import delta.codecharacter.dtos.CreateCodeRevisionRequestDto
 import delta.codecharacter.dtos.LanguageDto
 import delta.codecharacter.server.code.LanguageEnum
-import delta.codecharacter.server.user.UserEntity
 import io.mockk.confirmVerified
 import io.mockk.every
 import io.mockk.mockk
@@ -26,7 +25,7 @@ internal class CodeRevisionServiceTest {
 
     @Test
     fun `should create code revision`() {
-        val user = mockk<UserEntity>()
+        val userId = UUID.randomUUID()
         val createCodeRevisionRequestDto =
             CreateCodeRevisionRequestDto(
                 code = "code",
@@ -34,13 +33,13 @@ internal class CodeRevisionServiceTest {
             )
         val codeRevisionEntity = mockk<CodeRevisionEntity>()
 
-        every { codeRevisionRepository.findFirstByUserOrderByCreatedAtDesc(user) } returns
+        every { codeRevisionRepository.findFirstByUserIdOrderByCreatedAtDesc(userId) } returns
             Optional.of(codeRevisionEntity)
         every { codeRevisionRepository.save(any()) } returns codeRevisionEntity
 
-        codeRevisionService.createCodeRevision(user, createCodeRevisionRequestDto)
+        codeRevisionService.createCodeRevision(userId, createCodeRevisionRequestDto)
 
-        verify { codeRevisionRepository.findFirstByUserOrderByCreatedAtDesc(user) }
+        verify { codeRevisionRepository.findFirstByUserIdOrderByCreatedAtDesc(userId) }
         verify { codeRevisionRepository.save(any()) }
 
         confirmVerified(codeRevisionRepository)
@@ -48,24 +47,24 @@ internal class CodeRevisionServiceTest {
 
     @Test
     fun `should get all code revisions`() {
-        val user = mockk<UserEntity>()
+        val userId = UUID.randomUUID()
         val codeRevisionEntity =
             CodeRevisionEntity(
                 id = UUID.randomUUID(),
-                user = user,
+                userId = userId,
                 code = "code",
                 language = LanguageEnum.C,
                 parentRevision = null,
                 createdAt = Instant.now(),
             )
 
-        every { codeRevisionRepository.findAllByUserOrderByCreatedAtDesc(user) } returns
+        every { codeRevisionRepository.findAllByUserIdOrderByCreatedAtDesc(userId) } returns
             listOf(codeRevisionEntity)
 
-        val codeRevisionDtos = codeRevisionService.getCodeRevisions(user)
+        val codeRevisionDtos = codeRevisionService.getCodeRevisions(userId)
         val codeRevisionDto = codeRevisionDtos.first()
 
-        verify { codeRevisionRepository.findAllByUserOrderByCreatedAtDesc(user) }
+        verify { codeRevisionRepository.findAllByUserIdOrderByCreatedAtDesc(userId) }
 
         confirmVerified(codeRevisionRepository)
         assert(codeRevisionDtos.size == 1)

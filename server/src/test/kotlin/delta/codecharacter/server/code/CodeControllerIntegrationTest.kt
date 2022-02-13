@@ -63,7 +63,7 @@ internal class CodeControllerIntegrationTest(@Autowired val mockMvc: MockMvc) {
         val codeRevision = codeRevisions.first()
         assert(codeRevision.code == dto.code)
         assert(codeRevision.language == LanguageEnum.valueOf(dto.language.name))
-        assert(codeRevision.user.id == TestAttributes.user.id)
+        assert(codeRevision.userId == TestAttributes.user.id)
     }
 
     @Test
@@ -74,7 +74,7 @@ internal class CodeControllerIntegrationTest(@Autowired val mockMvc: MockMvc) {
                 id = UUID.randomUUID(),
                 code = "code",
                 language = LanguageEnum.CPP,
-                user = TestAttributes.user,
+                userId = TestAttributes.user.id,
                 parentRevision = null,
                 createdAt = Instant.now().truncatedTo(ChronoUnit.MILLIS)
             )
@@ -101,7 +101,7 @@ internal class CodeControllerIntegrationTest(@Autowired val mockMvc: MockMvc) {
     fun `should get latest code`() {
         val latestCodeEntity =
             LatestCodeEntity(
-                user = TestAttributes.user,
+                userId = TestAttributes.user.id,
                 code = "code",
                 language = LanguageEnum.CPP,
                 lastSavedAt = Instant.now().truncatedTo(ChronoUnit.MILLIS)
@@ -126,7 +126,7 @@ internal class CodeControllerIntegrationTest(@Autowired val mockMvc: MockMvc) {
     fun `should update latest code`() {
         val oldCodeEntity =
             LatestCodeEntity(
-                user = TestAttributes.user,
+                userId = TestAttributes.user.id,
                 code = "#include <iostream>",
                 language = LanguageEnum.CPP,
                 lastSavedAt = Instant.now().truncatedTo(ChronoUnit.MILLIS)
@@ -153,7 +153,7 @@ internal class CodeControllerIntegrationTest(@Autowired val mockMvc: MockMvc) {
     fun `should update latest code with lock`() {
         val oldCodeEntity =
             LatestCodeEntity(
-                user = TestAttributes.user,
+                userId = TestAttributes.user.id,
                 code = "#include <iostream>",
                 language = LanguageEnum.CPP,
                 lastSavedAt = Instant.now().truncatedTo(ChronoUnit.MILLIS)

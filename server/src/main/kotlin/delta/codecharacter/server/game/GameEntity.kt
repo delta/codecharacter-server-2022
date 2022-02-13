@@ -8,7 +8,7 @@ import java.util.UUID
 data class GameEntity(
     @Id val id: UUID,
     val coinsUsed: Int,
-    val destruction: Float,
+    val destruction: Double,
     val status: GameStatusEnum,
     val verdict: GameVerdictEnum,
     val matchId: UUID

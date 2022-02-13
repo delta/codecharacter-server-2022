@@ -1,6 +1,7 @@
 package delta.codecharacter.server
 
 import delta.codecharacter.server.user.UserEntity
+import delta.codecharacter.server.user.public_user.PublicUserEntity
 import org.springframework.amqp.rabbit.connection.ConnectionFactory
 import org.springframework.amqp.rabbit.core.RabbitAdmin
 import org.springframework.context.annotation.Bean
@@ -24,6 +25,19 @@ class TestAttributes {
                 isEnabled = true,
                 isAccountNonExpired = true,
                 isAccountNonLocked = true,
+            )
+        val publicUser =
+            PublicUserEntity(
+                userId = user.id,
+                username = user.username,
+                name = "Test User",
+                country = "Test Country",
+                college = "Test College",
+                avatarId = 1,
+                rating = 1000.0,
+                wins = 4,
+                losses = 2,
+                ties = 1,
             )
     }
 }
