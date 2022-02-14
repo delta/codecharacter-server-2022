@@ -19,6 +19,7 @@ import io.mockk.confirmVerified
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
@@ -73,8 +74,8 @@ internal class MatchServiceTest {
 
         val exception =
             assertThrows<CustomException> { matchService.createMatch(mockk(), createMatchRequestDto) }
-        assert(exception.status == HttpStatus.BAD_REQUEST)
-        assert(exception.message == "Revision IDs are required for self match")
+        assertThat(exception.status).isEqualTo(HttpStatus.BAD_REQUEST)
+        assertThat(exception.message).isEqualTo("Revision IDs are required for self match")
     }
 
     @Test
@@ -87,8 +88,8 @@ internal class MatchServiceTest {
 
         val exception =
             assertThrows<CustomException> { matchService.createMatch(mockk(), createMatchRequestDto) }
-        assert(exception.status == HttpStatus.BAD_REQUEST)
-        assert(exception.message == "Revision IDs are required for self match")
+        assertThat(exception.status).isEqualTo(HttpStatus.BAD_REQUEST)
+        assertThat(exception.message).isEqualTo("Revision IDs are required for self match")
     }
 
     @Test
@@ -114,8 +115,8 @@ internal class MatchServiceTest {
         val exception =
             assertThrows<CustomException> { matchService.createMatch(userId, createMatchRequestDto) }
 
-        assert(exception.status == HttpStatus.BAD_REQUEST)
-        assert(exception.message == "Invalid revision ID")
+        assertThat(exception.status).isEqualTo(HttpStatus.BAD_REQUEST)
+        assertThat(exception.message).isEqualTo("Invalid revision ID")
     }
 
     @Test
@@ -141,8 +142,8 @@ internal class MatchServiceTest {
         val exception =
             assertThrows<CustomException> { matchService.createMatch(userId, createMatchRequestDto) }
 
-        assert(exception.status == HttpStatus.BAD_REQUEST)
-        assert(exception.message == "Invalid revision ID")
+        assertThat(exception.status).isEqualTo(HttpStatus.BAD_REQUEST)
+        assertThat(exception.message).isEqualTo("Invalid revision ID")
     }
 
     @Test
@@ -196,8 +197,8 @@ internal class MatchServiceTest {
         val exception =
             assertThrows<CustomException> { matchService.createMatch(mockk(), createMatchRequestDto) }
 
-        assert(exception.status == HttpStatus.BAD_REQUEST)
-        assert(exception.message == "Opponent ID is required")
+        assertThat(exception.status).isEqualTo(HttpStatus.BAD_REQUEST)
+        assertThat(exception.message).isEqualTo("Opponent ID is required")
     }
 
     @Test
@@ -214,8 +215,8 @@ internal class MatchServiceTest {
         val exception =
             assertThrows<CustomException> { matchService.createMatch(mockk(), createMatchRequestDto) }
 
-        assert(exception.status == HttpStatus.BAD_REQUEST)
-        assert(exception.message == "Opponent ID is required")
+        assertThat(exception.status).isEqualTo(HttpStatus.BAD_REQUEST)
+        assertThat(exception.message).isEqualTo("Opponent ID is required")
     }
 
     @Test

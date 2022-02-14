@@ -11,6 +11,7 @@ import delta.codecharacter.server.game_map.latest_map.LatestMapEntity
 import delta.codecharacter.server.game_map.locked_map.LockedMapEntity
 import delta.codecharacter.server.game_map.map_revision.MapRevisionEntity
 import delta.codecharacter.server.user.UserEntity
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -58,11 +59,11 @@ internal class GameMapControllerIntegrationTest(@Autowired val mockMvc: MockMvc)
             .andExpect { status { is2xxSuccessful() } }
 
         val mapRevisions = mongoTemplate.findAll<MapRevisionEntity>()
-        assert(mapRevisions.size == 1)
+        assertThat(mapRevisions.size).isEqualTo(1)
 
         val mapRevision = mapRevisions.first()
-        assert(mapRevision.map == dto.map)
-        assert(mapRevision.userId == TestAttributes.user.id)
+        assertThat(mapRevision.map).isEqualTo(dto.map)
+        assertThat(mapRevision.userId).isEqualTo(TestAttributes.user.id)
     }
 
     @Test
@@ -138,8 +139,8 @@ internal class GameMapControllerIntegrationTest(@Autowired val mockMvc: MockMvc)
             .andExpect { status { is2xxSuccessful() } }
 
         val latestMap = mongoTemplate.findAll<LatestMapEntity>().first()
-        assert(latestMap.map == dto.map)
-        assert(latestMap.lastSavedAt != oldMapEntity.lastSavedAt)
+        assertThat(latestMap.map).isEqualTo(dto.map)
+        assertThat(latestMap.lastSavedAt).isNotEqualTo(oldMapEntity.lastSavedAt)
     }
 
     @Test
@@ -164,11 +165,11 @@ internal class GameMapControllerIntegrationTest(@Autowired val mockMvc: MockMvc)
             .andExpect { status { is2xxSuccessful() } }
 
         val latestMap = mongoTemplate.findAll<LatestMapEntity>().first()
-        assert(latestMap.map == dto.map)
-        assert(latestMap.lastSavedAt != oldMapEntity.lastSavedAt)
+        assertThat(latestMap.map).isEqualTo(dto.map)
+        assertThat(latestMap.lastSavedAt).isNotEqualTo(oldMapEntity.lastSavedAt)
 
         val lockedMap = mongoTemplate.findAll<LockedMapEntity>().first()
-        assert(lockedMap.map == dto.map)
+        assertThat(lockedMap.map).isEqualTo(dto.map)
     }
 
     @AfterEach

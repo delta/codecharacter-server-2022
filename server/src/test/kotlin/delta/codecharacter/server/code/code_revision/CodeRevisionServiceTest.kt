@@ -7,6 +7,7 @@ import io.mockk.confirmVerified
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.Instant
@@ -69,11 +70,11 @@ internal class CodeRevisionServiceTest {
         verify { codeRevisionRepository.findAllByUserIdOrderByCreatedAtDesc(userId) }
 
         confirmVerified(codeRevisionRepository)
-        assert(codeRevisionDtos.size == 1)
-        assert(codeRevisionDto.id == codeRevisionEntity.id)
-        assert(codeRevisionDto.code == codeRevisionEntity.code)
-        assert(codeRevisionDto.language.name == codeRevisionEntity.language.name)
-        assert(codeRevisionDto.parentRevision == codeRevisionEntity.parentRevision?.id)
-        assert(codeRevisionDto.createdAt == codeRevisionEntity.createdAt)
+        assertThat(codeRevisionDtos.size).isEqualTo(1)
+        assertThat(codeRevisionDto.id).isEqualTo(codeRevisionEntity.id)
+        assertThat(codeRevisionDto.code).isEqualTo(codeRevisionEntity.code)
+        assertThat(codeRevisionDto.language.name).isEqualTo(codeRevisionEntity.language.name)
+        assertThat(codeRevisionDto.parentRevision).isEqualTo(codeRevisionEntity.parentRevision?.id)
+        assertThat(codeRevisionDto.createdAt).isEqualTo(codeRevisionEntity.createdAt)
     }
 }

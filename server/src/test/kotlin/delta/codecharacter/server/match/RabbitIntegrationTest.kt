@@ -111,26 +111,26 @@ internal class RabbitIntegrationTest(@Autowired val mockMvc: MockMvc) {
             .andExpect { status { is2xxSuccessful() } }
 
         val matches = mongoTemplate.findAll<MatchEntity>()
-        assert(matches.size == 1)
+        assertThat(matches.size).isEqualTo(1)
 
         val match = matches.first()
-        assert(match.mode == MatchModeEnum.SELF)
-        assert(match.games.size == 1)
+        assertThat(match.mode).isEqualTo(MatchModeEnum.SELF)
+        assertThat(match.games.size).isEqualTo(1)
 
         val games = mongoTemplate.findAll<GameEntity>()
-        assert(games.size == 1)
+        assertThat(games.size).isEqualTo(1)
 
         val game = games.first()
-        assert(game.status == GameStatusEnum.IDLE)
-        assert(match.games.first() == game)
+        assertThat(game.status).isEqualTo(GameStatusEnum.IDLE)
+        assertThat(match.games.first()).isEqualTo(game)
 
         val gameRequestEntityString =
             this.rabbitTemplate.receiveAndConvert("gameRequestQueue") as String
         val gameRequestEntity = mapper.readValue(gameRequestEntityString, GameRequestEntity::class.java)
-        assert(gameRequestEntity.gameId == game.id)
-        assert(gameRequestEntity.map == mapRevision.map)
-        assert(gameRequestEntity.sourceCode == codeRevision.code)
-        assert(gameRequestEntity.language == codeRevision.language)
+        assertThat(gameRequestEntity.gameId).isEqualTo(game.id)
+        assertThat(gameRequestEntity.map).isEqualTo(mapRevision.map)
+        assertThat(gameRequestEntity.sourceCode).isEqualTo(codeRevision.code)
+        assertThat(gameRequestEntity.language).isEqualTo(codeRevision.language)
     }
 
     @Test

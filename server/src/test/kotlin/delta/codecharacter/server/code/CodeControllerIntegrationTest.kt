@@ -12,6 +12,7 @@ import delta.codecharacter.server.code.code_revision.CodeRevisionEntity
 import delta.codecharacter.server.code.latest_code.LatestCodeEntity
 import delta.codecharacter.server.code.locked_code.LockedCodeEntity
 import delta.codecharacter.server.user.UserEntity
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -59,12 +60,13 @@ internal class CodeControllerIntegrationTest(@Autowired val mockMvc: MockMvc) {
             .andExpect { status { is2xxSuccessful() } }
 
         val codeRevisions = mongoTemplate.findAll<CodeRevisionEntity>()
-        assert(codeRevisions.size == 1)
+        assertThat(codeRevisions.size).isEqualTo(1)
 
         val codeRevision = codeRevisions.first()
-        assert(codeRevision.code == dto.code)
-        assert(codeRevision.language == LanguageEnum.valueOf(dto.language.name))
-        assert(codeRevision.userId == TestAttributes.user.id)
+        assertThat(codeRevision.code).isEqualTo(dto.code)
+        assertThat(codeRevision.message).isEqualTo(dto.message)
+        assertThat(codeRevision.language).isEqualTo(LanguageEnum.valueOf(dto.language.name))
+        assertThat(codeRevision.userId).isEqualTo(TestAttributes.user.id)
     }
 
     @Test
@@ -146,9 +148,9 @@ internal class CodeControllerIntegrationTest(@Autowired val mockMvc: MockMvc) {
             .andExpect { status { is2xxSuccessful() } }
 
         val latestCode = mongoTemplate.findAll<LatestCodeEntity>().first()
-        assert(latestCode.code == dto.code)
-        assert(latestCode.language == LanguageEnum.valueOf(dto.language.name))
-        assert(latestCode.lastSavedAt != oldCodeEntity.lastSavedAt)
+        assertThat(latestCode.code).isEqualTo(dto.code)
+        assertThat(latestCode.language).isEqualTo(LanguageEnum.valueOf(dto.language.name))
+        assertThat(latestCode.lastSavedAt).isNotEqualTo(oldCodeEntity.lastSavedAt)
     }
 
     @Test
@@ -174,13 +176,13 @@ internal class CodeControllerIntegrationTest(@Autowired val mockMvc: MockMvc) {
             .andExpect { status { is2xxSuccessful() } }
 
         val latestCode = mongoTemplate.findAll<LatestCodeEntity>().first()
-        assert(latestCode.code == dto.code)
-        assert(latestCode.language == LanguageEnum.valueOf(dto.language.name))
-        assert(latestCode.lastSavedAt != oldCodeEntity.lastSavedAt)
+        assertThat(latestCode.code).isEqualTo(dto.code)
+        assertThat(latestCode.language).isEqualTo(LanguageEnum.valueOf(dto.language.name))
+        assertThat(latestCode.lastSavedAt).isNotEqualTo(oldCodeEntity.lastSavedAt)
 
         val lockedCode = mongoTemplate.findAll<LockedCodeEntity>().first()
-        assert(lockedCode.code == dto.code)
-        assert(lockedCode.language == LanguageEnum.valueOf(dto.language.name))
+        assertThat(lockedCode.code).isEqualTo(dto.code)
+        assertThat(lockedCode.language).isEqualTo(LanguageEnum.valueOf(dto.language.name))
     }
 
     @AfterEach

@@ -6,6 +6,7 @@ import io.mockk.confirmVerified
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.Instant
@@ -70,9 +71,9 @@ internal class MapRevisionServiceTest {
         verify { mapRevisionRepository.findAllByUserIdOrderByCreatedAtDesc(userId) }
 
         confirmVerified(mapRevisionRepository)
-        assert(mapRevisionDtos.size == 1)
-        assert(mapRevisionDto.id == mapRevisionEntity.id)
-        assert(mapRevisionDto.map == mapRevisionEntity.map)
-        assert(mapRevisionDto.parentRevision == mapRevisionEntity.parentRevision?.id)
+        assertThat(mapRevisionDtos.size).isEqualTo(1)
+        assertThat(mapRevisionDto.id).isEqualTo(mapRevisionEntity.id)
+        assertThat(mapRevisionDto.map).isEqualTo(mapRevisionEntity.map)
+        assertThat(mapRevisionDto.parentRevision).isEqualTo(mapRevisionEntity.parentRevision?.id)
     }
 }
