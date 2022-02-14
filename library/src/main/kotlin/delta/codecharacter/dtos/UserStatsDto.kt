@@ -5,19 +5,12 @@ import io.swagger.annotations.ApiModelProperty
 
 /**
  * User stats model
- * @param currentLevel
  * @param rating
  * @param wins
  * @param losses
  * @param ties
  */
 data class UserStatsDto(
-
-    @ApiModelProperty(example = "1", required = true, value = "")
-    @field:JsonProperty(
-        "currentLevel",
-        required = true
-    ) val currentLevel: Int,
 
     @ApiModelProperty(example = "1000", required = true, value = "")
     @field:JsonProperty(

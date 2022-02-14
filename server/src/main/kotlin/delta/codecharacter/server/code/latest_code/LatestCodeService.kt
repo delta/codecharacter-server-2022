@@ -4,19 +4,19 @@ import delta.codecharacter.dtos.CodeDto
 import delta.codecharacter.dtos.LanguageDto
 import delta.codecharacter.dtos.UpdateLatestCodeRequestDto
 import delta.codecharacter.server.code.LanguageEnum
-import delta.codecharacter.server.user.UserEntity
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.time.Instant
+import java.util.UUID
 
 /** Service for handling the latest code. */
 @Service
 class LatestCodeService(@Autowired private val latestCodeRepository: LatestCodeRepository) {
 
-    fun getLatestCode(userEntity: UserEntity): CodeDto {
+    fun getLatestCode(userId: UUID): CodeDto {
         return latestCodeRepository
-            .findById(userEntity)
-            .orElseThrow { throw Exception("Latest code not found for user ${userEntity.id}") }
+            .findById(userId)
+            .orElseThrow { throw Exception("Latest code not found for user $userId") }
             .let { latestCode ->
                 CodeDto(
                     code = latestCode.code,
@@ -26,15 +26,12 @@ class LatestCodeService(@Autowired private val latestCodeRepository: LatestCodeR
             }
     }
 
-    fun updateLatestCode(
-        userEntity: UserEntity,
-        updateLatestCodeRequestDto: UpdateLatestCodeRequestDto
-    ) {
+    fun updateLatestCode(userId: UUID, updateLatestCodeRequestDto: UpdateLatestCodeRequestDto) {
         latestCodeRepository.save(
             LatestCodeEntity(
                 code = updateLatestCodeRequestDto.code,
                 language = LanguageEnum.valueOf(updateLatestCodeRequestDto.language.name),
-                user = userEntity,
+                userId = userId,
                 lastSavedAt = Instant.now()
             )
         )

@@ -4,7 +4,6 @@ import delta.codecharacter.dtos.CodeRevisionDto
 import delta.codecharacter.dtos.CreateCodeRevisionRequestDto
 import delta.codecharacter.dtos.LanguageDto
 import delta.codecharacter.server.code.LanguageEnum
-import delta.codecharacter.server.user.UserEntity
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import java.time.Instant
@@ -14,30 +13,29 @@ import java.util.UUID
 @Service
 class CodeRevisionService(@Autowired private val codeRevisionRepository: CodeRevisionRepository) {
 
-    fun createCodeRevision(
-        userEntity: UserEntity,
-        createCodeRevisionRequestDto: CreateCodeRevisionRequestDto
-    ) {
-        val (code, language) = createCodeRevisionRequestDto
+    fun createCodeRevision(userId: UUID, createCodeRevisionRequestDto: CreateCodeRevisionRequestDto) {
+        val (code, message, language) = createCodeRevisionRequestDto
         val parentCodeRevision =
-            codeRevisionRepository.findFirstByUserOrderByCreatedAtDesc(userEntity).orElse(null)
+            codeRevisionRepository.findFirstByUserIdOrderByCreatedAtDesc(userId).orElse(null)
         codeRevisionRepository.save(
             CodeRevisionEntity(
                 id = UUID.randomUUID(),
                 code = code,
+                message = message,
                 language = LanguageEnum.valueOf(language.name),
-                user = userEntity,
+                userId = userId,
                 parentRevision = parentCodeRevision,
                 createdAt = Instant.now()
             )
         )
     }
 
-    fun getCodeRevisions(userEntity: UserEntity): List<CodeRevisionDto> {
-        return codeRevisionRepository.findAllByUserOrderByCreatedAtDesc(userEntity).map {
+    fun getCodeRevisions(userId: UUID): List<CodeRevisionDto> {
+        return codeRevisionRepository.findAllByUserIdOrderByCreatedAtDesc(userId).map {
             CodeRevisionDto(
                 id = it.id,
                 code = it.code,
+                message = it.message,
                 language = LanguageDto.valueOf(it.language.name),
                 createdAt = it.createdAt,
                 parentRevision = it.parentRevision?.id

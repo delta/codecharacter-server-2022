@@ -7,6 +7,8 @@ import io.swagger.annotations.ApiModelProperty
  * GameMap revision model
  * @param id
  * @param map
+ * @param createdAt
+ * @param message
  * @param parentRevision
  */
 data class GameMapRevisionDto(
@@ -25,13 +27,18 @@ data class GameMapRevisionDto(
     )
     @field:JsonProperty("map", required = true) val map: String,
 
+    @ApiModelProperty(example = "null", required = true, value = "")
+    @field:JsonProperty(
+        "createdAt",
+        required = true
+    ) val createdAt: java.time.Instant,
+
+    @ApiModelProperty(example = "message", required = true, value = "")
+    @field:JsonProperty("message", required = true) val message: String,
+
     @ApiModelProperty(
         example = "123e4567-e89b-12d3-a456-426614174111",
-        required = true,
         value = ""
     )
-    @field:JsonProperty(
-        "parentRevision",
-        required = true
-    ) val parentRevision: java.util.UUID
+    @field:JsonProperty("parentRevision") val parentRevision: java.util.UUID? = null
 )

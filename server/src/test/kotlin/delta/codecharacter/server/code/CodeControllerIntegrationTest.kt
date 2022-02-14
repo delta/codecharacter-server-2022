@@ -12,6 +12,7 @@ import delta.codecharacter.server.code.code_revision.CodeRevisionEntity
 import delta.codecharacter.server.code.latest_code.LatestCodeEntity
 import delta.codecharacter.server.code.locked_code.LockedCodeEntity
 import delta.codecharacter.server.user.UserEntity
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -27,6 +28,7 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.post
 import java.time.Instant
+import java.time.temporal.ChronoUnit
 import java.util.UUID
 
 @AutoConfigureMockMvc
@@ -47,7 +49,8 @@ internal class CodeControllerIntegrationTest(@Autowired val mockMvc: MockMvc) {
     @WithMockCustomUser
     fun `should create code revision`() {
 
-        val dto = CreateCodeRevisionRequestDto(code = "code", language = LanguageDto.CPP)
+        val dto =
+            CreateCodeRevisionRequestDto(code = "code", message = "message", language = LanguageDto.CPP)
 
         mockMvc
             .post("/user/code/revisions") {
@@ -57,12 +60,13 @@ internal class CodeControllerIntegrationTest(@Autowired val mockMvc: MockMvc) {
             .andExpect { status { is2xxSuccessful() } }
 
         val codeRevisions = mongoTemplate.findAll<CodeRevisionEntity>()
-        assert(codeRevisions.size == 1)
+        assertThat(codeRevisions.size).isEqualTo(1)
 
         val codeRevision = codeRevisions.first()
-        assert(codeRevision.code == dto.code)
-        assert(codeRevision.language == LanguageEnum.valueOf(dto.language.name))
-        assert(codeRevision.user.id == TestAttributes.user.id)
+        assertThat(codeRevision.code).isEqualTo(dto.code)
+        assertThat(codeRevision.message).isEqualTo(dto.message)
+        assertThat(codeRevision.language).isEqualTo(LanguageEnum.valueOf(dto.language.name))
+        assertThat(codeRevision.userId).isEqualTo(TestAttributes.user.id)
     }
 
     @Test
@@ -72,10 +76,11 @@ internal class CodeControllerIntegrationTest(@Autowired val mockMvc: MockMvc) {
             CodeRevisionEntity(
                 id = UUID.randomUUID(),
                 code = "code",
+                message = "message",
                 language = LanguageEnum.CPP,
-                user = TestAttributes.user,
+                userId = TestAttributes.user.id,
                 parentRevision = null,
-                createdAt = Instant.now().truncatedTo(java.time.temporal.ChronoUnit.MILLIS)
+                createdAt = Instant.now().truncatedTo(ChronoUnit.MILLIS)
             )
         mongoTemplate.insert<CodeRevisionEntity>(codeRevisionEntity)
 
@@ -84,6 +89,7 @@ internal class CodeControllerIntegrationTest(@Autowired val mockMvc: MockMvc) {
                 CodeRevisionDto(
                     id = codeRevisionEntity.id,
                     code = codeRevisionEntity.code,
+                    message = codeRevisionEntity.message,
                     language = LanguageDto.CPP,
                     createdAt = codeRevisionEntity.createdAt
                 )
@@ -100,10 +106,10 @@ internal class CodeControllerIntegrationTest(@Autowired val mockMvc: MockMvc) {
     fun `should get latest code`() {
         val latestCodeEntity =
             LatestCodeEntity(
-                user = TestAttributes.user,
+                userId = TestAttributes.user.id,
                 code = "code",
                 language = LanguageEnum.CPP,
-                lastSavedAt = Instant.now().truncatedTo(java.time.temporal.ChronoUnit.MILLIS)
+                lastSavedAt = Instant.now().truncatedTo(ChronoUnit.MILLIS)
             )
         mongoTemplate.insert<LatestCodeEntity>(latestCodeEntity)
 
@@ -125,10 +131,10 @@ internal class CodeControllerIntegrationTest(@Autowired val mockMvc: MockMvc) {
     fun `should update latest code`() {
         val oldCodeEntity =
             LatestCodeEntity(
-                user = TestAttributes.user,
+                userId = TestAttributes.user.id,
                 code = "#include <iostream>",
                 language = LanguageEnum.CPP,
-                lastSavedAt = Instant.now().truncatedTo(java.time.temporal.ChronoUnit.MILLIS)
+                lastSavedAt = Instant.now().truncatedTo(ChronoUnit.MILLIS)
             )
         mongoTemplate.insert<LatestCodeEntity>(oldCodeEntity)
 
@@ -142,9 +148,9 @@ internal class CodeControllerIntegrationTest(@Autowired val mockMvc: MockMvc) {
             .andExpect { status { is2xxSuccessful() } }
 
         val latestCode = mongoTemplate.findAll<LatestCodeEntity>().first()
-        assert(latestCode.code == dto.code)
-        assert(latestCode.language == LanguageEnum.valueOf(dto.language.name))
-        assert(latestCode.lastSavedAt != oldCodeEntity.lastSavedAt)
+        assertThat(latestCode.code).isEqualTo(dto.code)
+        assertThat(latestCode.language).isEqualTo(LanguageEnum.valueOf(dto.language.name))
+        assertThat(latestCode.lastSavedAt).isNotEqualTo(oldCodeEntity.lastSavedAt)
     }
 
     @Test
@@ -152,10 +158,10 @@ internal class CodeControllerIntegrationTest(@Autowired val mockMvc: MockMvc) {
     fun `should update latest code with lock`() {
         val oldCodeEntity =
             LatestCodeEntity(
-                user = TestAttributes.user,
+                userId = TestAttributes.user.id,
                 code = "#include <iostream>",
                 language = LanguageEnum.CPP,
-                lastSavedAt = Instant.now().truncatedTo(java.time.temporal.ChronoUnit.MILLIS)
+                lastSavedAt = Instant.now().truncatedTo(ChronoUnit.MILLIS)
             )
         mongoTemplate.insert<LatestCodeEntity>(oldCodeEntity)
 
@@ -170,13 +176,13 @@ internal class CodeControllerIntegrationTest(@Autowired val mockMvc: MockMvc) {
             .andExpect { status { is2xxSuccessful() } }
 
         val latestCode = mongoTemplate.findAll<LatestCodeEntity>().first()
-        assert(latestCode.code == dto.code)
-        assert(latestCode.language == LanguageEnum.valueOf(dto.language.name))
-        assert(latestCode.lastSavedAt != oldCodeEntity.lastSavedAt)
+        assertThat(latestCode.code).isEqualTo(dto.code)
+        assertThat(latestCode.language).isEqualTo(LanguageEnum.valueOf(dto.language.name))
+        assertThat(latestCode.lastSavedAt).isNotEqualTo(oldCodeEntity.lastSavedAt)
 
         val lockedCode = mongoTemplate.findAll<LockedCodeEntity>().first()
-        assert(lockedCode.code == dto.code)
-        assert(lockedCode.language == LanguageEnum.valueOf(dto.language.name))
+        assertThat(lockedCode.code).isEqualTo(dto.code)
+        assertThat(lockedCode.language).isEqualTo(LanguageEnum.valueOf(dto.language.name))
     }
 
     @AfterEach

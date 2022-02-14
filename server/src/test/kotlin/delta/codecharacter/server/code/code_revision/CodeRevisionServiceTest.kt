@@ -3,11 +3,11 @@ package delta.codecharacter.server.code.code_revision
 import delta.codecharacter.dtos.CreateCodeRevisionRequestDto
 import delta.codecharacter.dtos.LanguageDto
 import delta.codecharacter.server.code.LanguageEnum
-import delta.codecharacter.server.user.UserEntity
 import io.mockk.confirmVerified
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.time.Instant
@@ -26,21 +26,22 @@ internal class CodeRevisionServiceTest {
 
     @Test
     fun `should create code revision`() {
-        val user = mockk<UserEntity>()
+        val userId = UUID.randomUUID()
         val createCodeRevisionRequestDto =
             CreateCodeRevisionRequestDto(
                 code = "code",
+                message = "message",
                 language = LanguageDto.C,
             )
         val codeRevisionEntity = mockk<CodeRevisionEntity>()
 
-        every { codeRevisionRepository.findFirstByUserOrderByCreatedAtDesc(user) } returns
+        every { codeRevisionRepository.findFirstByUserIdOrderByCreatedAtDesc(userId) } returns
             Optional.of(codeRevisionEntity)
         every { codeRevisionRepository.save(any()) } returns codeRevisionEntity
 
-        codeRevisionService.createCodeRevision(user, createCodeRevisionRequestDto)
+        codeRevisionService.createCodeRevision(userId, createCodeRevisionRequestDto)
 
-        verify { codeRevisionRepository.findFirstByUserOrderByCreatedAtDesc(user) }
+        verify { codeRevisionRepository.findFirstByUserIdOrderByCreatedAtDesc(userId) }
         verify { codeRevisionRepository.save(any()) }
 
         confirmVerified(codeRevisionRepository)
@@ -48,31 +49,32 @@ internal class CodeRevisionServiceTest {
 
     @Test
     fun `should get all code revisions`() {
-        val user = mockk<UserEntity>()
+        val userId = UUID.randomUUID()
         val codeRevisionEntity =
             CodeRevisionEntity(
                 id = UUID.randomUUID(),
-                user = user,
+                userId = userId,
                 code = "code",
+                message = "message",
                 language = LanguageEnum.C,
                 parentRevision = null,
                 createdAt = Instant.now(),
             )
 
-        every { codeRevisionRepository.findAllByUserOrderByCreatedAtDesc(user) } returns
+        every { codeRevisionRepository.findAllByUserIdOrderByCreatedAtDesc(userId) } returns
             listOf(codeRevisionEntity)
 
-        val codeRevisionDtos = codeRevisionService.getCodeRevisions(user)
+        val codeRevisionDtos = codeRevisionService.getCodeRevisions(userId)
         val codeRevisionDto = codeRevisionDtos.first()
 
-        verify { codeRevisionRepository.findAllByUserOrderByCreatedAtDesc(user) }
+        verify { codeRevisionRepository.findAllByUserIdOrderByCreatedAtDesc(userId) }
 
         confirmVerified(codeRevisionRepository)
-        assert(codeRevisionDtos.size == 1)
-        assert(codeRevisionDto.id == codeRevisionEntity.id)
-        assert(codeRevisionDto.code == codeRevisionEntity.code)
-        assert(codeRevisionDto.language.name == codeRevisionEntity.language.name)
-        assert(codeRevisionDto.parentRevision == codeRevisionEntity.parentRevision?.id)
-        assert(codeRevisionDto.createdAt == codeRevisionEntity.createdAt)
+        assertThat(codeRevisionDtos.size).isEqualTo(1)
+        assertThat(codeRevisionDto.id).isEqualTo(codeRevisionEntity.id)
+        assertThat(codeRevisionDto.code).isEqualTo(codeRevisionEntity.code)
+        assertThat(codeRevisionDto.language.name).isEqualTo(codeRevisionEntity.language.name)
+        assertThat(codeRevisionDto.parentRevision).isEqualTo(codeRevisionEntity.parentRevision?.id)
+        assertThat(codeRevisionDto.createdAt).isEqualTo(codeRevisionEntity.createdAt)
     }
 }

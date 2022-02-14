@@ -8,6 +8,7 @@ import javax.validation.Valid
  * Code revision model
  * @param id
  * @param code
+ * @param message
  * @param language
  * @param createdAt
  * @param parentRevision
@@ -27,6 +28,9 @@ data class CodeRevisionDto(
         value = ""
     )
     @field:JsonProperty("code", required = true) val code: String,
+
+    @ApiModelProperty(example = "message", required = true, value = "")
+    @field:JsonProperty("message", required = true) val message: String,
 
     @field:Valid
     @ApiModelProperty(example = "null", required = true, value = "")

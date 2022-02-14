@@ -43,6 +43,11 @@ jobs:
   test:
     runs-on: ubuntu-latest
     needs: build
+    services:
+      rabbitmq:
+        image: rabbitmq:3-management
+        ports:
+          - 5672:5672
     steps:
       - uses: actions/checkout@v2
       - name: Set up JDK 17

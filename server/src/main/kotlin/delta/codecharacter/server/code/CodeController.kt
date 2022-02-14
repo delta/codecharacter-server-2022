@@ -27,20 +27,20 @@ class CodeController(
         createCodeRevisionRequestDto: CreateCodeRevisionRequestDto
     ): ResponseEntity<Unit> {
         val user = SecurityContextHolder.getContext().authentication.principal as UserEntity
-        codeRevisionService.createCodeRevision(user, createCodeRevisionRequestDto)
+        codeRevisionService.createCodeRevision(user.id, createCodeRevisionRequestDto)
         return ResponseEntity.ok().build()
     }
 
     @Secured(value = ["ROLE_USER"])
     override fun getCodeRevisions(): ResponseEntity<List<CodeRevisionDto>> {
         val user = SecurityContextHolder.getContext().authentication.principal as UserEntity
-        return ResponseEntity.ok(codeRevisionService.getCodeRevisions(user))
+        return ResponseEntity.ok(codeRevisionService.getCodeRevisions(user.id))
     }
 
     @Secured(value = ["ROLE_USER"])
     override fun getLatestCode(): ResponseEntity<CodeDto> {
         val user = SecurityContextHolder.getContext().authentication.principal as UserEntity
-        return ResponseEntity.ok(latestCodeService.getLatestCode(user))
+        return ResponseEntity.ok(latestCodeService.getLatestCode(user.id))
     }
 
     @Secured(value = ["ROLE_USER"])
@@ -48,9 +48,9 @@ class CodeController(
         updateLatestCodeRequestDto: UpdateLatestCodeRequestDto
     ): ResponseEntity<Unit> {
         val user = SecurityContextHolder.getContext().authentication.principal as UserEntity
-        latestCodeService.updateLatestCode(user, updateLatestCodeRequestDto)
+        latestCodeService.updateLatestCode(user.id, updateLatestCodeRequestDto)
         if (updateLatestCodeRequestDto.lock == true) {
-            lockedCodeService.updateLockedCode(user, updateLatestCodeRequestDto)
+            lockedCodeService.updateLockedCode(user.id, updateLatestCodeRequestDto)
         }
         return ResponseEntity.ok().build()
     }

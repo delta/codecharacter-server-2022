@@ -3,7 +3,6 @@ package delta.codecharacter.server.code.locked_code
 import delta.codecharacter.dtos.LanguageDto
 import delta.codecharacter.dtos.UpdateLatestCodeRequestDto
 import delta.codecharacter.server.code.LanguageEnum
-import delta.codecharacter.server.user.UserEntity
 import io.mockk.confirmVerified
 import io.mockk.every
 import io.mockk.mockk
@@ -12,6 +11,7 @@ import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import java.util.Optional
+import java.util.UUID
 
 internal class LockedCodeServiceTest {
     private lateinit var lockedCodeRepository: LockedCodeRepository
@@ -25,27 +25,29 @@ internal class LockedCodeServiceTest {
 
     @Test
     fun `should return latest code`() {
-        val user = mockk<UserEntity>()
-        val lockedCodeEntity = LockedCodeEntity(code = "code", language = LanguageEnum.C, user = user)
+        val userId = UUID.randomUUID()
+        val lockedCodeEntity =
+            LockedCodeEntity(code = "code", language = LanguageEnum.C, userId = userId)
 
-        every { lockedCodeRepository.findById(user) } returns Optional.of(lockedCodeEntity)
+        every { lockedCodeRepository.findById(userId) } returns Optional.of(lockedCodeEntity)
 
-        val latestCode = lockedCodeService.getLockedCode(user)
+        val latestCode = lockedCodeService.getLockedCode(userId)
 
-        verify { lockedCodeRepository.findById(user) }
+        verify { lockedCodeRepository.findById(userId) }
         confirmVerified(lockedCodeRepository)
         assertNotNull(latestCode)
     }
 
     @Test
     fun `should update latest code`() {
-        val user = mockk<UserEntity>()
-        val lockedCodeEntity = LockedCodeEntity(code = "code", language = LanguageEnum.C, user = user)
+        val userId = UUID.randomUUID()
+        val lockedCodeEntity =
+            LockedCodeEntity(code = "code", language = LanguageEnum.C, userId = userId)
         val codeDto = UpdateLatestCodeRequestDto(code = lockedCodeEntity.code, language = LanguageDto.C)
 
         every { lockedCodeRepository.save(any()) } returns lockedCodeEntity
 
-        lockedCodeService.updateLockedCode(user, codeDto)
+        lockedCodeService.updateLockedCode(userId, codeDto)
 
         verify { lockedCodeRepository.save(any()) }
         confirmVerified(lockedCodeRepository)
