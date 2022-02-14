@@ -47,7 +47,8 @@ internal class GameMapControllerIntegrationTest(@Autowired val mockMvc: MockMvc)
     @WithMockCustomUser
     fun `should create map revision`() {
 
-        val dto = CreateMapRevisionRequestDto(map = "map", message = "message")
+        val validMap = mapper.writeValueAsString(List(64) { List(64) { 0 } })
+        val dto = CreateMapRevisionRequestDto(map = validMap, message = "message")
 
         mockMvc
             .post("/user/map/revisions") {
@@ -117,15 +118,17 @@ internal class GameMapControllerIntegrationTest(@Autowired val mockMvc: MockMvc)
     @Test
     @WithMockCustomUser
     fun `should update latest map`() {
+        val validMap = mapper.writeValueAsString(List(64) { List(64) { 0 } })
         val oldMapEntity =
             LatestMapEntity(
                 userId = TestAttributes.user.id,
-                map = "[[0]]",
+                map = validMap,
                 lastSavedAt = Instant.now().truncatedTo(ChronoUnit.MILLIS)
             )
+
         mongoTemplate.insert<LatestMapEntity>(oldMapEntity)
 
-        val dto = UpdateLatestMapRequestDto(map = "[[1]]")
+        val dto = UpdateLatestMapRequestDto(map = validMap)
 
         mockMvc
             .post("/user/map/latest") {
@@ -142,15 +145,16 @@ internal class GameMapControllerIntegrationTest(@Autowired val mockMvc: MockMvc)
     @Test
     @WithMockCustomUser
     fun `should update latest map with lock`() {
+        val validMap = mapper.writeValueAsString(List(64) { List(64) { 0 } })
         val oldMapEntity =
             LatestMapEntity(
                 userId = TestAttributes.user.id,
-                map = "[[0]]",
+                map = validMap,
                 lastSavedAt = Instant.now().truncatedTo(ChronoUnit.MILLIS)
             )
         mongoTemplate.insert<LatestMapEntity>(oldMapEntity)
 
-        val dto = UpdateLatestMapRequestDto(map = "[[1]]", lock = true)
+        val dto = UpdateLatestMapRequestDto(map = validMap, lock = true)
 
         mockMvc
             .post("/user/map/latest") {

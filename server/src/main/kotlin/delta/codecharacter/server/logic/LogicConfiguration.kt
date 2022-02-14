@@ -2,6 +2,7 @@ package delta.codecharacter.server.logic
 
 import delta.codecharacter.server.logic.rating.RatingAlgorithm
 import delta.codecharacter.server.logic.rating.ZeroRatingAlgorithm
+import delta.codecharacter.server.logic.validation.MapValidator
 import delta.codecharacter.server.logic.verdict.Player1WinnerAlgorithm
 import delta.codecharacter.server.logic.verdict.VerdictAlgorithm
 import org.springframework.context.annotation.Bean
@@ -18,5 +19,10 @@ class LogicConfiguration {
     @Bean
     fun verdictAlgorithm(): VerdictAlgorithm {
         return Player1WinnerAlgorithm()
+    }
+
+    @Bean
+    fun mapValidator(): MapValidator {
+        return MapValidator()
     }
 }

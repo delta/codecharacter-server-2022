@@ -1,6 +1,7 @@
 package delta.codecharacter.server.game_map.map_revision
 
 import delta.codecharacter.dtos.CreateMapRevisionRequestDto
+import delta.codecharacter.server.logic.validation.MapValidator
 import io.mockk.confirmVerified
 import io.mockk.every
 import io.mockk.mockk
@@ -14,11 +15,13 @@ import java.util.UUID
 internal class MapRevisionServiceTest {
     private lateinit var mapRevisionRepository: MapRevisionRepository
     private lateinit var mapRevisionService: MapRevisionService
+    private lateinit var mapValidator: MapValidator
 
     @BeforeEach
     fun setUp() {
         mapRevisionRepository = mockk()
-        mapRevisionService = MapRevisionService(mapRevisionRepository)
+        mapValidator = mockk()
+        mapRevisionService = MapRevisionService(mapRevisionRepository, mapValidator)
     }
 
     @Test
@@ -34,13 +37,15 @@ internal class MapRevisionServiceTest {
         every { mapRevisionRepository.findFirstByUserIdOrderByCreatedAtDesc(userId) } returns
             Optional.of(mapRevisionEntity)
         every { mapRevisionRepository.save(any()) } returns mapRevisionEntity
+        every { mapValidator.validateMap(createMapRevisionRequestDto.map) } returns Unit
 
         mapRevisionService.createMapRevision(userId, createMapRevisionRequestDto)
 
         verify { mapRevisionRepository.findFirstByUserIdOrderByCreatedAtDesc(userId) }
+        verify { mapValidator.validateMap(createMapRevisionRequestDto.map) }
         verify { mapRevisionRepository.save(any()) }
 
-        confirmVerified(mapRevisionRepository)
+        confirmVerified(mapRevisionRepository, mapValidator)
     }
 
     @Test
