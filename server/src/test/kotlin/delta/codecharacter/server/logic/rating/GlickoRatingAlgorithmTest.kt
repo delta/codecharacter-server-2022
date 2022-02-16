@@ -22,7 +22,7 @@ internal class GlickoRatingAlgorithmTest {
         val newPlayerRating =
             ratingAlgorithm.calculateNewRating(playerRating, opponentRatings, outcomes)
 
-        assert((newPlayerRating.getRating() - 1464.0) <= 0.2)
-        assert((newPlayerRating.getRatingDeviation() - 151.4) <= 0.2)
+        assert((newPlayerRating.rating - 1464.0) <= 0.2)
+        assert((newPlayerRating.ratingDeviation - 151.4) <= 0.2)
     }
 }

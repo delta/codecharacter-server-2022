@@ -44,12 +44,12 @@ class GlickoRatingAlgorithm : RatingAlgorithm {
 
     private fun dSquared(
         r0: Double,
-        opponentRatings: List<Rating>,
+        opponentRatings: List<GlickoRating>,
     ): Double {
         var sm = 0.0
         for (oppRating in opponentRatings) {
-            val rI = oppRating.getRating()
-            val rdI = oppRating.getRatingDeviation()
+            val rI = oppRating.rating
+            val rdI = oppRating.ratingDeviation
             val grd = g(rdI)
             val expectation = e(r0, rI, rdI)
             sm += (grd * grd * expectation * (1.0 - expectation))
@@ -58,21 +58,21 @@ class GlickoRatingAlgorithm : RatingAlgorithm {
     }
 
     override fun calculateNewRating(
-        rating: Rating,
-        opponentRatings: List<Rating>,
+        rating: GlickoRating,
+        opponentRatings: List<GlickoRating>,
         opponentOutcomes: List<Double>,
-    ): Rating {
-        val r0 = rating.getRating()
+    ): GlickoRating {
+        val r0 = rating.rating
         var sm = 0.0
         for ((i, opponentRating) in opponentRatings.withIndex()) {
-            val rI = opponentRating.getRating()
-            val rdI = opponentRating.getRatingDeviation()
+            val rI = opponentRating.rating
+            val rdI = opponentRating.ratingDeviation
             val grd = g(rdI)
             val expectation = e(r0, rI, rdI)
             val sI = opponentOutcomes[i]
             sm += (grd * (sI - expectation))
         }
-        val rd = rating.getRatingDeviation()
+        val rd = rating.ratingDeviation
         val d2 = dSquared(r0, opponentRatings)
         val numerator = q * sm
         val denominator = (1.0 / (rd * rd)) + (1.0 / d2)
