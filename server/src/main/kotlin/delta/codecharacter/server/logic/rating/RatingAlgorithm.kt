@@ -1,5 +1,9 @@
 package delta.codecharacter.server.logic.rating
 
 interface RatingAlgorithm {
-    fun calculateRating(currentRating: Int): Int
+    fun calculateNewRating(
+        rating: Rating,
+        opponentRatings: List<Rating>,
+        opponentOutcomes: List<Double>,
+    ): Rating
 }
