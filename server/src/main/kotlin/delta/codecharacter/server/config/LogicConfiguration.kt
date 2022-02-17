@@ -1,4 +1,4 @@
-package delta.codecharacter.server.logic
+package delta.codecharacter.server.config
 
 import delta.codecharacter.server.logic.rating.RatingAlgorithm
 import delta.codecharacter.server.logic.rating.ZeroRatingAlgorithm

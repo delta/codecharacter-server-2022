@@ -9,9 +9,13 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.annotation.Secured
 import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.web.bind.annotation.CrossOrigin
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
+@CrossOrigin(
+    origins = ["*"],
+)
 class CurrentUserController(
     @Autowired private val userService: UserService,
     @Autowired private val publicUserService: PublicUserService
