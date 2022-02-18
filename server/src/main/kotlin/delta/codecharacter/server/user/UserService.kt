@@ -21,8 +21,9 @@ class UserService(
     @Autowired private val ratingHistoryService: RatingHistoryService
 ) : UserDetailsService {
 
-     @org.springframework.context.annotation.Lazy
-     @Autowired private lateinit var passwordEncoder: BCryptPasswordEncoder
+    @org.springframework.context.annotation.Lazy
+    @Autowired
+    private lateinit var passwordEncoder: BCryptPasswordEncoder
 
     override fun loadUserByUsername(email: String?): UserEntity {
         if (email == null) {
@@ -31,12 +32,12 @@ class UserService(
         val user = userRepository.findFirstByEmail(email)
         if (user.isEmpty) {
             print("yes")
-            throw CustomException(HttpStatus.SERVICE_UNAVAILABLE,"User not found")
+            throw CustomException(HttpStatus.SERVICE_UNAVAILABLE, "User not found")
             throw UsernameNotFoundException("User not found")
         }
-//        else if (!user.get().isEnabled) {
-//            throw CustomException(HttpStatus.UNAUTHORIZED, "Email not verified")
-//        }
+        //        else if (!user.get().isEnabled) {
+        //            throw CustomException(HttpStatus.UNAUTHORIZED, "Email not verified")
+        //        }
         else if (!user.get().isAccountNonExpired) {
             throw CustomException(HttpStatus.UNAUTHORIZED, "Account expired")
         } else {
@@ -70,7 +71,7 @@ class UserService(
 
     private fun verifyUserPassword(id: UUID, password: String): Boolean {
         val user = userRepository.findById(id)
-        return passwordEncoder.matches(password,user.get().password)
+        return passwordEncoder.matches(password, user.get().password)
     }
 
     fun updatePassword(userId: UUID, updatePasswordRequestDto: UpdatePasswordRequestDto) {

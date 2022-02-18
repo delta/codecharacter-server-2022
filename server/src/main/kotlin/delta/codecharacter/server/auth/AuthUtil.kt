@@ -6,30 +6,23 @@ import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
 import org.springframework.stereotype.Service
 import java.io.Serializable
-import java.util.*
+import java.util.Date
 import java.util.function.Function
 
 @Service
 class AuthUtil : Serializable {
 
-    private val secret: String ="secret"
+    private val secret: String = "secret"
 
     fun getUsernameFromToken(token: String?): String {
-        return getClaimFromToken(
-            token
-        ) { obj: Claims -> obj.subject }
+        return getClaimFromToken(token) { obj: Claims -> obj.subject }
     }
 
     fun getExpirationDateFromToken(token: String?): Date {
-        return getClaimFromToken(
-            token
-        ) { obj: Claims -> obj.expiration }
+        return getClaimFromToken(token) { obj: Claims -> obj.expiration }
     }
 
-    fun <T> getClaimFromToken(
-        token: String?,
-        claimsResolver: Function<Claims, T>
-    ): T {
+    fun <T> getClaimFromToken(token: String?, claimsResolver: Function<Claims, T>): T {
         val claims = getAllClaimsFromToken(token)
         return claimsResolver.apply(claims)
     }
@@ -37,8 +30,7 @@ class AuthUtil : Serializable {
     private fun getAllClaimsFromToken(token: String?): Claims {
         try {
             return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).body
-        } catch (e: Exception)
-        {
+        } catch (e: Exception) {
             throw e
         }
     }
@@ -52,17 +44,17 @@ class AuthUtil : Serializable {
         val claims: Map<String, Any> = HashMap()
         return doGenerateToken(claims, userDetails.email)
     }
-    private fun doGenerateToken(
-        claims: Map<String, Any>,
-        subject: String
-    ): String {
-        val jwt = Jwts.builder().apply {
-            setClaims(claims)
-            setSubject(subject)
-            setIssuedAt(Date(System.currentTimeMillis()))
-            setExpiration(Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 24))
-            signWith(SignatureAlgorithm.HS512,secret)
-        }.compact()
+    private fun doGenerateToken(claims: Map<String, Any>, subject: String): String {
+        val jwt =
+            Jwts.builder()
+                .apply {
+                    setClaims(claims)
+                    setSubject(subject)
+                    setIssuedAt(Date(System.currentTimeMillis()))
+                    setExpiration(Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 24))
+                    signWith(SignatureAlgorithm.HS512, secret)
+                }
+                .compact()
         return jwt
     }
 
@@ -70,5 +62,4 @@ class AuthUtil : Serializable {
         val username = getUsernameFromToken(token)
         return username == userDetails.email && !isTokenExpired(token)
     }
-
 }

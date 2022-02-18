@@ -16,26 +16,30 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 import org.springframework.security.web.session.SessionManagementFilter
 
-
 @Configuration
 @EnableWebSecurity
-
 class WebSecurityConfiguration : WebSecurityConfigurerAdapter() {
 
-    @Autowired private lateinit var corsFilter:CorsFilter
+    @Autowired private lateinit var corsFilter: CorsFilter
     @Autowired private lateinit var jwtRequestFilter: JwtRequestFilter
     @Autowired private lateinit var userService: UserService
     override fun configure(http: HttpSecurity?) {
         http?.cors()?.disable()
         http?.csrf()?.apply {
-            disable().authorizeRequests().apply {
-                antMatchers("/auth/login/**","/users").permitAll()
-                antMatchers(HttpMethod.OPTIONS,"/**").permitAll()
-            }.anyRequest().authenticated()
-                .and().sessionManagement().apply {
-                    sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                }.and().addFilterBefore(jwtRequestFilter,UsernamePasswordAuthenticationFilter::class.java)
-                .addFilterBefore(corsFilter,SessionManagementFilter::class.java)
+            disable()
+                .authorizeRequests()
+                .apply {
+                    antMatchers("/auth/login/**", "/users").permitAll()
+                    antMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                }
+                .anyRequest()
+                .authenticated()
+                .and()
+                .sessionManagement()
+                .apply { sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
+                .and()
+                .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter::class.java)
+                .addFilterBefore(corsFilter, SessionManagementFilter::class.java)
         }
     }
 
@@ -48,8 +52,4 @@ class WebSecurityConfiguration : WebSecurityConfigurerAdapter() {
         return super.authenticationManagerBean()
     }
     @Bean fun passwordEncoder() = BCryptPasswordEncoder()
-
-
 }
-
-
