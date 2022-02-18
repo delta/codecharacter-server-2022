@@ -1,7 +1,11 @@
 package delta.codecharacter.server.notifications
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
+import delta.codecharacter.dtos.NotificationDto
 import delta.codecharacter.server.TestAttributes
 import delta.codecharacter.server.user.UserEntity
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -11,6 +15,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.mongodb.core.MongoTemplate
 import org.springframework.data.mongodb.core.dropCollection
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder
 import org.springframework.messaging.converter.StringMessageConverter
 import org.springframework.messaging.simp.stomp.StompSession
 import org.springframework.messaging.simp.stomp.StompSessionHandlerAdapter
@@ -33,8 +38,13 @@ class NotificationIntegrationTest(@Autowired val mockMvc: MockMvc) {
     private lateinit var stompClient: WebSocketStompClient
     private lateinit var stompSession: StompSession
 
+    @Autowired private lateinit var jackson2ObjectMapperBuilder: Jackson2ObjectMapperBuilder
+    private lateinit var mapper: ObjectMapper
+
     @BeforeEach
     fun setUp() {
+        mapper = jackson2ObjectMapperBuilder.build()
+
         mongoTemplate.save<UserEntity>(TestAttributes.user)
 
         stompClient =
@@ -51,10 +61,18 @@ class NotificationIntegrationTest(@Autowired val mockMvc: MockMvc) {
     fun `should receive user notifications`() {
         val user = TestAttributes.user
 
-        stompSession.subscribe("/notifications", ClientFrameHandler { payload -> println(payload) })
-        Thread.sleep(1000)
+        var message: String? = null
+        stompSession.subscribe(
+            "/notifications/${user.id}", ClientFrameHandler { payload -> message = payload }
+        )
         notificationService.sendNotification(user.id, "test", "test")
-        Thread.sleep(1000)
+
+        Thread.sleep(100)
+        assertThat(message).isNotNull
+
+        val notification = mapper.readValue<NotificationDto>(message!!)
+        assertThat(notification.title).isEqualTo("test")
+        assertThat(notification.content).isEqualTo("test")
     }
 
     @AfterEach

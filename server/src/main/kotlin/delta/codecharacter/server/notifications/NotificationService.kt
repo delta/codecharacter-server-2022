@@ -1,10 +1,11 @@
 package delta.codecharacter.server.notifications
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import delta.codecharacter.dtos.NotificationDto
 import delta.codecharacter.server.exception.CustomException
-import delta.codecharacter.server.user.UserService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder
 import org.springframework.messaging.simp.SimpMessagingTemplate
 import org.springframework.stereotype.Service
 import java.time.Instant
@@ -13,9 +14,11 @@ import java.util.UUID
 @Service
 class NotificationService(
     @Autowired private val notificationRepository: NotificationRepository,
-    @Autowired private val userService: UserService,
+    @Autowired private val jackson2ObjectMapperBuilder: Jackson2ObjectMapperBuilder,
     @Autowired private val simpMessagingTemplate: SimpMessagingTemplate,
 ) {
+    private var mapper: ObjectMapper = jackson2ObjectMapperBuilder.build()
+
     fun getAllNotifications(userId: UUID): List<NotificationDto> {
         return notificationRepository.findAllByUserId(userId).map { notificationEntity ->
             NotificationDto(
@@ -46,7 +49,17 @@ class NotificationService(
                 read = false
             )
         notificationRepository.save(notification)
-
-        simpMessagingTemplate.convertAndSend("/notifications/$userId", "aaa")
+        simpMessagingTemplate.convertAndSend(
+            "/notifications/$userId",
+            mapper.writeValueAsString(
+                NotificationDto(
+                    id = notification.id,
+                    title = notification.title,
+                    content = notification.content,
+                    createdAt = notification.createdAt,
+                    read = notification.read
+                )
+            )
+        )
     }
 }
