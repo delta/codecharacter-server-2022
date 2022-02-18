@@ -1,20 +1,15 @@
 package delta.codecharacter.server.auth
 
-import com.nimbusds.oauth2.sdk.auth.Secret
 import delta.codecharacter.server.user.UserEntity
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
-import org.springframework.beans.factory.annotation.Value
-import org.springframework.context.annotation.PropertySource
-import org.springframework.stereotype.Component
 import org.springframework.stereotype.Service
 import java.io.Serializable
 import java.util.*
 import java.util.function.Function
 
 @Service
-@Component
 class AuthUtil : Serializable {
 
     private val secret: String ="secret"
