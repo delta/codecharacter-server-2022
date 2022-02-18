@@ -1,41 +1,39 @@
 package delta.codecharacter.server.auth
 
+import delta.codecharacter.server.exception.CustomException
 import delta.codecharacter.server.user.UserEntity
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
-import java.io.Serializable
 import java.util.Date
 import java.util.function.Function
 
 @Service
-class AuthUtil : Serializable {
+class AuthUtil {
 
-    private val secret: String = "secret"
+    @Value("\${jwt.secret}") private lateinit var secret: String
 
-    fun getUsernameFromToken(token: String?): String {
+    fun getUsernameFromToken(token: String): String {
         return getClaimFromToken(token) { obj: Claims -> obj.subject }
     }
 
-    fun getExpirationDateFromToken(token: String?): Date {
+    fun getExpirationDateFromToken(token: String): Date {
         return getClaimFromToken(token) { obj: Claims -> obj.expiration }
     }
 
-    fun <T> getClaimFromToken(token: String?, claimsResolver: Function<Claims, T>): T {
+    fun <T> getClaimFromToken(token: String, claimsResolver: Function<Claims, T>): T {
         val claims = getAllClaimsFromToken(token)
         return claimsResolver.apply(claims)
     }
 
-    private fun getAllClaimsFromToken(token: String?): Claims {
-        try {
-            return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).body
-        } catch (e: Exception) {
-            throw e
-        }
+    private fun getAllClaimsFromToken(token: String): Claims {
+        return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).body
     }
 
-    private fun isTokenExpired(token: String?): Boolean {
+    private fun isTokenExpired(token: String): Boolean {
         val expiration = getExpirationDateFromToken(token)
         return expiration.before(Date())
     }
@@ -44,6 +42,7 @@ class AuthUtil : Serializable {
         val claims: Map<String, Any> = HashMap()
         return doGenerateToken(claims, userDetails.email)
     }
+
     private fun doGenerateToken(claims: Map<String, Any>, subject: String): String {
         val jwt =
             Jwts.builder()
@@ -58,8 +57,10 @@ class AuthUtil : Serializable {
         return jwt
     }
 
-    fun validateToken(token: String?, userDetails: UserEntity): Boolean {
+    fun validateToken(token: String, userDetails: UserEntity) {
         val username = getUsernameFromToken(token)
-        return username == userDetails.email && !isTokenExpired(token)
+        if (username != userDetails.email || isTokenExpired(token)) {
+            throw CustomException(HttpStatus.UNAUTHORIZED, "Token is invalid")
+        }
     }
 }

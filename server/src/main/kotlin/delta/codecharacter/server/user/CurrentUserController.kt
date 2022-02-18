@@ -9,10 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.annotation.Secured
 import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.web.bind.annotation.CrossOrigin
 import org.springframework.web.bind.annotation.RestController
 
-@CrossOrigin(origins = ["*"])
 @RestController
 class CurrentUserController(
     @Autowired private val userService: UserService,
@@ -20,14 +18,12 @@ class CurrentUserController(
 ) : CurrentUserApi {
 
     @Secured(value = ["ROLE_USER"])
-    @CrossOrigin(origins = ["*"])
     override fun getCurrentUser(): ResponseEntity<CurrentUserProfileDto> {
         val user = SecurityContextHolder.getContext().authentication.principal as UserEntity
         return ResponseEntity.ok(publicUserService.getUserProfile(user.id, user.email))
     }
 
     @Secured("ROLE_USER")
-    @CrossOrigin(origins = ["*"])
     override fun updateCurrentUser(
         updateCurrentUserProfileDto: UpdateCurrentUserProfileDto
     ): ResponseEntity<Unit> {
@@ -37,7 +33,6 @@ class CurrentUserController(
     }
 
     @Secured("ROLE_USER")
-    @CrossOrigin(origins = ["*"])
     override fun updatePassword(
         updatePasswordRequestDto: UpdatePasswordRequestDto
     ): ResponseEntity<Unit> {

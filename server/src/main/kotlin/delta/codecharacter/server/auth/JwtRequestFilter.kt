@@ -15,26 +15,32 @@ import javax.servlet.http.HttpServletResponse
 class JwtRequestFilter : OncePerRequestFilter() {
     @Autowired private lateinit var userService: UserService
     @Autowired private lateinit var authUtil: AuthUtil
+
     override fun doFilterInternal(
         request: HttpServletRequest,
         response: HttpServletResponse,
         filterChain: FilterChain
     ) {
         val authorizationHeader = request.getHeader("Authorization")
-        var email: String? = null
-        var jwt: String? = null
-        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-            jwt = authorizationHeader.substring(7)
-            email = authUtil.getUsernameFromToken(jwt)
+        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+            filterChain.doFilter(request, response)
+            return
         }
-        if (email != null && SecurityContextHolder.getContext().authentication == null) {
-            val userDetails = userService.loadUserByUsername(email)
-            if (authUtil.validateToken(jwt, userDetails)) {
+        val jwt = authorizationHeader.substring(7)
+
+        if (SecurityContextHolder.getContext().authentication == null) {
+            try {
+                val email = authUtil.getUsernameFromToken(jwt)
+                val userDetails = userService.loadUserByUsername(email)
+                authUtil.validateToken(jwt, userDetails)
                 val usernamePasswordAuthenticationToken =
                     UsernamePasswordAuthenticationToken(userDetails, null, userDetails.authorities)
                 usernamePasswordAuthenticationToken.details =
                     WebAuthenticationDetailsSource().buildDetails(request)
                 SecurityContextHolder.getContext().authentication = usernamePasswordAuthenticationToken
+            } catch (e: Exception) {
+                response.status = HttpServletResponse.SC_UNAUTHORIZED
+                return
             }
         }
         filterChain.doFilter(request, response)

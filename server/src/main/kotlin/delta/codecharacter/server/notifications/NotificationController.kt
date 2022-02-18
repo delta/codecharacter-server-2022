@@ -6,11 +6,9 @@ import delta.codecharacter.server.user.UserEntity
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.web.bind.annotation.CrossOrigin
 import org.springframework.web.bind.annotation.RestController
 import java.util.UUID
 
-@CrossOrigin(origins = ["*"])
 @RestController
 class NotificationController(@Autowired private val notificationService: NotificationService) :
     NotificationApi {
