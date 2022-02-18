@@ -6,6 +6,7 @@ import delta.codecharacter.server.exception.CustomException
 import delta.codecharacter.server.user.public_user.PublicUserService
 import delta.codecharacter.server.user.rating_history.RatingHistoryService
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.context.annotation.Lazy
 import org.springframework.dao.DuplicateKeyException
 import org.springframework.http.HttpStatus
 import org.springframework.security.core.userdetails.UserDetailsService
@@ -21,9 +22,7 @@ class UserService(
     @Autowired private val ratingHistoryService: RatingHistoryService
 ) : UserDetailsService {
 
-    @org.springframework.context.annotation.Lazy
-    @Autowired
-    private lateinit var passwordEncoder: BCryptPasswordEncoder
+    @Lazy @Autowired private lateinit var passwordEncoder: BCryptPasswordEncoder
 
     override fun loadUserByUsername(email: String?): UserEntity {
         if (email == null) {
@@ -31,14 +30,10 @@ class UserService(
         }
         val user = userRepository.findFirstByEmail(email)
         if (user.isEmpty) {
-            print("yes")
-            throw CustomException(HttpStatus.SERVICE_UNAVAILABLE, "User not found")
             throw UsernameNotFoundException("User not found")
-        }
-        //        else if (!user.get().isEnabled) {
-        //            throw CustomException(HttpStatus.UNAUTHORIZED, "Email not verified")
-        //        }
-        else if (!user.get().isAccountNonExpired) {
+        } else if (!user.get().isEnabled) {
+            throw CustomException(HttpStatus.UNAUTHORIZED, "Email not verified")
+        } else if (!user.get().isAccountNonExpired) {
             throw CustomException(HttpStatus.UNAUTHORIZED, "Account expired")
         } else {
             return user.get()
@@ -52,7 +47,7 @@ class UserService(
                 username = username,
                 password = passwordEncoder.encode(password),
                 email = email,
-                isEnabled = false,
+                isEnabled = true,
                 isAccountNonExpired = true,
                 isAccountNonLocked = true,
                 isCredentialsNonExpired = true,
@@ -69,7 +64,7 @@ class UserService(
         }
     }
 
-    private fun verifyUserPassword(id: UUID, password: String): Boolean {
+    fun verifyUserPassword(id: UUID, password: String): Boolean {
         val user = userRepository.findById(id)
         return passwordEncoder.matches(password, user.get().password)
     }
