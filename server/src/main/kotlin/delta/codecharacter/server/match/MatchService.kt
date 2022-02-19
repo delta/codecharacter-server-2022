@@ -9,14 +9,17 @@ import delta.codecharacter.dtos.PublicUserDto
 import delta.codecharacter.dtos.VerdictDto
 import delta.codecharacter.server.code.LanguageEnum
 import delta.codecharacter.server.code.code_revision.CodeRevisionService
+import delta.codecharacter.server.code.latest_code.LatestCodeService
 import delta.codecharacter.server.code.locked_code.LockedCodeService
 import delta.codecharacter.server.exception.CustomException
 import delta.codecharacter.server.game.GameService
 import delta.codecharacter.server.game.GameStatusEnum
+import delta.codecharacter.server.game_map.latest_map.LatestMapService
 import delta.codecharacter.server.game_map.locked_map.LockedMapService
 import delta.codecharacter.server.game_map.map_revision.MapRevisionService
 import delta.codecharacter.server.logic.verdict.VerdictAlgorithm
 import delta.codecharacter.server.user.public_user.PublicUserService
+import delta.codecharacter.server.user.rating_history.RatingHistoryService
 import org.springframework.amqp.rabbit.annotation.RabbitListener
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
@@ -29,20 +32,41 @@ import java.util.UUID
 class MatchService(
     @Autowired private val matchRepository: MatchRepository,
     @Autowired private val gameService: GameService,
+    @Autowired private val latestCodeService: LatestCodeService,
     @Autowired private val codeRevisionService: CodeRevisionService,
     @Autowired private val lockedCodeService: LockedCodeService,
+    @Autowired private val latestMapService: LatestMapService,
     @Autowired private val mapRevisionService: MapRevisionService,
     @Autowired private val lockedMapService: LockedMapService,
     @Autowired private val publicUserService: PublicUserService,
     @Autowired private val verdictAlgorithm: VerdictAlgorithm,
+    @Autowired private val ratingHistoryService: RatingHistoryService
 ) {
-    private fun createSelfMatch(userId: UUID, codeRevisionId: UUID, mapRevisionId: UUID) {
-        val (_, code, _, language) =
-            codeRevisionService.getCodeRevisions(userId).find { it.id == codeRevisionId }
-                ?: throw CustomException(HttpStatus.BAD_REQUEST, "Invalid revision ID")
-        val map =
-            mapRevisionService.getMapRevisions(userId).find { it.id == mapRevisionId }?.map
-                ?: throw CustomException(HttpStatus.BAD_REQUEST, "Invalid revision ID")
+    private fun createSelfMatch(userId: UUID, codeRevisionId: UUID?, mapRevisionId: UUID?) {
+        val code: String
+        val language: LanguageEnum
+        if (codeRevisionId == null) {
+            val latestCode = latestCodeService.getLatestCode(userId)
+            code = latestCode.code
+            language = LanguageEnum.valueOf(latestCode.language.name)
+        } else {
+            val codeRevision =
+                codeRevisionService.getCodeRevisions(userId).find { it.id == codeRevisionId }
+                    ?: throw CustomException(HttpStatus.BAD_REQUEST, "Invalid revision ID")
+            code = codeRevision.code
+            language = LanguageEnum.valueOf(codeRevision.language.name)
+        }
+
+        val map: String =
+            if (mapRevisionId == null) {
+                val latestMap = latestMapService.getLatestMap(userId)
+                latestMap.map
+            } else {
+                val mapRevision =
+                    mapRevisionService.getMapRevisions(userId).find { it.id == mapRevisionId }
+                        ?: throw CustomException(HttpStatus.BAD_REQUEST, "Invalid revision ID")
+                mapRevision.map
+            }
 
         val matchId = UUID.randomUUID()
         val game = gameService.createGame(matchId)
@@ -62,7 +86,11 @@ class MatchService(
         gameService.sendGameRequest(game, code, LanguageEnum.valueOf(language.name), map)
     }
 
-    fun createDualMatch(userId: UUID, opponentId: UUID) {
+    fun createDualMatch(userId: UUID, opponentUsername: String) {
+        val publicUser = publicUserService.getPublicUser(userId)
+        val publicOpponent = publicUserService.getPublicUserByUsername(opponentUsername)
+        val opponentId = publicOpponent.userId
+
         val (userLanguage, userCode) = lockedCodeService.getLockedCode(userId)
         val userMap = lockedMapService.getLockedMap(userId)
 
@@ -73,9 +101,6 @@ class MatchService(
 
         val game1 = gameService.createGame(matchId)
         val game2 = gameService.createGame(matchId)
-
-        val publicUser = publicUserService.getPublicUser(userId)
-        val publicOpponent = publicUserService.getPublicUser(opponentId)
 
         val match =
             MatchEntity(
@@ -98,16 +123,13 @@ class MatchService(
         when (createMatchRequestDto.mode) {
             MatchModeDto.SELF -> {
                 val (_, _, mapRevisionId, codeRevisionId) = createMatchRequestDto
-                if (codeRevisionId == null || mapRevisionId == null) {
-                    throw CustomException(HttpStatus.BAD_REQUEST, "Revision IDs are required for self match")
-                }
                 createSelfMatch(userId, codeRevisionId, mapRevisionId)
             }
             MatchModeDto.MANUAL, MatchModeDto.AUTO -> {
-                if (createMatchRequestDto.opponentId == null) {
+                if (createMatchRequestDto.opponentUsername == null) {
                     throw CustomException(HttpStatus.BAD_REQUEST, "Opponent ID is required")
                 }
-                createDualMatch(userId, createMatchRequestDto.opponentId!!)
+                createDualMatch(userId, createMatchRequestDto.opponentUsername!!)
             }
         }
     }
@@ -134,7 +156,6 @@ class MatchService(
                     .toSet(),
                 user1 =
                 PublicUserDto(
-                    userId = matchEntity.player1.userId,
                     username = matchEntity.player1.username,
                     name = matchEntity.player1.name,
                     country = matchEntity.player1.country,
@@ -143,7 +164,6 @@ class MatchService(
                 ),
                 user2 =
                 PublicUserDto(
-                    userId = matchEntity.player2.userId,
                     username = matchEntity.player2.username,
                     name = matchEntity.player2.name,
                     country = matchEntity.player2.country,
@@ -187,6 +207,8 @@ class MatchService(
                     player2Game.destruction
                 )
             val finishedMatch = match.copy(verdict = verdict)
+            ratingHistoryService.updateRating(match.player1.userId, match.player2.userId, verdict)
+
             matchRepository.save(finishedMatch)
         }
     }

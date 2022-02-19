@@ -47,7 +47,7 @@ internal class GameControllerIntegrationTest(@Autowired val mockMvc: MockMvc) {
             )
         mongoTemplate.save<GameEntity>(gameEntity)
 
-        val gameLogEntity = GameLogEntity(id = gameEntity, log = "game log")
+        val gameLogEntity = GameLogEntity(gameId = gameEntity.id, log = "game log")
         mongoTemplate.save<GameLogEntity>(gameLogEntity)
 
         mockMvc
@@ -61,21 +61,13 @@ internal class GameControllerIntegrationTest(@Autowired val mockMvc: MockMvc) {
 
     @Test
     @WithMockCustomUser
-    fun `should return 404 when game not found`() {
+    fun `should return empty string when game not found`() {
         val randomUUID = UUID.randomUUID()
 
         mockMvc.get("/games/$randomUUID/logs") { contentType = MediaType.APPLICATION_JSON }.andExpect {
-            status { isNotFound() }
+            status { is2xxSuccessful() }
             content { contentType(MediaType.APPLICATION_JSON) }
-            content {
-                json(
-                    mapper.writeValueAsString(
-                        mapOf(
-                            "message" to "Game not found",
-                        )
-                    )
-                )
-            }
+            content { string("") }
         }
     }
 

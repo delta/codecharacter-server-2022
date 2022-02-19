@@ -2,11 +2,11 @@ package delta.codecharacter.server.game
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import delta.codecharacter.server.code.LanguageEnum
+import delta.codecharacter.server.config.GameConfiguration
 import delta.codecharacter.server.exception.CustomException
 import delta.codecharacter.server.game.queue.entities.GameRequestEntity
 import delta.codecharacter.server.game.queue.entities.GameResultEntity
 import delta.codecharacter.server.game.queue.entities.GameStatusUpdateEntity
-import delta.codecharacter.server.params.GameConfiguration
 import delta.codecharacter.server.params.GameParameters
 import io.mockk.confirmVerified
 import io.mockk.every

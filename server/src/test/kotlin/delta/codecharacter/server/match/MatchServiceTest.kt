@@ -5,16 +5,20 @@ import delta.codecharacter.dtos.CreateMatchRequestDto
 import delta.codecharacter.dtos.GameMapRevisionDto
 import delta.codecharacter.dtos.LanguageDto
 import delta.codecharacter.dtos.MatchModeDto
+import delta.codecharacter.server.TestAttributes
 import delta.codecharacter.server.code.LanguageEnum
 import delta.codecharacter.server.code.code_revision.CodeRevisionService
+import delta.codecharacter.server.code.latest_code.LatestCodeService
 import delta.codecharacter.server.code.locked_code.LockedCodeService
 import delta.codecharacter.server.exception.CustomException
 import delta.codecharacter.server.game.GameEntity
 import delta.codecharacter.server.game.GameService
+import delta.codecharacter.server.game_map.latest_map.LatestMapService
 import delta.codecharacter.server.game_map.locked_map.LockedMapService
 import delta.codecharacter.server.game_map.map_revision.MapRevisionService
 import delta.codecharacter.server.logic.verdict.VerdictAlgorithm
 import delta.codecharacter.server.user.public_user.PublicUserService
+import delta.codecharacter.server.user.rating_history.RatingHistoryService
 import io.mockk.confirmVerified
 import io.mockk.every
 import io.mockk.mockk
@@ -31,12 +35,15 @@ internal class MatchServiceTest {
 
     private lateinit var matchRepository: MatchRepository
     private lateinit var gameService: GameService
+    private lateinit var latestCodeService: LatestCodeService
     private lateinit var codeRevisionService: CodeRevisionService
     private lateinit var lockedCodeService: LockedCodeService
+    private lateinit var latestMapService: LatestMapService
     private lateinit var mapRevisionService: MapRevisionService
     private lateinit var lockedMapService: LockedMapService
     private lateinit var publicUserService: PublicUserService
     private lateinit var verdictAlgorithm: VerdictAlgorithm
+    private lateinit var ratingHistoryService: RatingHistoryService
 
     private lateinit var matchService: MatchService
 
@@ -44,52 +51,30 @@ internal class MatchServiceTest {
     fun setUp() {
         matchRepository = mockk(relaxed = true)
         gameService = mockk(relaxed = true)
+        latestCodeService = mockk(relaxed = true)
         codeRevisionService = mockk(relaxed = true)
         lockedCodeService = mockk(relaxed = true)
+        latestMapService = mockk(relaxed = true)
         mapRevisionService = mockk(relaxed = true)
         lockedMapService = mockk(relaxed = true)
         publicUserService = mockk(relaxed = true)
         verdictAlgorithm = mockk(relaxed = true)
+        ratingHistoryService = mockk(relaxed = true)
 
         matchService =
             MatchService(
                 matchRepository,
                 gameService,
+                latestCodeService,
                 codeRevisionService,
                 lockedCodeService,
+                latestMapService,
                 mapRevisionService,
                 lockedMapService,
                 publicUserService,
-                verdictAlgorithm
+                verdictAlgorithm,
+                ratingHistoryService
             )
-    }
-
-    @Test
-    @Throws(CustomException::class)
-    fun `should throw bad request if code revision id is empty for self match`() {
-        val createMatchRequestDto =
-            CreateMatchRequestDto(
-                mode = MatchModeDto.SELF, codeRevisionId = null, mapRevisionId = UUID.randomUUID()
-            )
-
-        val exception =
-            assertThrows<CustomException> { matchService.createMatch(mockk(), createMatchRequestDto) }
-        assertThat(exception.status).isEqualTo(HttpStatus.BAD_REQUEST)
-        assertThat(exception.message).isEqualTo("Revision IDs are required for self match")
-    }
-
-    @Test
-    @Throws(CustomException::class)
-    fun `should throw bad request if map revision id is empty for self match`() {
-        val createMatchRequestDto =
-            CreateMatchRequestDto(
-                mode = MatchModeDto.SELF, codeRevisionId = UUID.randomUUID(), mapRevisionId = null
-            )
-
-        val exception =
-            assertThrows<CustomException> { matchService.createMatch(mockk(), createMatchRequestDto) }
-        assertThat(exception.status).isEqualTo(HttpStatus.BAD_REQUEST)
-        assertThat(exception.message).isEqualTo("Revision IDs are required for self match")
     }
 
     @Test
@@ -191,7 +176,7 @@ internal class MatchServiceTest {
                 mode = MatchModeDto.MANUAL,
                 codeRevisionId = UUID.randomUUID(),
                 mapRevisionId = UUID.randomUUID(),
-                opponentId = null
+                opponentUsername = null
             )
 
         val exception =
@@ -209,7 +194,7 @@ internal class MatchServiceTest {
                 mode = MatchModeDto.AUTO,
                 codeRevisionId = UUID.randomUUID(),
                 mapRevisionId = UUID.randomUUID(),
-                opponentId = null
+                opponentUsername = null
             )
 
         val exception =
@@ -223,6 +208,8 @@ internal class MatchServiceTest {
     fun `should create manual match`() {
         val userId = UUID.randomUUID()
         val opponentId = UUID.randomUUID()
+        val opponentPublicUser =
+            TestAttributes.publicUser.copy(userId = opponentId, username = "opponent")
 
         val userCode = Pair(LanguageEnum.CPP, "user-code")
         val opponentCode = Pair(LanguageEnum.PYTHON, "opponent-code")
@@ -232,9 +219,11 @@ internal class MatchServiceTest {
         val createMatchRequestDto =
             CreateMatchRequestDto(
                 mode = MatchModeDto.MANUAL,
-                opponentId = opponentId,
+                opponentUsername = opponentPublicUser.username,
             )
 
+        every { publicUserService.getPublicUserByUsername(opponentPublicUser.username) } returns
+            opponentPublicUser
         every { lockedCodeService.getLockedCode(userId) } returns userCode
         every { lockedCodeService.getLockedCode(opponentId) } returns opponentCode
         every { lockedMapService.getLockedMap(userId) } returns userMap
@@ -250,6 +239,7 @@ internal class MatchServiceTest {
         matchService.createMatch(userId, createMatchRequestDto)
 
         verify {
+            publicUserService.getPublicUserByUsername(opponentPublicUser.username)
             lockedCodeService.getLockedCode(userId)
             lockedCodeService.getLockedCode(opponentId)
             lockedMapService.getLockedMap(userId)
@@ -268,6 +258,8 @@ internal class MatchServiceTest {
     fun `should create auto match`() {
         val userId = UUID.randomUUID()
         val opponentId = UUID.randomUUID()
+        val opponentPublicUser =
+            TestAttributes.publicUser.copy(userId = opponentId, username = "opponent")
 
         val userCode = Pair(LanguageEnum.CPP, "user-code")
         val opponentCode = Pair(LanguageEnum.PYTHON, "opponent-code")
@@ -277,9 +269,11 @@ internal class MatchServiceTest {
         val createMatchRequestDto =
             CreateMatchRequestDto(
                 mode = MatchModeDto.AUTO,
-                opponentId = opponentId,
+                opponentUsername = opponentPublicUser.username,
             )
 
+        every { publicUserService.getPublicUserByUsername(opponentPublicUser.username) } returns
+            opponentPublicUser
         every { lockedCodeService.getLockedCode(userId) } returns userCode
         every { lockedCodeService.getLockedCode(opponentId) } returns opponentCode
         every { lockedMapService.getLockedMap(userId) } returns userMap
@@ -295,6 +289,7 @@ internal class MatchServiceTest {
         matchService.createMatch(userId, createMatchRequestDto)
 
         verify {
+            publicUserService.getPublicUserByUsername(opponentPublicUser.username)
             lockedCodeService.getLockedCode(userId)
             lockedCodeService.getLockedCode(opponentId)
             lockedMapService.getLockedMap(userId)

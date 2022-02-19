@@ -1,5 +1,6 @@
-package delta.codecharacter.server.params
+package delta.codecharacter.server.config
 
+import delta.codecharacter.server.params.GameParameters
 import delta.codecharacter.server.params.game_entities.Attacker
 import delta.codecharacter.server.params.game_entities.Defender
 import org.springframework.context.annotation.Bean

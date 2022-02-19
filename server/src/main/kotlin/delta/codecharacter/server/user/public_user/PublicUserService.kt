@@ -45,7 +45,6 @@ class PublicUserService(@Autowired private val publicUserRepository: PublicUserR
             LeaderboardEntryDto(
                 user =
                 PublicUserDto(
-                    userId = it.userId,
                     username = it.username,
                     name = it.name,
                     country = it.country,
@@ -88,5 +87,9 @@ class PublicUserService(@Autowired private val publicUserRepository: PublicUserR
 
     fun getPublicUser(userId: UUID): PublicUserEntity {
         return publicUserRepository.findById(userId).get()
+    }
+
+    fun getPublicUserByUsername(username: String): PublicUserEntity {
+        return publicUserRepository.findByUsername(username).get()
     }
 }

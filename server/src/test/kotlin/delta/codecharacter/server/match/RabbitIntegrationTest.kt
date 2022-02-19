@@ -142,9 +142,12 @@ internal class RabbitIntegrationTest(@Autowired val mockMvc: MockMvc) {
                     id = UUID.randomUUID(), username = "opponent", email = "opponent@test.com"
                 )
             )
-        mongoTemplate.save(
-            TestAttributes.publicUser.copy(userId = opponentUser.id, username = opponentUser.username)
-        )
+        val opponentPublicUser =
+            mongoTemplate.save(
+                TestAttributes.publicUser.copy(
+                    userId = opponentUser.id, username = opponentUser.username
+                )
+            )
 
         val userLockedCode =
             mongoTemplate.save(
@@ -181,7 +184,7 @@ internal class RabbitIntegrationTest(@Autowired val mockMvc: MockMvc) {
         val createMatchRequestDto =
             CreateMatchRequestDto(
                 mode = MatchModeDto.MANUAL,
-                opponentId = opponentUser.id,
+                opponentUsername = opponentPublicUser.username,
             )
 
         mockMvc
