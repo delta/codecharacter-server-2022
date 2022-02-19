@@ -7,6 +7,7 @@ import io.mockk.verify
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder
 import java.time.Instant
 import java.util.UUID
 
@@ -16,10 +17,13 @@ internal class NotificationServiceTest {
 
     private lateinit var notificationService: NotificationService
 
+    private val jackson2ObjectMapperBuilder = Jackson2ObjectMapperBuilder()
+
     @BeforeEach
     fun setUp() {
         notificationRepository = mockk()
-        notificationService = NotificationService(notificationRepository, mockk(), mockk())
+        notificationService =
+            NotificationService(notificationRepository, jackson2ObjectMapperBuilder, mockk())
     }
 
     @Test

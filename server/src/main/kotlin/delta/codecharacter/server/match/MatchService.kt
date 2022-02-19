@@ -9,10 +9,12 @@ import delta.codecharacter.dtos.PublicUserDto
 import delta.codecharacter.dtos.VerdictDto
 import delta.codecharacter.server.code.LanguageEnum
 import delta.codecharacter.server.code.code_revision.CodeRevisionService
+import delta.codecharacter.server.code.latest_code.LatestCodeService
 import delta.codecharacter.server.code.locked_code.LockedCodeService
 import delta.codecharacter.server.exception.CustomException
 import delta.codecharacter.server.game.GameService
 import delta.codecharacter.server.game.GameStatusEnum
+import delta.codecharacter.server.game_map.latest_map.LatestMapService
 import delta.codecharacter.server.game_map.locked_map.LockedMapService
 import delta.codecharacter.server.game_map.map_revision.MapRevisionService
 import delta.codecharacter.server.logic.verdict.VerdictAlgorithm
@@ -29,20 +31,40 @@ import java.util.UUID
 class MatchService(
     @Autowired private val matchRepository: MatchRepository,
     @Autowired private val gameService: GameService,
+    @Autowired private val latestCodeService: LatestCodeService,
     @Autowired private val codeRevisionService: CodeRevisionService,
     @Autowired private val lockedCodeService: LockedCodeService,
+    @Autowired private val latestMapService: LatestMapService,
     @Autowired private val mapRevisionService: MapRevisionService,
     @Autowired private val lockedMapService: LockedMapService,
     @Autowired private val publicUserService: PublicUserService,
     @Autowired private val verdictAlgorithm: VerdictAlgorithm,
 ) {
-    private fun createSelfMatch(userId: UUID, codeRevisionId: UUID, mapRevisionId: UUID) {
-        val (_, code, _, language) =
-            codeRevisionService.getCodeRevisions(userId).find { it.id == codeRevisionId }
-                ?: throw CustomException(HttpStatus.BAD_REQUEST, "Invalid revision ID")
-        val map =
-            mapRevisionService.getMapRevisions(userId).find { it.id == mapRevisionId }?.map
-                ?: throw CustomException(HttpStatus.BAD_REQUEST, "Invalid revision ID")
+    private fun createSelfMatch(userId: UUID, codeRevisionId: UUID?, mapRevisionId: UUID?) {
+        val code: String
+        val language: LanguageEnum
+        if (codeRevisionId == null) {
+            val latestCode = latestCodeService.getLatestCode(userId)
+            code = latestCode.code
+            language = LanguageEnum.valueOf(latestCode.language.name)
+        } else {
+            val codeRevision =
+                codeRevisionService.getCodeRevisions(userId).find { it.id == codeRevisionId }
+                    ?: throw CustomException(HttpStatus.BAD_REQUEST, "Invalid revision ID")
+            code = codeRevision.code
+            language = LanguageEnum.valueOf(codeRevision.language.name)
+        }
+
+        val map: String =
+            if (mapRevisionId == null) {
+                val latestMap = latestMapService.getLatestMap(userId)
+                latestMap.map
+            } else {
+                val mapRevision =
+                    mapRevisionService.getMapRevisions(userId).find { it.id == mapRevisionId }
+                        ?: throw CustomException(HttpStatus.BAD_REQUEST, "Invalid revision ID")
+                mapRevision.map
+            }
 
         val matchId = UUID.randomUUID()
         val game = gameService.createGame(matchId)
@@ -98,9 +120,6 @@ class MatchService(
         when (createMatchRequestDto.mode) {
             MatchModeDto.SELF -> {
                 val (_, _, mapRevisionId, codeRevisionId) = createMatchRequestDto
-                if (codeRevisionId == null || mapRevisionId == null) {
-                    throw CustomException(HttpStatus.BAD_REQUEST, "Revision IDs are required for self match")
-                }
                 createSelfMatch(userId, codeRevisionId, mapRevisionId)
             }
             MatchModeDto.MANUAL, MatchModeDto.AUTO -> {

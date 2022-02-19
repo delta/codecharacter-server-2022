@@ -29,31 +29,6 @@ internal class MatchControllerIntegrationTest(@Autowired val mockMvc: MockMvc) {
 
     @Test
     @WithMockCustomUser
-    fun `should return bad request when revision IDs are empty for self match`() {
-        val request =
-            CreateMatchRequestDto(
-                mode = MatchModeDto.SELF,
-                codeRevisionId = null,
-                mapRevisionId = null,
-            )
-
-        mockMvc
-            .post("/user/matches") {
-                content = mapper.writeValueAsString(request)
-                contentType = MediaType.APPLICATION_JSON
-            }
-            .andExpect {
-                status { isBadRequest() }
-                content {
-                    mapper.writeValueAsString(
-                        mapOf("message" to "Revision IDs are required for self match")
-                    )
-                }
-            }
-    }
-
-    @Test
-    @WithMockCustomUser
     fun `should return bad request when revision IDs don't belong to the user for self match`() {
         val createMatchRequestDto =
             CreateMatchRequestDto(
