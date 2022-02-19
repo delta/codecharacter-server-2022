@@ -3,8 +3,8 @@ package delta.codecharacter.server.logic.validation
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
+import delta.codecharacter.server.config.GameConfiguration
 import delta.codecharacter.server.exception.CustomException
-import delta.codecharacter.server.params.GameConfiguration
 import org.springframework.http.HttpStatus
 
 class MapValidator {
