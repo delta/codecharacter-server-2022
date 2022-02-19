@@ -5,9 +5,9 @@ import io.swagger.annotations.ApiModelProperty
 import javax.validation.Valid
 
 /**
- * Create match request
+ * Create match request  If mode is SELF: either/both of mapRevisionId and codeRevisionId have to be provided, or else latest code will be used to initiate the match If mode is MANUAL: only opponentUsername should be provided
  * @param mode
- * @param opponentId User ID of the opponent
+ * @param opponentUsername User ID of the opponent
  * @param mapRevisionId Revision ID of the map
  * @param codeRevisionId Revision of the code
  */
@@ -17,8 +17,8 @@ data class CreateMatchRequestDto(
     @ApiModelProperty(example = "null", required = true, value = "")
     @field:JsonProperty("mode", required = true) val mode: MatchModeDto,
 
-    @ApiModelProperty(example = "null", value = "User ID of the opponent")
-    @field:JsonProperty("opponentId") val opponentId: java.util.UUID? = null,
+    @ApiModelProperty(example = "null", value = "Username of the opponent")
+    @field:JsonProperty("opponentUsername") val opponentUsername: String? = null,
 
     @ApiModelProperty(example = "null", value = "Revision ID of the map")
     @field:JsonProperty("mapRevisionId") val mapRevisionId: java.util.UUID? = null,

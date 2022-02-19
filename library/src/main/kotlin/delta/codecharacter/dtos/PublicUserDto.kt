@@ -5,7 +5,6 @@ import io.swagger.annotations.ApiModelProperty
 
 /**
  * Public user model
- * @param userId
  * @param username
  * @param name
  * @param country
@@ -13,13 +12,6 @@ import io.swagger.annotations.ApiModelProperty
  * @param avatarId
  */
 data class PublicUserDto(
-
-    @ApiModelProperty(
-        example = "123e4567-e89b-12d3-a456-426614174003",
-        required = true,
-        value = ""
-    )
-    @field:JsonProperty("userId", required = true) val userId: java.util.UUID,
 
     @ApiModelProperty(example = "test", required = true, value = "")
     @field:JsonProperty(

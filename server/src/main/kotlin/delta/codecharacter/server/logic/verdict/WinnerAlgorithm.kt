@@ -1,7 +1,7 @@
 package delta.codecharacter.server.logic.verdict
 
+import delta.codecharacter.server.config.GameConfiguration
 import delta.codecharacter.server.match.MatchVerdictEnum
-import delta.codecharacter.server.params.GameConfiguration
 
 class WinnerAlgorithm : VerdictAlgorithm {
     override fun getVerdict(

@@ -1,4 +1,4 @@
-package delta.codecharacter.server.game.queue
+package delta.codecharacter.server.config
 
 import org.springframework.amqp.core.Queue
 import org.springframework.amqp.rabbit.annotation.EnableRabbit
