@@ -5,6 +5,7 @@ import delta.codecharacter.dtos.CreateMatchRequestDto
 import delta.codecharacter.dtos.GameMapRevisionDto
 import delta.codecharacter.dtos.LanguageDto
 import delta.codecharacter.dtos.MatchModeDto
+import delta.codecharacter.server.TestAttributes
 import delta.codecharacter.server.code.LanguageEnum
 import delta.codecharacter.server.code.code_revision.CodeRevisionService
 import delta.codecharacter.server.code.latest_code.LatestCodeService
@@ -171,7 +172,7 @@ internal class MatchServiceTest {
                 mode = MatchModeDto.MANUAL,
                 codeRevisionId = UUID.randomUUID(),
                 mapRevisionId = UUID.randomUUID(),
-                opponentId = null
+                opponentUsername = null
             )
 
         val exception =
@@ -189,7 +190,7 @@ internal class MatchServiceTest {
                 mode = MatchModeDto.AUTO,
                 codeRevisionId = UUID.randomUUID(),
                 mapRevisionId = UUID.randomUUID(),
-                opponentId = null
+                opponentUsername = null
             )
 
         val exception =
@@ -203,6 +204,8 @@ internal class MatchServiceTest {
     fun `should create manual match`() {
         val userId = UUID.randomUUID()
         val opponentId = UUID.randomUUID()
+        val opponentPublicUser =
+            TestAttributes.publicUser.copy(userId = opponentId, username = "opponent")
 
         val userCode = Pair(LanguageEnum.CPP, "user-code")
         val opponentCode = Pair(LanguageEnum.PYTHON, "opponent-code")
@@ -212,9 +215,11 @@ internal class MatchServiceTest {
         val createMatchRequestDto =
             CreateMatchRequestDto(
                 mode = MatchModeDto.MANUAL,
-                opponentId = opponentId,
+                opponentUsername = opponentPublicUser.username,
             )
 
+        every { publicUserService.getPublicUserByUsername(opponentPublicUser.username) } returns
+            opponentPublicUser
         every { lockedCodeService.getLockedCode(userId) } returns userCode
         every { lockedCodeService.getLockedCode(opponentId) } returns opponentCode
         every { lockedMapService.getLockedMap(userId) } returns userMap
@@ -230,6 +235,7 @@ internal class MatchServiceTest {
         matchService.createMatch(userId, createMatchRequestDto)
 
         verify {
+            publicUserService.getPublicUserByUsername(opponentPublicUser.username)
             lockedCodeService.getLockedCode(userId)
             lockedCodeService.getLockedCode(opponentId)
             lockedMapService.getLockedMap(userId)
@@ -248,6 +254,8 @@ internal class MatchServiceTest {
     fun `should create auto match`() {
         val userId = UUID.randomUUID()
         val opponentId = UUID.randomUUID()
+        val opponentPublicUser =
+            TestAttributes.publicUser.copy(userId = opponentId, username = "opponent")
 
         val userCode = Pair(LanguageEnum.CPP, "user-code")
         val opponentCode = Pair(LanguageEnum.PYTHON, "opponent-code")
@@ -257,9 +265,11 @@ internal class MatchServiceTest {
         val createMatchRequestDto =
             CreateMatchRequestDto(
                 mode = MatchModeDto.AUTO,
-                opponentId = opponentId,
+                opponentUsername = opponentPublicUser.username,
             )
 
+        every { publicUserService.getPublicUserByUsername(opponentPublicUser.username) } returns
+            opponentPublicUser
         every { lockedCodeService.getLockedCode(userId) } returns userCode
         every { lockedCodeService.getLockedCode(opponentId) } returns opponentCode
         every { lockedMapService.getLockedMap(userId) } returns userMap
@@ -275,6 +285,7 @@ internal class MatchServiceTest {
         matchService.createMatch(userId, createMatchRequestDto)
 
         verify {
+            publicUserService.getPublicUserByUsername(opponentPublicUser.username)
             lockedCodeService.getLockedCode(userId)
             lockedCodeService.getLockedCode(opponentId)
             lockedMapService.getLockedMap(userId)

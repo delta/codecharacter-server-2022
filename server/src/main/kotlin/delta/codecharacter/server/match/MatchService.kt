@@ -84,7 +84,11 @@ class MatchService(
         gameService.sendGameRequest(game, code, LanguageEnum.valueOf(language.name), map)
     }
 
-    fun createDualMatch(userId: UUID, opponentId: UUID) {
+    fun createDualMatch(userId: UUID, opponentUsername: String) {
+        val publicUser = publicUserService.getPublicUser(userId)
+        val publicOpponent = publicUserService.getPublicUserByUsername(opponentUsername)
+        val opponentId = publicOpponent.userId
+
         val (userLanguage, userCode) = lockedCodeService.getLockedCode(userId)
         val userMap = lockedMapService.getLockedMap(userId)
 
@@ -95,9 +99,6 @@ class MatchService(
 
         val game1 = gameService.createGame(matchId)
         val game2 = gameService.createGame(matchId)
-
-        val publicUser = publicUserService.getPublicUser(userId)
-        val publicOpponent = publicUserService.getPublicUser(opponentId)
 
         val match =
             MatchEntity(
@@ -123,10 +124,10 @@ class MatchService(
                 createSelfMatch(userId, codeRevisionId, mapRevisionId)
             }
             MatchModeDto.MANUAL, MatchModeDto.AUTO -> {
-                if (createMatchRequestDto.opponentId == null) {
+                if (createMatchRequestDto.opponentUsername == null) {
                     throw CustomException(HttpStatus.BAD_REQUEST, "Opponent ID is required")
                 }
-                createDualMatch(userId, createMatchRequestDto.opponentId!!)
+                createDualMatch(userId, createMatchRequestDto.opponentUsername!!)
             }
         }
     }
@@ -153,7 +154,6 @@ class MatchService(
                     .toSet(),
                 user1 =
                 PublicUserDto(
-                    userId = matchEntity.player1.userId,
                     username = matchEntity.player1.username,
                     name = matchEntity.player1.name,
                     country = matchEntity.player1.country,
@@ -162,7 +162,6 @@ class MatchService(
                 ),
                 user2 =
                 PublicUserDto(
-                    userId = matchEntity.player2.userId,
                     username = matchEntity.player2.username,
                     name = matchEntity.player2.name,
                     country = matchEntity.player2.country,

@@ -12,7 +12,8 @@ $ openapi-generator-cli generate \
     --model-name-suffix=Dto \
     --import-mappings=DateTime=java.time.Instant \
     --type-mappings=DateTime=java.time.Instant \
-    -o library
+    -o library \
+    --enable-post-process-file
 ```
 
 ### API Docs:
