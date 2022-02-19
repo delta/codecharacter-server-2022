@@ -22,7 +22,7 @@
 1. Clone the repo and open in IntelliJ Ultimate.
 2. Press `Ctrl+Alt+Shift+S` and make sure the JDK version is 17.
 3. Press `Ctrl+Alt+S` and go to `Build, Execution, Deployment -> Docker` and make sure docker is configured correctly/
-4. Copy server/src/main/resources/application.example.yml to server/src/main/resources/application.yml.
+4. Copy `server/src/main/resources/application.example.yml` to `server/src/main/resources/application.yml`. If you want to use docker instead, copy the `server/src/main/resources/application.docker.example.yml` to `server/src/main/resources/application.yml`.
 5. The run configurations will be available in the top bar:
    ![Run Configurations](https://i.imgur.com/pO2SrPd.png)
 
