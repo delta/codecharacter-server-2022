@@ -15,6 +15,7 @@ import delta.codecharacter.server.game_map.locked_map.LockedMapService
 import delta.codecharacter.server.game_map.map_revision.MapRevisionService
 import delta.codecharacter.server.logic.verdict.VerdictAlgorithm
 import delta.codecharacter.server.user.public_user.PublicUserService
+import delta.codecharacter.server.user.rating_history.RatingHistoryService
 import io.mockk.confirmVerified
 import io.mockk.every
 import io.mockk.mockk
@@ -37,6 +38,7 @@ internal class MatchServiceTest {
     private lateinit var lockedMapService: LockedMapService
     private lateinit var publicUserService: PublicUserService
     private lateinit var verdictAlgorithm: VerdictAlgorithm
+    private lateinit var ratingHistoryService: RatingHistoryService
 
     private lateinit var matchService: MatchService
 
@@ -50,6 +52,7 @@ internal class MatchServiceTest {
         lockedMapService = mockk(relaxed = true)
         publicUserService = mockk(relaxed = true)
         verdictAlgorithm = mockk(relaxed = true)
+        ratingHistoryService = mockk(relaxed = true)
 
         matchService =
             MatchService(
@@ -60,7 +63,8 @@ internal class MatchServiceTest {
                 mapRevisionService,
                 lockedMapService,
                 publicUserService,
-                verdictAlgorithm
+                verdictAlgorithm,
+                ratingHistoryService
             )
     }
 

@@ -25,11 +25,15 @@ class GlickoRatingAlgorithm : RatingAlgorithm {
     //                          - Mark E Glickman
     private val minRatingDeviation: Double = 30.0
 
-    // Amount which decides how much a player's rating deviation changes every time period
-    private val c: Double = 416.0 // last year's value change this lol
-
     // Time for one rating period in minutes
-    private val timePeriod: Double = 5.0
+    private val timePeriod: Double = 15.0
+
+    // Amount which decides how much a player's rating deviation changes every time period
+    // Using timePeriod 15 mins and time to reduce the rating to min rating as 48 hrs,
+    // we get the number of time periods to reduce the rating to min rating as 192.
+    // Using these we calculate c = sqrt((350**2 - 50**2)/192) = 25, where 50 is
+    // the rating deviation of a typical player.
+    private val c: Double = 25.0
 
     // Wont let RD be more than this value
     private val unratedPlayerRD: Double = 350.0
@@ -83,7 +87,7 @@ class GlickoRatingAlgorithm : RatingAlgorithm {
         return GlickoRating(newR, newRd)
     }
 
-    fun getWeightedRatingDeviationSinceLastCompetetion(
+    override fun getWeightedRatingDeviationSinceLastCompetition(
         lastRD: Double,
         lastMatchDate: Instant,
     ): Double {

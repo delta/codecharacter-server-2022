@@ -17,6 +17,7 @@ import delta.codecharacter.server.game_map.locked_map.LockedMapService
 import delta.codecharacter.server.game_map.map_revision.MapRevisionService
 import delta.codecharacter.server.logic.verdict.VerdictAlgorithm
 import delta.codecharacter.server.user.public_user.PublicUserService
+import delta.codecharacter.server.user.rating_history.RatingHistoryService
 import org.springframework.amqp.rabbit.annotation.RabbitListener
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
@@ -35,6 +36,7 @@ class MatchService(
     @Autowired private val lockedMapService: LockedMapService,
     @Autowired private val publicUserService: PublicUserService,
     @Autowired private val verdictAlgorithm: VerdictAlgorithm,
+    @Autowired private val ratingHistoryService: RatingHistoryService
 ) {
     private fun createSelfMatch(userId: UUID, codeRevisionId: UUID, mapRevisionId: UUID) {
         val (_, code, _, language) =
@@ -187,6 +189,8 @@ class MatchService(
                     player2Game.destruction
                 )
             val finishedMatch = match.copy(verdict = verdict)
+            ratingHistoryService.updateRating(match.player1.userId, match.player2.userId, verdict)
+
             matchRepository.save(finishedMatch)
         }
     }
