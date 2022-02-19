@@ -17,7 +17,7 @@ class CurrentUserController(
     @Autowired private val publicUserService: PublicUserService
 ) : CurrentUserApi {
 
-    @Secured("ROLE_USER")
+    @Secured(value = ["ROLE_USER"])
     override fun getCurrentUser(): ResponseEntity<CurrentUserProfileDto> {
         val user = SecurityContextHolder.getContext().authentication.principal as UserEntity
         return ResponseEntity.ok(publicUserService.getUserProfile(user.id, user.email))

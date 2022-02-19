@@ -29,7 +29,6 @@ repositories {
 val snippetsDir by extra { file("build/generated-snippets") }
 
 dependencies {
-    val mapstructVersion = "1.4.2.Final"
 
     implementation("org.springframework.boot:spring-boot-starter-amqp:2.6.3")
     implementation("org.springframework.boot:spring-boot-starter-data-mongodb:2.6.3")
@@ -43,11 +42,10 @@ dependencies {
     implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.13.1")
     implementation("org.jetbrains.kotlin:kotlin-reflect:1.6.0")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.6.0")
+    implementation("io.jsonwebtoken:jjwt:0.9.1")
+    implementation("javax.xml.bind:jaxb-api:2.4.0-b180830.0359")
     implementation(project(":library"))
     implementation("org.junit.jupiter:junit-jupiter:5.8.2")
-    implementation("org.mapstruct:mapstruct:$mapstructVersion")
-    compileOnly("org.mapstruct:mapstruct-processor:$mapstructVersion")
-    annotationProcessor("org.mapstruct:mapstruct-processor:$mapstructVersion")
     testImplementation("com.ninja-squad:springmockk:3.1.0")
     developmentOnly("org.springframework.boot:spring-boot-devtools:2.6.3")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor:2.6.3")
@@ -58,7 +56,6 @@ dependencies {
     testImplementation("org.springframework.amqp:spring-rabbit-test:2.4.2")
     testImplementation("org.springframework.restdocs:spring-restdocs-mockmvc:2.0.6.RELEASE")
     testImplementation("org.springframework.security:spring-security-test:5.5.1")
-    testAnnotationProcessor("org.mapstruct:mapstruct-processor:$mapstructVersion")
 }
 
 allOpen {

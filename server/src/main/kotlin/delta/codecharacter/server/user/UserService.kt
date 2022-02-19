@@ -6,6 +6,7 @@ import delta.codecharacter.server.exception.CustomException
 import delta.codecharacter.server.user.public_user.PublicUserService
 import delta.codecharacter.server.user.rating_history.RatingHistoryService
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.context.annotation.Lazy
 import org.springframework.dao.DuplicateKeyException
 import org.springframework.http.HttpStatus
 import org.springframework.security.core.userdetails.UserDetailsService
@@ -21,7 +22,7 @@ class UserService(
     @Autowired private val ratingHistoryService: RatingHistoryService
 ) : UserDetailsService {
 
-    @Autowired private lateinit var passwordEncoder: BCryptPasswordEncoder
+    @Lazy @Autowired private lateinit var passwordEncoder: BCryptPasswordEncoder
 
     override fun loadUserByUsername(email: String?): UserEntity {
         if (email == null) {
@@ -46,7 +47,7 @@ class UserService(
                 username = username,
                 password = passwordEncoder.encode(password),
                 email = email,
-                isEnabled = false,
+                isEnabled = true,
                 isAccountNonExpired = true,
                 isAccountNonLocked = true,
                 isCredentialsNonExpired = true,
@@ -63,9 +64,9 @@ class UserService(
         }
     }
 
-    private fun verifyUserPassword(id: UUID, password: String): Boolean {
+    fun verifyUserPassword(id: UUID, password: String): Boolean {
         val user = userRepository.findById(id)
-        return user.get().password == passwordEncoder.encode(password)
+        return passwordEncoder.matches(password, user.get().password)
     }
 
     fun updatePassword(userId: UUID, updatePasswordRequestDto: UpdatePasswordRequestDto) {

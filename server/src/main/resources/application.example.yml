@@ -14,3 +14,10 @@ spring:
       write-dates-as-timestamps: false
 
 debug: false
+
+cors:
+  enabled: true
+  allowed-origin: http://localhost:3000
+
+jwt:
+  secret: 'example'

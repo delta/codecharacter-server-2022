@@ -4,6 +4,21 @@
       "name": "api.base-path",
       "type": "java.lang.String",
       "description": "Base route of the API."
+    },
+    {
+      "name": "jwt.secret",
+      "type": "java.lang.String",
+      "description": "JWT secret used to sign tokens."
+    },
+    {
+      "name": "cors.enabled",
+      "type": "java.lang.Boolean",
+      "description": "Enable CORS."
+    },
+    {
+      "name": "cors.allowed-origin",
+      "type": "java.lang.String",
+      "description": "Allowed origin (Frontend URL)"
     }
   ]
 }
