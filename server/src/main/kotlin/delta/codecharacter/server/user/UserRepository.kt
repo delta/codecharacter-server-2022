@@ -8,4 +8,5 @@ import java.util.UUID
 @Repository
 interface UserRepository : MongoRepository<UserEntity, UUID> {
     fun findFirstByEmail(email: String): Optional<UserEntity>
+    fun findFirstById(id: UUID): Optional<UserEntity>
 }

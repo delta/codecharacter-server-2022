@@ -12,6 +12,9 @@ spring:
   jackson:
     serialization:
       write-dates-as-timestamps: false
+  sendgrid:
+    api-key: your-api-key
+    template-id: your-template-id
 
 debug: false
 
@@ -21,3 +24,8 @@ cors:
 
 jwt:
   secret: 'example'
+
+BASE-URL: your-base-url
+
+
+

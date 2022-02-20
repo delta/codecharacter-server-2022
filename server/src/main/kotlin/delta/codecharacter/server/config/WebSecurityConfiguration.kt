@@ -26,9 +26,9 @@ class WebSecurityConfiguration : WebSecurityConfigurerAdapter() {
 
     override fun configure(http: HttpSecurity?) {
         http {
+            csrf { disable() }
             authorizeRequests { authorize(HttpMethod.OPTIONS, "/**", permitAll) }
             cors { if (!corsEnabled) disable() }
-            csrf { disable() }
             sessionManagement { sessionCreationPolicy = SessionCreationPolicy.STATELESS }
             addFilterBefore<UsernamePasswordAuthenticationFilter>(jwtRequestFilter)
         }

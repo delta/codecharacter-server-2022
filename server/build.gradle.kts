@@ -44,6 +44,7 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.6.0")
     implementation("io.jsonwebtoken:jjwt:0.9.1")
     implementation("javax.xml.bind:jaxb-api:2.4.0-b180830.0359")
+    implementation("com.sendgrid:sendgrid-java:4.8.3")
     implementation(project(":library"))
     implementation("org.junit.jupiter:junit-jupiter:5.8.2")
     testImplementation("com.ninja-squad:springmockk:3.1.0")

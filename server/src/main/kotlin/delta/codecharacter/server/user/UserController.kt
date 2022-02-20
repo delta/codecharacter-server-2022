@@ -29,7 +29,8 @@ class UserController(
         userId: UUID,
         activateUserRequestDto: ActivateUserRequestDto
     ): ResponseEntity<Unit> {
-        TODO("Implement user activation")
+        userService.activateUser(userId, activateUserRequestDto.token)
+        return ResponseEntity.status(HttpStatus.ACCEPTED).body(Unit)
     }
 
     override fun getRatingHistory(userId: UUID): ResponseEntity<List<RatingHistoryDto>> {
