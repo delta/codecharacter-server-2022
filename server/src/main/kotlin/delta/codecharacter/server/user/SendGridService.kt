@@ -8,40 +8,44 @@ import com.sendgrid.SendGrid
 import com.sendgrid.helpers.mail.Mail
 import com.sendgrid.helpers.mail.objects.Email
 import com.sendgrid.helpers.mail.objects.Personalization
+import delta.codecharacter.server.exception.CustomException
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import java.util.Collections
 import java.util.UUID
 
-@Suppress("NAME_SHADOWING")
 @Service
 class SendGridService {
 
-    @Autowired private lateinit var sendGrid: SendGrid
+    private val logger: Logger = LoggerFactory.getLogger(SendGridService::class.java)
 
-    @Value("\${spring.sendgrid.api-key}") private lateinit var key: String
+    @Autowired private lateinit var sendGrid: SendGrid
 
     @Value("\${spring.sendgrid.template-id}") private lateinit var templateId: String
 
     @Value("\${spring.sendgrid.sender-email}") private lateinit var senderEmail: String
 
-    @Value("\${base-url}") private lateinit var BASE_URL: String
+    @Value("\${base-url}") private lateinit var baseUrl: String
+
     fun activateUserEmail(userId: UUID, token: String, name: String, email: String) {
-        val link = "$BASE_URL/activate?id=$userId&token=$token"
+        val link = "$baseUrl/activate?id=$userId&token=$token"
         val linkName = "User Activation link"
-        val message = "Please! CLick the button to acitvate your account"
+        val message = "Please click the button to activate your account"
         val buttonName = "Activate"
         val subjectInfo = "CodeCharacter Account Activation Link"
         sendTemplateEmail(email, name, linkName, link, message, buttonName, subjectInfo)
     }
 
     fun forgotPasswordEmail(userId: UUID, token: String, name: String, email: String) {
-        val link = "$BASE_URL/reset-password?id=$userId&token=$token"
+        val link = "$baseUrl/reset-password?id=$userId&token=$token"
         val linkName = "Reset-Password link"
-        val message = "Please! CLick the button to reset your password"
+        val message = "Please click the button to reset your password"
         val buttonName = "Reset Password"
-        val subjectInfo = "CodeCharacter Reset password Link"
+        val subjectInfo = "CodeCharacter Reset-Password Link"
         sendTemplateEmail(email, name, linkName, link, message, buttonName, subjectInfo)
     }
 
@@ -54,12 +58,10 @@ class SendGridService {
         buttonName: String,
         subjectInfo: String
     ) {
-        val emailFrom = Email(senderEmail)
-        val emailTo = Email(emailTo)
         val mail = Mail()
         val personalization = DynamicTemplatePersonalization()
-        personalization.addTo(emailTo)
-        mail.setFrom(emailFrom)
+        personalization.addTo(Email(emailTo))
+        mail.setFrom(Email(senderEmail))
         mail.setSubject(subjectInfo)
         personalization.addDynamicTemplateData("name", name)
         personalization.addDynamicTemplateData("link_name", linkName)
@@ -69,7 +71,6 @@ class SendGridService {
         personalization.addDynamicTemplateData("subject", subjectInfo)
         mail.addPersonalization(personalization)
         mail.setTemplateId(templateId)
-        val sendGrid = SendGrid(key)
         val request = Request()
         try {
             request.apply {
@@ -78,17 +79,28 @@ class SendGridService {
                 body = mail.build()
             }
             val response: Response = sendGrid.api(request)
+            if (response.statusCode >= 400) {
+                logger.error(
+                    "Error while sending email with status: ${response.statusCode}. Error: ${response.body}"
+                )
+                throw CustomException(
+                    HttpStatus.INTERNAL_SERVER_ERROR, "Unknown error. Please contact event admins."
+                )
+            }
         } catch (e: Exception) {
-            throw Exception("Error occurred while sending email:" + e.message)
+            logger.error("Error while sending email: ${e.message}")
+            throw CustomException(
+                HttpStatus.INTERNAL_SERVER_ERROR, "Unknown error. Please contact event admins."
+            )
         }
     }
 }
 
-class DynamicTemplatePersonalization() : Personalization() {
+class DynamicTemplatePersonalization : Personalization() {
     @JsonProperty(value = "dynamic_template_data")
     private var dynamicTemplateData: HashMap<String, String>? = null
 
-    @JsonProperty("dynamic_template_data")
+    @JsonProperty(value = "dynamic_template_data")
     override fun getDynamicTemplateData(): Map<String, String> {
         return dynamicTemplateData ?: (Collections.emptyMap())
     }

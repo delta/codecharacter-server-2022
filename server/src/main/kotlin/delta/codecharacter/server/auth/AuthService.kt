@@ -43,7 +43,8 @@ class AuthService(
     }
 
     fun forgotPassword(forgotPasswordRequestDto: ForgotPasswordRequestDto) {
-        val user = userRepository.findFirstByEmail(email = forgotPasswordRequestDto.email)
+        val email = forgotPasswordRequestDto.email
+        val user = userRepository.findFirstByEmail(email)
         if (!user.isEmpty) {
             val passwordResetToken = UUID.randomUUID().toString()
             val passwordResetUser =
@@ -55,7 +56,7 @@ class AuthService(
                 )
             resetPasswordRepository.save(passwordResetUser)
             sendGridService.forgotPasswordEmail(
-                user.get().id, passwordResetToken, user.get().username, forgotPasswordRequestDto.email
+                user.get().id, passwordResetToken, user.get().username, email
             )
         } else {
             throw CustomException(HttpStatus.BAD_REQUEST, "Invalid request")
@@ -63,16 +64,13 @@ class AuthService(
     }
 
     fun resetPassword(resetPasswordRequestDto: ResetPasswordRequestDto) {
-        val resetPasswordUser =
-            resetPasswordRepository.findFirstByPasswordResetToken(resetPasswordRequestDto.token)
+        val (token, password, passwordConfirmation) = resetPasswordRequestDto
+        val resetPasswordUser = resetPasswordRepository.findFirstByPasswordResetToken(token)
         if (!resetPasswordUser.isEmpty) {
             if (resetPasswordUser.get().expiration > Date(System.currentTimeMillis())) {
-                if (resetPasswordRequestDto.password == resetPasswordRequestDto.passwordConfirmation) {
+                if (password == passwordConfirmation) {
                     val user = userRepository.findFirstById(resetPasswordUser.get().userId).get()
-                    val resetUserPassword =
-                        user.copy(
-                            password = passwordEncoder.encode(resetPasswordRequestDto.passwordConfirmation)
-                        )
+                    val resetUserPassword = user.copy(password = passwordEncoder.encode(passwordConfirmation))
                     userRepository.save(resetUserPassword)
                     resetPasswordRepository.delete(resetPasswordUser.get())
                 } else {
@@ -82,10 +80,10 @@ class AuthService(
                 }
             } else {
                 resetPasswordRepository.delete(resetPasswordUser.get())
-                throw CustomException(HttpStatus.REQUEST_TIMEOUT, "Reset Password Request timeout")
+                throw CustomException(HttpStatus.BAD_REQUEST, "Invalid token")
             }
         } else {
-            throw Exception("Request Not found , Try again!")
+            throw CustomException(HttpStatus.BAD_REQUEST, "Invalid token")
         }
     }
 }

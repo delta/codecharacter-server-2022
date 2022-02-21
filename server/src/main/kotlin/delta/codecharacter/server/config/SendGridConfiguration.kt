@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
 @Configuration
-class SendGridConfig {
+class SendGridConfiguration {
     @Value("\${spring.sendgrid.api-key}") private lateinit var key: String
     @Bean
     fun getSendGrid(): SendGrid {
