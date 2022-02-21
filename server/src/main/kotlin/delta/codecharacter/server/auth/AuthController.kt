@@ -32,9 +32,6 @@ class AuthController(@Autowired private val authService: AuthService) : AuthApi 
     override fun resetPassword(
         resetPasswordRequestDto: ResetPasswordRequestDto
     ): ResponseEntity<Unit> {
-        print(resetPasswordRequestDto.password)
-        print(resetPasswordRequestDto.passwordConfirmation)
-        print(resetPasswordRequestDto.token)
         authService.resetPassword(resetPasswordRequestDto)
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(Unit)
     }

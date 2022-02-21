@@ -15,6 +15,7 @@ spring:
   sendgrid:
     api-key: your-api-key
     template-id: your-template-id
+    sender-email: sender-email-id
 
 debug: false
 
@@ -25,7 +26,4 @@ cors:
 jwt:
   secret: 'example'
 
-BASE-URL: your-base-url
-
-
-
+base-url: your-base-url

@@ -4,7 +4,7 @@ import delta.codecharacter.dtos.RegisterUserRequestDto
 import delta.codecharacter.dtos.UpdatePasswordRequestDto
 import delta.codecharacter.server.exception.CustomException
 import delta.codecharacter.server.user.activate_user.ActivateUserRepository
-import delta.codecharacter.server.user.activate_user.ActivationuserEntity
+import delta.codecharacter.server.user.activate_user.ActivationUserEntity
 import delta.codecharacter.server.user.public_user.PublicUserService
 import delta.codecharacter.server.user.rating_history.RatingHistoryService
 import org.springframework.beans.factory.annotation.Autowired
@@ -111,7 +111,7 @@ class UserService(
         val token = UUID.randomUUID().toString()
         val expirationTime = Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10)
         val activationUser =
-            ActivationuserEntity(
+            ActivationUserEntity(
                 id = id,
                 userId = userId,
                 token = token,
@@ -123,7 +123,7 @@ class UserService(
         if (!user.isEmpty) sendGridService.activateUserEmail(userId, token, name, email)
     }
     fun activateUser(userId: UUID, token: String) {
-        val unactivatedUserInfo: ActivationuserEntity
+        val unactivatedUserInfo: ActivationUserEntity
         val unactivatedUser = activateUserRepository.findFirstByToken(token)
         if (unactivatedUser.isEmpty) throw UsernameNotFoundException("User is not yet registered")
         else unactivatedUserInfo = unactivatedUser.get()

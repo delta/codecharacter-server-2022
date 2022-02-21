@@ -44,7 +44,6 @@ class AuthService(
 
     fun forgotPassword(forgotPasswordRequestDto: ForgotPasswordRequestDto) {
         val user = userRepository.findFirstByEmail(email = forgotPasswordRequestDto.email).get()
-        print((forgotPasswordRequestDto.email))
         val passwordResetUser =
             ResetPasswordEntity(
                 id = UUID.randomUUID(),
@@ -67,7 +66,6 @@ class AuthService(
             if (resetPasswordUser.get().expiration > Date(System.currentTimeMillis())) {
                 if (resetPasswordRequestDto.password == resetPasswordRequestDto.passwordConfirmation) {
                     val user = userRepository.findFirstById(resetPasswordUser.get().userId).get()
-                    print(user)
                     val resetUserPassword =
                         user.copy(
                             password = passwordEncoder.encode(resetPasswordRequestDto.passwordConfirmation)

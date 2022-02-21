@@ -26,7 +26,7 @@ class SendGridService {
 
     @Value("\${spring.sendgrid.sender-email}") private lateinit var senderEmail: String
 
-    @Value("\${BASE-URL}") private lateinit var BASE_URL: String
+    @Value("\${base-url}") private lateinit var BASE_URL: String
     fun activateUserEmail(userId: UUID, token: String, name: String, email: String) {
         val link = "$BASE_URL/activate?id=$userId&token=$token"
         val linkName = "User Activation link"

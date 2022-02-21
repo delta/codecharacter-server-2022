@@ -5,8 +5,8 @@ import org.springframework.data.mongodb.core.mapping.Document
 import java.util.Date
 import java.util.UUID
 
-@Document(collection = "activationUser")
-data class ActivationuserEntity(
+@Document(collection = "activation_user")
+data class ActivationUserEntity(
     @Id val id: UUID,
     val userId: UUID,
     val token: String,

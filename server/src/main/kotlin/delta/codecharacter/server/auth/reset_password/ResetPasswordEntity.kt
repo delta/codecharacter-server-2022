@@ -5,7 +5,7 @@ import org.springframework.data.mongodb.core.mapping.Document
 import java.util.Date
 import java.util.UUID
 
-@Document(collection = "PasswordReset")
+@Document(collection = "password_reset")
 data class ResetPasswordEntity(
     @Id val id: UUID,
     val userId: UUID,
