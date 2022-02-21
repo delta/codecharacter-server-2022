@@ -43,23 +43,26 @@ class AuthService(
     }
 
     fun forgotPassword(forgotPasswordRequestDto: ForgotPasswordRequestDto) {
-        val user = userRepository.findFirstByEmail(email = forgotPasswordRequestDto.email).get()
-        val passwordResetUser =
-            ResetPasswordEntity(
-                id = UUID.randomUUID(),
-                userId = user.id,
-                passwordResetToken = UUID.randomUUID().toString(),
-                expiration = Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10)
+        val user = userRepository.findFirstByEmail(email = forgotPasswordRequestDto.email)
+        if (!user.isEmpty) {
+            val passwordResetToken = UUID.randomUUID().toString()
+            val passwordResetUser =
+                ResetPasswordEntity(
+                    id = UUID.randomUUID(),
+                    userId = user.get().id,
+                    passwordResetToken = passwordResetToken,
+                    expiration = Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10)
+                )
+            resetPasswordRepository.save(passwordResetUser)
+            sendGridService.forgotPasswordEmail(
+                user.get().id, passwordResetToken, user.get().username, forgotPasswordRequestDto.email
             )
-        resetPasswordRepository.save(passwordResetUser)
-        val token = resetPasswordRepository.findFirstByUserId(user.id).get().passwordResetToken
-        sendGridService.forgotPasswordEmail(
-            user.id, token, user.username, forgotPasswordRequestDto.email
-        )
+        } else {
+            throw CustomException(HttpStatus.BAD_REQUEST, "Invalid request")
+        }
     }
 
     fun resetPassword(resetPasswordRequestDto: ResetPasswordRequestDto) {
-        print(resetPasswordRequestDto.token)
         val resetPasswordUser =
             resetPasswordRepository.findFirstByPasswordResetToken(resetPasswordRequestDto.token)
         if (!resetPasswordUser.isEmpty) {
