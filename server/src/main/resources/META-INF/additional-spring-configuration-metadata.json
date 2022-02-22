@@ -23,12 +23,12 @@
     {
       "name": "sendgrid.api-key",
       "type": "java.lang.String",
-      "description": "Description for sendgrid.api-key."
+      "description": "Sendgrid API Key"
     },
     {
       "name": "spring.sendgrid.template-id",
       "type": "java.lang.String",
-      "description": "Description for spring.sendgrid.template-id."
+      "description": "Sendgrid Template ID"
     }
   ]
 }
