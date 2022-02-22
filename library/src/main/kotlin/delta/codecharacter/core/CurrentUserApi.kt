@@ -5,6 +5,7 @@
  */
 package delta.codecharacter.core
 
+import delta.codecharacter.dtos.CompleteProfileRequestDto
 import delta.codecharacter.dtos.CurrentUserProfileDto
 import delta.codecharacter.dtos.GenericErrorDto
 import delta.codecharacter.dtos.UpdateCurrentUserProfileDto
@@ -27,6 +28,32 @@ import javax.validation.Valid
 @Api(value = "CurrentUser", description = "The CurrentUser API")
 @RequestMapping("\${api.base-path:}")
 interface CurrentUserApi {
+
+    @ApiOperation(
+        value = "Complete user profile",
+        nickname = "completeUserProfile",
+        notes = "Complete the user profile for users who registered using OAuth",
+        authorizations = [Authorization(value = "http-bearer")]
+    )
+    @ApiResponses(
+        value = [ApiResponse(
+            code = 200,
+            message = "OK"
+        ), ApiResponse(code = 401, message = "Unauthorized")]
+    )
+    @RequestMapping(
+        method = [RequestMethod.POST],
+        value = ["/user/complete-profile"],
+        consumes = ["application/json"]
+    )
+    fun completeUserProfile(
+        @ApiParam(
+            value = "",
+            required = true
+        ) @Valid @RequestBody completeProfileRequestDto: CompleteProfileRequestDto
+    ): ResponseEntity<Unit> {
+        return ResponseEntity(HttpStatus.NOT_IMPLEMENTED)
+    }
 
     @ApiOperation(
         value = "Get current user profile",

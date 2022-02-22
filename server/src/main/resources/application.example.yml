@@ -16,6 +16,17 @@ spring:
     api-key: your-api-key
     template-id: your-template-id
     sender-email: sender-email-id
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: your-google-client-id
+            client-secret: your-google-client-secret
+          github:
+            client-id: your-github-client-id
+            client-secret: your-github-client-secret
+            scope: user:email
 
 debug: false
 

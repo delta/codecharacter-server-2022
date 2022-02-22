@@ -30,7 +30,7 @@ class JwtRequestFilter : OncePerRequestFilter() {
 
         if (SecurityContextHolder.getContext().authentication == null) {
             try {
-                val email = authUtil.getUsernameFromToken(jwt)
+                val email = authUtil.getEmailFromToken(jwt)
                 val userDetails = userService.loadUserByUsername(email)
                 authUtil.validateToken(jwt, userDetails)
                 val usernamePasswordAuthenticationToken =

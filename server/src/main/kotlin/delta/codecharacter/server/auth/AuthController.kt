@@ -22,6 +22,7 @@ class AuthController(@Autowired private val authService: AuthService) : AuthApi 
         return ResponseEntity.ok(authService.passwordLogin(passwordLoginRequestDto))
     }
 
+    @Secured(value = ["ROLE_ANONYMOUS"])
     override fun forgotPassword(
         forgotPasswordRequestDto: ForgotPasswordRequestDto
     ): ResponseEntity<Unit> {
@@ -29,6 +30,7 @@ class AuthController(@Autowired private val authService: AuthService) : AuthApi 
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(Unit)
     }
 
+    @Secured(value = ["ROLE_ANONYMOUS"])
     override fun resetPassword(
         resetPasswordRequestDto: ResetPasswordRequestDto
     ): ResponseEntity<Unit> {

@@ -1,5 +1,6 @@
 package delta.codecharacter.server.user
 
+import delta.codecharacter.dtos.CompleteProfileRequestDto
 import delta.codecharacter.dtos.RegisterUserRequestDto
 import delta.codecharacter.dtos.UpdatePasswordRequestDto
 import delta.codecharacter.server.exception.CustomException
@@ -11,11 +12,13 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Lazy
 import org.springframework.dao.DuplicateKeyException
 import org.springframework.http.HttpStatus
+import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
 import java.util.Date
+import java.util.Optional
 import java.util.UUID
 
 @Service
@@ -45,29 +48,49 @@ class UserService(
         }
     }
 
-    private fun createUser(userId: UUID, username: String, password: String, email: String) {
+    private fun createUserWithPassword(userId: UUID, password: String, email: String) {
         val user =
             UserEntity(
                 id = userId,
-                username = username,
                 password = passwordEncoder.encode(password),
                 email = email,
+                loginType = LoginType.PASSWORD,
+                isProfileComplete = true,
+                isEnabled = false,
+                isAccountNonExpired = true,
+                isAccountNonLocked = true,
+                isCredentialsNonExpired = true,
+                userAuthorities = mutableListOf(SimpleGrantedAuthority("ROLE_USER"))
+            )
+        userRepository.save(user)
+    }
+
+    fun createOAuthUser(email: String, oauthProvider: LoginType): UserEntity {
+        val userId = UUID.randomUUID()
+        val user =
+            UserEntity(
+                id = userId,
+                password = passwordEncoder.encode(UUID.randomUUID().toString()),
+                email = email,
+                loginType = oauthProvider,
+                isProfileComplete = false,
                 isEnabled = true,
                 isAccountNonExpired = true,
                 isAccountNonLocked = true,
                 isCredentialsNonExpired = true,
+                userAuthorities = mutableListOf(SimpleGrantedAuthority("ROLE_USER_INCOMPLETE_PROFILE"))
             )
-        userRepository.save(user)
-        createActivationuserTable(userId, UUID.randomUUID(), username, email)
+        ratingHistoryService.create(userId)
+        return userRepository.save(user)
     }
 
-    fun getUserById(id: UUID): UserEntity {
-        val user = userRepository.findById(id)
-        if (user.isEmpty || !user.get().isEnabled || !user.get().isAccountNonExpired) {
-            throw CustomException(HttpStatus.BAD_REQUEST, "User not found")
-        } else {
-            return user.get()
-        }
+    fun getUserByEmail(email: String): Optional<UserEntity> {
+        return userRepository.findFirstByEmail(email)
+    }
+
+    fun updateUserPassword(userId: UUID, password: String) {
+        val user = userRepository.findById(userId).get()
+        userRepository.save(user.copy(password = passwordEncoder.encode(password)))
     }
 
     fun verifyUserPassword(id: UUID, password: String): Boolean {
@@ -98,21 +121,27 @@ class UserService(
             )
         }
 
+        if (!publicUserService.isUsernameUnique(username)) {
+            throw CustomException(HttpStatus.BAD_REQUEST, "Username already taken")
+        }
+
         val userId = UUID.randomUUID()
         try {
-            createUser(userId, username, password, email)
+            createUserWithPassword(userId, password, email)
             publicUserService.create(userId, username, name, country, college, avatarId)
             ratingHistoryService.create(userId)
+            createActivationUserTableEntry(userId, username, email)
         } catch (duplicateError: DuplicateKeyException) {
             throw CustomException(HttpStatus.BAD_REQUEST, "Username/Email already exists")
         }
     }
-    fun createActivationuserTable(userId: UUID, id: UUID, name: String, email: String) {
+
+    fun createActivationUserTableEntry(userId: UUID, name: String, email: String) {
         val token = UUID.randomUUID().toString()
         val expirationTime = Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10)
         val activationUser =
             ActivationUserEntity(
-                id = id,
+                id = UUID.randomUUID(),
                 userId = userId,
                 token = token,
                 expiration = expirationTime,
@@ -122,21 +151,32 @@ class UserService(
 
         if (!user.isEmpty) sendGridService.activateUserEmail(userId, token, name, email)
     }
+
     fun activateUser(userId: UUID, token: String) {
-        val unactivatedUserInfo: ActivationUserEntity
-        val unactivatedUser = activateUserRepository.findFirstByToken(token)
-        if (unactivatedUser.isEmpty) throw UsernameNotFoundException("User is not yet registered")
-        else unactivatedUserInfo = unactivatedUser.get()
-        if (unactivatedUserInfo.expiration > Date(System.currentTimeMillis())) {
+        val unactivatedUser =
+            activateUserRepository.findFirstByToken(token).orElseThrow {
+                CustomException(HttpStatus.BAD_REQUEST, "Invalid request")
+            }
+        if (unactivatedUser.expiration > Date(System.currentTimeMillis())) {
             val user = userRepository.findFirstById((userId)).get()
             val activatedUser = user.copy(isEnabled = true)
             userRepository.save(activatedUser)
-            activateUserRepository.delete(unactivatedUser.get())
+            activateUserRepository.delete(unactivatedUser)
         } else {
-            val user = userRepository.findFirstById((userId))
-            if (!user.isEmpty) userRepository.delete(user.get())
-            activateUserRepository.delete(unactivatedUser.get())
-            throw CustomException(HttpStatus.SERVICE_UNAVAILABLE, "Service Timeout!!")
+            activateUserRepository.delete(unactivatedUser)
+            throw CustomException(HttpStatus.BAD_REQUEST, "Invalid token")
         }
+    }
+
+    fun completeUserProfile(userId: UUID, completeProfileRequestDto: CompleteProfileRequestDto) {
+        val (username, name, country, college, avatarId) = completeProfileRequestDto
+        val user = userRepository.findFirstById(userId).get()
+        publicUserService.create(userId, username, name, country, college, avatarId)
+        userRepository.save(
+            user.copy(
+                isProfileComplete = true,
+                userAuthorities = mutableListOf(SimpleGrantedAuthority("ROLE_USER"))
+            )
+        )
     }
 }

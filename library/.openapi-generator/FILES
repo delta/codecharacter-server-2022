@@ -10,11 +10,11 @@ src/main/kotlin/delta/codecharacter/core/UserApi.kt
 src/main/kotlin/delta/codecharacter/dtos/ActivateUserRequestDto.kt
 src/main/kotlin/delta/codecharacter/dtos/CodeDto.kt
 src/main/kotlin/delta/codecharacter/dtos/CodeRevisionDto.kt
+src/main/kotlin/delta/codecharacter/dtos/CompleteProfileRequestDto.kt
 src/main/kotlin/delta/codecharacter/dtos/CreateCodeRevisionRequestDto.kt
 src/main/kotlin/delta/codecharacter/dtos/CreateMapRevisionRequestDto.kt
 src/main/kotlin/delta/codecharacter/dtos/CreateMatchRequestDto.kt
 src/main/kotlin/delta/codecharacter/dtos/CurrentUserProfileDto.kt
-src/main/kotlin/delta/codecharacter/dtos/ExternalLoginRequestDto.kt
 src/main/kotlin/delta/codecharacter/dtos/ForgotPasswordRequestDto.kt
 src/main/kotlin/delta/codecharacter/dtos/GameDto.kt
 src/main/kotlin/delta/codecharacter/dtos/GameMapDto.kt

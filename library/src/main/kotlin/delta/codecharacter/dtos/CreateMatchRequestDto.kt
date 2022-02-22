@@ -7,7 +7,7 @@ import javax.validation.Valid
 /**
  * Create match request  If mode is SELF: either/both of mapRevisionId and codeRevisionId have to be provided, or else latest code will be used to initiate the match If mode is MANUAL: only opponentUsername should be provided
  * @param mode
- * @param opponentUsername User ID of the opponent
+ * @param opponentUsername Username of the opponent
  * @param mapRevisionId Revision ID of the map
  * @param codeRevisionId Revision of the code
  */

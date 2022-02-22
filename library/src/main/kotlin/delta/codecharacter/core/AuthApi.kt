@@ -5,7 +5,6 @@
  */
 package delta.codecharacter.core
 
-import delta.codecharacter.dtos.ExternalLoginRequestDto
 import delta.codecharacter.dtos.ForgotPasswordRequestDto
 import delta.codecharacter.dtos.GenericErrorDto
 import delta.codecharacter.dtos.PasswordLoginRequestDto
@@ -28,36 +27,6 @@ import javax.validation.Valid
 @Api(value = "Auth", description = "The Auth API")
 @RequestMapping("\${api.base-path:}")
 interface AuthApi {
-
-    @ApiOperation(
-        value = "External Login",
-        nickname = "externalLogin",
-        notes = "Redirect to challenge for the given external login provider"
-    )
-    @ApiResponses(
-        value = [ApiResponse(
-            code = 302,
-            message = "Found"
-        ), ApiResponse(
-            code = 400,
-            message = "Bad Request",
-            response = GenericErrorDto::class
-        )]
-    )
-    @RequestMapping(
-        method = [RequestMethod.POST],
-        value = ["/auth/login/external"],
-        produces = ["application/json"],
-        consumes = ["application/json"]
-    )
-    fun externalLogin(
-        @ApiParam(
-            value = "",
-            required = true
-        ) @Valid @RequestBody externalLoginRequestDto: ExternalLoginRequestDto
-    ): ResponseEntity<Unit> {
-        return ResponseEntity(HttpStatus.NOT_IMPLEMENTED)
-    }
 
     @ApiOperation(
         value = "Forgot password",
