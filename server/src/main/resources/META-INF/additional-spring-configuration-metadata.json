@@ -19,6 +19,16 @@
       "name": "cors.allowed-origin",
       "type": "java.lang.String",
       "description": "Allowed origin (Frontend URL)"
+    },
+    {
+      "name": "sendgrid.api-key",
+      "type": "java.lang.String",
+      "description": "Sendgrid API Key"
+    },
+    {
+      "name": "spring.sendgrid.template-id",
+      "type": "java.lang.String",
+      "description": "Sendgrid Template ID"
     }
   ]
 }

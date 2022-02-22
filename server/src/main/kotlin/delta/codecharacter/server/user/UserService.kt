@@ -3,6 +3,8 @@ package delta.codecharacter.server.user
 import delta.codecharacter.dtos.RegisterUserRequestDto
 import delta.codecharacter.dtos.UpdatePasswordRequestDto
 import delta.codecharacter.server.exception.CustomException
+import delta.codecharacter.server.user.activate_user.ActivateUserRepository
+import delta.codecharacter.server.user.activate_user.ActivationUserEntity
 import delta.codecharacter.server.user.public_user.PublicUserService
 import delta.codecharacter.server.user.rating_history.RatingHistoryService
 import org.springframework.beans.factory.annotation.Autowired
@@ -13,13 +15,16 @@ import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
+import java.util.Date
 import java.util.UUID
 
 @Service
 class UserService(
     @Autowired private val userRepository: UserRepository,
     @Autowired private val publicUserService: PublicUserService,
-    @Autowired private val ratingHistoryService: RatingHistoryService
+    @Autowired private val ratingHistoryService: RatingHistoryService,
+    @Autowired private val activateUserRepository: ActivateUserRepository,
+    @Autowired private val sendGridService: SendGridService
 ) : UserDetailsService {
 
     @Lazy @Autowired private lateinit var passwordEncoder: BCryptPasswordEncoder
@@ -53,6 +58,7 @@ class UserService(
                 isCredentialsNonExpired = true,
             )
         userRepository.save(user)
+        createActivationuserTable(userId, UUID.randomUUID(), username, email)
     }
 
     fun getUserById(id: UUID): UserEntity {
@@ -99,6 +105,38 @@ class UserService(
             ratingHistoryService.create(userId)
         } catch (duplicateError: DuplicateKeyException) {
             throw CustomException(HttpStatus.BAD_REQUEST, "Username/Email already exists")
+        }
+    }
+    fun createActivationuserTable(userId: UUID, id: UUID, name: String, email: String) {
+        val token = UUID.randomUUID().toString()
+        val expirationTime = Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10)
+        val activationUser =
+            ActivationUserEntity(
+                id = id,
+                userId = userId,
+                token = token,
+                expiration = expirationTime,
+            )
+        activateUserRepository.save(activationUser)
+        val user = activateUserRepository.findFirstByUserId(userId)
+
+        if (!user.isEmpty) sendGridService.activateUserEmail(userId, token, name, email)
+    }
+    fun activateUser(userId: UUID, token: String) {
+        val unactivatedUserInfo: ActivationUserEntity
+        val unactivatedUser = activateUserRepository.findFirstByToken(token)
+        if (unactivatedUser.isEmpty) throw UsernameNotFoundException("User is not yet registered")
+        else unactivatedUserInfo = unactivatedUser.get()
+        if (unactivatedUserInfo.expiration > Date(System.currentTimeMillis())) {
+            val user = userRepository.findFirstById((userId)).get()
+            val activatedUser = user.copy(isEnabled = true)
+            userRepository.save(activatedUser)
+            activateUserRepository.delete(unactivatedUser.get())
+        } else {
+            val user = userRepository.findFirstById((userId))
+            if (!user.isEmpty) userRepository.delete(user.get())
+            activateUserRepository.delete(unactivatedUser.get())
+            throw CustomException(HttpStatus.SERVICE_UNAVAILABLE, "Service Timeout!!")
         }
     }
 }

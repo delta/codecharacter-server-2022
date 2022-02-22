@@ -14,6 +14,10 @@ spring:
       write-dates-as-timestamps: false
   rabbitmq:
     host: codecharacter_rabbitmq
+  sendgrid:
+    api-key: your-api-key
+    template-id: your-template-id
+    sender-email: sender-email-id
 
 debug: false
 
@@ -23,3 +27,6 @@ cors:
 
 jwt:
   secret: 'example'
+
+base-url: your-base-url
+
