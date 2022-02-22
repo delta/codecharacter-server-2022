@@ -41,6 +41,7 @@ class WebSecurityConfiguration : WebSecurityConfigurerAdapter() {
                     userService = customOAuth2UserService
                 }
                 authenticationSuccessHandler = customOAuth2SuccessHandler
+                authenticationFailureHandler = customOAuth2FailureHandler
             }
             authorizeRequests { authorize(HttpMethod.OPTIONS, "/**", permitAll) }
             cors { if (!corsEnabled) disable() }
