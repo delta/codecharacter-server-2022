@@ -574,6 +574,7 @@ paths:
             examples:
               Example:
                 value:
+                  username: TestUser
                   name: Test User
                   country: IN
                   college: Test
@@ -1534,6 +1535,9 @@ components:
       type: object
       description: Model for complete profile request
       properties:
+        username:
+          type: string
+          example: TestUser
         name:
           type: string
           example: Test User
@@ -1547,6 +1551,7 @@ components:
           type: integer
           example: 1
       required:
+        - username
         - name
         - country
         - college
