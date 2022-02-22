@@ -1,5 +1,6 @@
 package delta.codecharacter.server.auth
 
+import delta.codecharacter.dtos.AuthStatusResponseDto
 import delta.codecharacter.dtos.ForgotPasswordRequestDto
 import delta.codecharacter.dtos.PasswordLoginRequestDto
 import delta.codecharacter.dtos.PasswordLoginResponseDto
@@ -94,5 +95,17 @@ class AuthService(
             }
         }
         return authUtil.generateToken(userEntity)
+    }
+
+    fun getAuthStatus(user: UserEntity): AuthStatusResponseDto {
+        val status: AuthStatusResponseDto.Status =
+            if (!user.isProfileComplete) {
+                AuthStatusResponseDto.Status.PROFILE_INCOMPLETE
+            } else if (!user.isEnabled) {
+                AuthStatusResponseDto.Status.ACTIVATION_PENDING
+            } else {
+                AuthStatusResponseDto.Status.AUTHENTICATED
+            }
+        return AuthStatusResponseDto(status)
     }
 }

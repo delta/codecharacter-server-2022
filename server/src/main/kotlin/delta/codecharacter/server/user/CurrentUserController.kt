@@ -26,13 +26,13 @@ class CurrentUserController(
         return ResponseEntity.ok().build()
     }
 
-    @Secured(value = ["ROLE_USER_INCOMPLETE_PROFILE", "ROLE_USER"])
+    @Secured(value = ["ROLE_USER"])
     override fun getCurrentUser(): ResponseEntity<CurrentUserProfileDto> {
         val user = SecurityContextHolder.getContext().authentication.principal as UserEntity
         return ResponseEntity.ok(publicUserService.getUserProfile(user.id, user.email))
     }
 
-    @Secured("ROLE_USER")
+    @Secured(value = ["ROLE_USER"])
     override fun updateCurrentUser(
         updateCurrentUserProfileDto: UpdateCurrentUserProfileDto
     ): ResponseEntity<Unit> {
@@ -41,7 +41,7 @@ class CurrentUserController(
         return ResponseEntity.ok().build()
     }
 
-    @Secured("ROLE_USER")
+    @Secured(value = ["ROLE_USER"])
     override fun updatePassword(
         updatePasswordRequestDto: UpdatePasswordRequestDto
     ): ResponseEntity<Unit> {

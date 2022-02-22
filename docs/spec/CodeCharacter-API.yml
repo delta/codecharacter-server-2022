@@ -92,6 +92,26 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ResetPasswordRequest'
+  /auth/status:
+    get:
+      summary: Get authentication status
+      tags:
+        - auth
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthStatusResponse'
+              examples:
+                Example:
+                  value:
+                    status: AUTHENTICATED
+      operationId: getAuthStatus
+      description: >-
+        Get authentication status: fully authenticated, activation pending and
+        incomplete profile
   /auth/forgot-password:
     post:
       summary: Forgot password
@@ -1748,6 +1768,16 @@ components:
         - EXECUTING
         - EXECUTED
         - EXECUTE_ERROR
+    AuthStatusResponse:
+      title: AuthStatusResponse
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+            - AUTHENTICATED
+            - PROFILE_INCOMPLETE
+            - ACTIVATION_PENDING
   securitySchemes:
     oauth2-google:
       type: oauth2

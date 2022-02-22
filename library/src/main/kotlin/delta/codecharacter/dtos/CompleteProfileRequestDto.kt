@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModelProperty
 
 /**
  * Model for complete profile request
+ * @param username
  * @param name
  * @param country
  * @param college
@@ -13,7 +14,10 @@ import io.swagger.annotations.ApiModelProperty
 data class CompleteProfileRequestDto(
 
     @ApiModelProperty(example = "TestUser", required = true, value = "")
-    @field:JsonProperty("username", required = true) val username: String,
+    @field:JsonProperty(
+        "username",
+        required = true
+    ) val username: String,
 
     @ApiModelProperty(example = "Test User", required = true, value = "")
     @field:JsonProperty("name", required = true) val name: String,
