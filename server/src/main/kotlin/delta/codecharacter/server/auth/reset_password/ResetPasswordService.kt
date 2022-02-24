@@ -31,8 +31,9 @@ class ResetPasswordService(
             resetPasswordRepository.findFirstByPasswordResetToken(token).orElseThrow {
                 throw CustomException(HttpStatus.BAD_REQUEST, "Invalid token")
             }
-        resetPasswordRepository.delete(resetPasswordEntity)
+        resetPasswordRepository.deleteResetPasswordEntityByPasswordResetToken(token)
         if (resetPasswordEntity.expiration < Date(System.currentTimeMillis())) {
+            resetPasswordRepository.deleteResetPasswordEntityByPasswordResetToken(token)
             throw CustomException(HttpStatus.BAD_REQUEST, "Token expired")
         }
         return resetPasswordEntity.userId
