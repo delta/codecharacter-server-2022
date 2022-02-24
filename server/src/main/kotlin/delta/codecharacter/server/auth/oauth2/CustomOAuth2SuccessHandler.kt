@@ -3,6 +3,8 @@ package delta.codecharacter.server.auth.oauth2
 import delta.codecharacter.server.auth.AuthService
 import delta.codecharacter.server.exception.CustomException
 import delta.codecharacter.server.user.LoginType
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Lazy
@@ -10,7 +12,6 @@ import org.springframework.security.core.Authentication
 import org.springframework.security.oauth2.core.OAuth2AuthenticatedPrincipal
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler
 import org.springframework.stereotype.Component
-import javax.servlet.http.Cookie
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
@@ -19,6 +20,8 @@ class CustomOAuth2SuccessHandler(@Lazy @Autowired private val authService: AuthS
     AuthenticationSuccessHandler {
 
     @Value("\${base-url}") private val baseUrl: String = ""
+
+    private val logger: Logger = LoggerFactory.getLogger(CustomOAuth2SuccessHandler::class.java)
 
     override fun onAuthenticationSuccess(
         request: HttpServletRequest?,
@@ -33,7 +36,6 @@ class CustomOAuth2SuccessHandler(@Lazy @Autowired private val authService: AuthS
             val loginType = LoginType.valueOf(provider ?: "GOOGLE")
             try {
                 val token = authService.oAuth2Login(email, loginType)
-                response?.addCookie(Cookie("bearer-token", token))
                 if (baseUrl.contains("https")) {
                     response?.setHeader(
                         "Set-Cookie", "bearer-token=$token; Path=/; HttpOnly; Secure; SameSite=None"
@@ -44,6 +46,9 @@ class CustomOAuth2SuccessHandler(@Lazy @Autowired private val authService: AuthS
                 response?.sendRedirect("$baseUrl/#/dashboard")
             } catch (e: CustomException) {
                 response?.sendRedirect("$baseUrl/#/login?error=${e.message}")
+            } catch (e: Exception) {
+                logger.error("Unexpected error", e)
+                response?.sendRedirect("$baseUrl/#/login?error=Internal Server Error")
             }
         } else {
             response?.sendRedirect("$baseUrl/#/login?error=Invalid login, please try again")

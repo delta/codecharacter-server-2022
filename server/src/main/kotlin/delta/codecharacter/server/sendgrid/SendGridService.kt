@@ -1,13 +1,11 @@
-package delta.codecharacter.server.user
+package delta.codecharacter.server.sendgrid
 
-import com.fasterxml.jackson.annotation.JsonProperty
 import com.sendgrid.Method
 import com.sendgrid.Request
 import com.sendgrid.Response
 import com.sendgrid.SendGrid
 import com.sendgrid.helpers.mail.Mail
 import com.sendgrid.helpers.mail.objects.Email
-import com.sendgrid.helpers.mail.objects.Personalization
 import delta.codecharacter.server.exception.CustomException
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -15,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
-import java.util.Collections
 import java.util.UUID
 
 @Service
@@ -40,7 +37,7 @@ class SendGridService {
         sendTemplateEmail(email, name, linkName, link, message, buttonName, subjectInfo)
     }
 
-    fun forgotPasswordEmail(userId: UUID, token: String, name: String, email: String) {
+    fun resetPasswordEmail(userId: UUID, token: String, name: String, email: String) {
         val link = "$baseUrl/reset-password?id=$userId&token=$token"
         val linkName = "Reset-Password link"
         val message = "Please click the button to reset your password"
@@ -92,25 +89,6 @@ class SendGridService {
             throw CustomException(
                 HttpStatus.INTERNAL_SERVER_ERROR, "Unknown error. Please contact event admins."
             )
-        }
-    }
-}
-
-class DynamicTemplatePersonalization : Personalization() {
-    @JsonProperty(value = "dynamic_template_data")
-    private var dynamicTemplateData: HashMap<String, String>? = null
-
-    @JsonProperty(value = "dynamic_template_data")
-    override fun getDynamicTemplateData(): Map<String, String> {
-        return dynamicTemplateData ?: (Collections.emptyMap())
-    }
-
-    fun addDynamicTemplateData(key: String, value: String) {
-        if (dynamicTemplateData == null) {
-            dynamicTemplateData = HashMap()
-            dynamicTemplateData!![key] = value
-        } else {
-            dynamicTemplateData!![key] = value
         }
     }
 }

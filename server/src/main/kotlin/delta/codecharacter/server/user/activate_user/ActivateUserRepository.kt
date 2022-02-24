@@ -6,7 +6,7 @@ import java.util.Optional
 import java.util.UUID
 
 @Repository
-interface ActivateUserRepository : MongoRepository<ActivationUserEntity, UUID> {
-    fun findFirstByUserId(userId: UUID): Optional<ActivationUserEntity>
-    fun findFirstByToken(token: String): Optional<ActivationUserEntity>
+interface ActivateUserRepository : MongoRepository<ActivateUserEntity, UUID> {
+    fun findFirstByUserId(userId: UUID): Optional<ActivateUserEntity>
+    fun findFirstByToken(token: String): Optional<ActivateUserEntity>
 }

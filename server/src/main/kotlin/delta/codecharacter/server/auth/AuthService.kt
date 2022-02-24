@@ -5,11 +5,10 @@ import delta.codecharacter.dtos.ForgotPasswordRequestDto
 import delta.codecharacter.dtos.PasswordLoginRequestDto
 import delta.codecharacter.dtos.PasswordLoginResponseDto
 import delta.codecharacter.dtos.ResetPasswordRequestDto
-import delta.codecharacter.server.auth.reset_password.ResetPasswordEntity
-import delta.codecharacter.server.auth.reset_password.ResetPasswordRepository
+import delta.codecharacter.server.auth.jwt.JwtService
+import delta.codecharacter.server.auth.reset_password.ResetPasswordService
 import delta.codecharacter.server.exception.CustomException
 import delta.codecharacter.server.user.LoginType
-import delta.codecharacter.server.user.SendGridService
 import delta.codecharacter.server.user.UserEntity
 import delta.codecharacter.server.user.UserService
 import org.springframework.beans.factory.annotation.Autowired
@@ -17,16 +16,13 @@ import org.springframework.http.HttpStatus
 import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
-import java.util.Date
-import java.util.UUID
 
 @Service
 class AuthService(
     @Autowired private val userService: UserService,
-    @Autowired private val authUtil: AuthUtil,
+    @Autowired private val jwtService: JwtService,
+    @Autowired private val resetPasswordService: ResetPasswordService,
     @Autowired private val passwordEncoder: BCryptPasswordEncoder,
-    @Autowired private val sendGridService: SendGridService,
-    @Autowired private val resetPasswordRepository: ResetPasswordRepository
 ) {
     fun passwordLogin(passwordLoginRequestDto: PasswordLoginRequestDto): PasswordLoginResponseDto {
         val email = passwordLoginRequestDto.email
@@ -41,7 +37,7 @@ class AuthService(
             throw CustomException(HttpStatus.UNAUTHORIZED, "Invalid credentials")
         }
         if (passwordEncoder.matches(password, user.password)) {
-            return PasswordLoginResponseDto(authUtil.generateToken(user))
+            return PasswordLoginResponseDto(jwtService.generateToken(user))
         } else throw CustomException(HttpStatus.UNAUTHORIZED, "Invalid credentials")
     }
 
@@ -51,50 +47,33 @@ class AuthService(
             userService.getUserByEmail(email).orElseThrow {
                 throw CustomException(HttpStatus.BAD_REQUEST, "Invalid credentials")
             }
-        val passwordResetToken = UUID.randomUUID().toString()
-        val passwordResetUser =
-            ResetPasswordEntity(
-                userId = user.id,
-                passwordResetToken = passwordResetToken,
-                expiration = Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10)
-            )
-        resetPasswordRepository.save(passwordResetUser)
-        sendGridService.forgotPasswordEmail(user.id, passwordResetToken, user.username, email)
+        if (user.loginType != LoginType.PASSWORD) {
+            throw CustomException(HttpStatus.BAD_REQUEST, "User not registered with password")
+        }
+        resetPasswordService.sendResetPasswordEmail(user)
     }
 
     fun resetPassword(resetPasswordRequestDto: ResetPasswordRequestDto) {
         val (token, password, passwordConfirmation) = resetPasswordRequestDto
-        val resetPasswordEntity =
-            resetPasswordRepository.findFirstByPasswordResetToken(token).orElseThrow {
-                throw CustomException(HttpStatus.BAD_REQUEST, "Invalid token")
-            }
-        if (resetPasswordEntity.expiration > Date(System.currentTimeMillis())) {
-            if (password == passwordConfirmation) {
-                userService.updateUserPassword(resetPasswordEntity.userId, password)
-                resetPasswordRepository.delete(resetPasswordEntity)
-            } else {
-                throw CustomException(
-                    HttpStatus.BAD_REQUEST, "Password and Confirm Password does not match"
-                )
-            }
-        } else {
-            resetPasswordRepository.delete(resetPasswordEntity)
-            throw CustomException(HttpStatus.BAD_REQUEST, "Invalid token")
+        if (password != passwordConfirmation) {
+            throw CustomException(HttpStatus.BAD_REQUEST, "Password and Confirm Password does not match")
         }
+        val userId = resetPasswordService.processResetPasswordTokenAndGetUserId(token)
+        userService.updateUserPassword(userId, password)
     }
 
     fun oAuth2Login(email: String, loginType: LoginType): String {
         val user = userService.getUserByEmail(email)
         val userEntity: UserEntity
         if (user.isEmpty) {
-            userEntity = userService.createOAuthUser(email, loginType)
+            userEntity = userService.createUserWithOAuth(email, loginType)
         } else {
             userEntity = user.get()
             if (userEntity.loginType != loginType) {
                 throw CustomException(HttpStatus.BAD_REQUEST, "Incorrect login provider")
             }
         }
-        return authUtil.generateToken(userEntity)
+        return jwtService.generateToken(userEntity)
     }
 
     fun getAuthStatus(user: UserEntity): AuthStatusResponseDto {

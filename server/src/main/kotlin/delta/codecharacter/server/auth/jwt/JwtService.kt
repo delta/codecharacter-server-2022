@@ -1,4 +1,4 @@
-package delta.codecharacter.server.auth
+package delta.codecharacter.server.auth.jwt
 
 import delta.codecharacter.server.exception.CustomException
 import delta.codecharacter.server.user.UserEntity
@@ -12,7 +12,7 @@ import java.util.Date
 import java.util.function.Function
 
 @Service
-class AuthUtil {
+class JwtService {
 
     @Value("\${jwt.secret}") private lateinit var secret: String
 

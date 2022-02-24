@@ -4,8 +4,7 @@ import delta.codecharacter.dtos.CompleteProfileRequestDto
 import delta.codecharacter.dtos.RegisterUserRequestDto
 import delta.codecharacter.dtos.UpdatePasswordRequestDto
 import delta.codecharacter.server.exception.CustomException
-import delta.codecharacter.server.user.activate_user.ActivateUserRepository
-import delta.codecharacter.server.user.activate_user.ActivationUserEntity
+import delta.codecharacter.server.user.activate_user.ActivateUserService
 import delta.codecharacter.server.user.public_user.PublicUserService
 import delta.codecharacter.server.user.rating_history.RatingHistoryService
 import org.springframework.beans.factory.annotation.Autowired
@@ -17,7 +16,6 @@ import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
-import java.util.Date
 import java.util.Optional
 import java.util.UUID
 
@@ -26,8 +24,7 @@ class UserService(
     @Autowired private val userRepository: UserRepository,
     @Autowired private val publicUserService: PublicUserService,
     @Autowired private val ratingHistoryService: RatingHistoryService,
-    @Autowired private val activateUserRepository: ActivateUserRepository,
-    @Autowired private val sendGridService: SendGridService
+    @Autowired private val activateUserService: ActivateUserService
 ) : UserDetailsService {
 
     @Lazy @Autowired private lateinit var passwordEncoder: BCryptPasswordEncoder
@@ -65,7 +62,7 @@ class UserService(
         userRepository.save(user)
     }
 
-    fun createOAuthUser(email: String, oauthProvider: LoginType): UserEntity {
+    fun createUserWithOAuth(email: String, oauthProvider: LoginType): UserEntity {
         val userId = UUID.randomUUID()
         val user =
             UserEntity(
@@ -93,8 +90,8 @@ class UserService(
         userRepository.save(user.copy(password = passwordEncoder.encode(password)))
     }
 
-    fun verifyUserPassword(id: UUID, password: String): Boolean {
-        val user = userRepository.findById(id)
+    fun verifyUserPassword(userId: UUID, password: String): Boolean {
+        val user = userRepository.findById(userId)
         return passwordEncoder.matches(password, user.get().password)
     }
 
@@ -130,42 +127,17 @@ class UserService(
             createUserWithPassword(userId, password, email)
             publicUserService.create(userId, username, name, country, college, avatarId)
             ratingHistoryService.create(userId)
-            createActivationUserTableEntry(userId, username, email)
+            activateUserService.sendActivationToken(userId, name, email)
         } catch (duplicateError: DuplicateKeyException) {
             throw CustomException(HttpStatus.BAD_REQUEST, "Username/Email already exists")
         }
     }
 
-    fun createActivationUserTableEntry(userId: UUID, name: String, email: String) {
-        val token = UUID.randomUUID().toString()
-        val expirationTime = Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10)
-        val activationUser =
-            ActivationUserEntity(
-                id = UUID.randomUUID(),
-                userId = userId,
-                token = token,
-                expiration = expirationTime,
-            )
-        activateUserRepository.save(activationUser)
-        val user = activateUserRepository.findFirstByUserId(userId)
-
-        if (!user.isEmpty) sendGridService.activateUserEmail(userId, token, name, email)
-    }
-
     fun activateUser(userId: UUID, token: String) {
-        val unactivatedUser =
-            activateUserRepository.findFirstByToken(token).orElseThrow {
-                CustomException(HttpStatus.BAD_REQUEST, "Invalid request")
-            }
-        if (unactivatedUser.expiration > Date(System.currentTimeMillis())) {
-            val user = userRepository.findFirstById((userId)).get()
-            val activatedUser = user.copy(isEnabled = true)
-            userRepository.save(activatedUser)
-            activateUserRepository.delete(unactivatedUser)
-        } else {
-            activateUserRepository.delete(unactivatedUser)
-            throw CustomException(HttpStatus.BAD_REQUEST, "Invalid token")
-        }
+        activateUserService.processActivationToken(userId, token)
+        val user = userRepository.findFirstById((userId)).get()
+        val activatedUser = user.copy(isEnabled = true)
+        userRepository.save(activatedUser)
     }
 
     fun completeUserProfile(userId: UUID, completeProfileRequestDto: CompleteProfileRequestDto) {

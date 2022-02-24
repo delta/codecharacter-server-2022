@@ -1,10 +1,10 @@
 package delta.codecharacter.server.config
 
-import delta.codecharacter.server.auth.JwtRequestFilter
+import delta.codecharacter.server.auth.jwt.JwtRequestFilter
 import delta.codecharacter.server.auth.oauth2.CustomOAuth2FailureHandler
 import delta.codecharacter.server.auth.oauth2.CustomOAuth2SuccessHandler
-import delta.codecharacter.server.user.CustomOAuth2UserService
-import delta.codecharacter.server.user.CustomOidcUserService
+import delta.codecharacter.server.auth.oauth2.CustomOAuth2UserService
+import delta.codecharacter.server.auth.oauth2.CustomOidcUserService
 import delta.codecharacter.server.user.UserService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
@@ -19,6 +19,8 @@ import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.config.web.servlet.invoke
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
+import org.springframework.security.web.firewall.HttpStatusRequestRejectedHandler
+import org.springframework.security.web.firewall.RequestRejectedHandler
 
 @Configuration
 class WebSecurityConfiguration : WebSecurityConfigurerAdapter() {
@@ -60,4 +62,9 @@ class WebSecurityConfiguration : WebSecurityConfigurerAdapter() {
     }
 
     @Bean fun passwordEncoder() = BCryptPasswordEncoder()
+
+    @Bean
+    fun requestRejectedHandler(): RequestRejectedHandler {
+        return HttpStatusRequestRejectedHandler()
+    }
 }

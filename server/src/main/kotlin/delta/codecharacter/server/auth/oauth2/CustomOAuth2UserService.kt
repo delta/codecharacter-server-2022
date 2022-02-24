@@ -1,4 +1,4 @@
-package delta.codecharacter.server.user
+package delta.codecharacter.server.auth.oauth2
 
 import delta.codecharacter.server.exception.CustomException
 import org.slf4j.Logger
@@ -28,6 +28,9 @@ class CustomOAuth2UserService : OAuth2UserService<OAuth2UserRequest, OAuth2User>
 
     override fun loadUser(userRequest: OAuth2UserRequest?): OAuth2User {
         if (userRequest?.clientRegistration?.registrationId != "github") {
+            logger.error(
+                "Unsupported client registration: ${userRequest?.clientRegistration?.registrationId}"
+            )
             throw OAuth2AuthenticationException(
                 OAuth2Error(OAuth2ErrorCodes.INVALID_CLIENT),
                 "Unsupported OAuth2 client",
@@ -38,6 +41,7 @@ class CustomOAuth2UserService : OAuth2UserService<OAuth2UserRequest, OAuth2User>
         attributes.putAll(oAuth2User.attributes)
 
         if (userRequest.accessToken?.tokenValue == null) {
+            logger.error("Access token is null in GitHub authentication")
             throw OAuth2AuthenticationException(
                 OAuth2Error(OAuth2ErrorCodes.INVALID_TOKEN),
                 CustomException(HttpStatus.BAD_REQUEST, "Invalid token")
@@ -68,6 +72,7 @@ class CustomOAuth2UserService : OAuth2UserService<OAuth2UserRequest, OAuth2User>
             )
         }
         if (primaryEmail == null) {
+            logger.error("Failed to get primary email from github for user ${oAuth2User.name}")
             throw OAuth2AuthenticationException(
                 OAuth2Error(OAuth2ErrorCodes.INVALID_TOKEN),
                 CustomException(HttpStatus.BAD_REQUEST, "No valid email found.")

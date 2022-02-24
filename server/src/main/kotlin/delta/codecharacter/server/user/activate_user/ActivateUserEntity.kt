@@ -6,7 +6,7 @@ import java.util.Date
 import java.util.UUID
 
 @Document(collection = "activation_user")
-data class ActivationUserEntity(
+data class ActivateUserEntity(
     @Id val id: UUID,
     val userId: UUID,
     val token: String,
