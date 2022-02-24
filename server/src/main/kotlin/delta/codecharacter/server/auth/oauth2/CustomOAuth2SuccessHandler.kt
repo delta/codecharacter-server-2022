@@ -37,11 +37,9 @@ class CustomOAuth2SuccessHandler(@Lazy @Autowired private val authService: AuthS
             try {
                 val token = authService.oAuth2Login(email, loginType)
                 if (baseUrl.contains("https")) {
-                    response?.setHeader(
-                        "Set-Cookie", "bearer-token=$token; Path=/; HttpOnly; Secure; SameSite=None"
-                    )
+                    response?.setHeader("Set-Cookie", "bearer-token=$token; Path=/; Secure; SameSite=None")
                 } else {
-                    response?.setHeader("Set-Cookie", "bearer-token=$token; Path=/; HttpOnly; SameSite=false")
+                    response?.setHeader("Set-Cookie", "bearer-token=$token; Path=/; SameSite=false")
                 }
                 response?.sendRedirect("$baseUrl/#/dashboard")
             } catch (e: CustomException) {

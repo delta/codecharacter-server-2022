@@ -29,7 +29,7 @@ class SendGridService {
     @Value("\${base-url}") private lateinit var baseUrl: String
 
     fun activateUserEmail(userId: UUID, token: String, name: String, email: String) {
-        val link = "$baseUrl/activate?id=$userId&token=$token"
+        val link = "$baseUrl#/activate?id=$userId&token=$token"
         val linkName = "User Activation link"
         val message = "Please click the button to activate your account"
         val buttonName = "Activate"
@@ -38,7 +38,7 @@ class SendGridService {
     }
 
     fun resetPasswordEmail(userId: UUID, token: String, name: String, email: String) {
-        val link = "$baseUrl/reset-password?id=$userId&token=$token"
+        val link = "$baseUrl#/reset-password?id=$userId&token=$token"
         val linkName = "Reset-Password link"
         val message = "Please click the button to reset your password"
         val buttonName = "Reset Password"

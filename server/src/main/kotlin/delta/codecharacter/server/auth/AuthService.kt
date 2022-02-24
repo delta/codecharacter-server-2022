@@ -56,7 +56,10 @@ class AuthService(
     fun resetPassword(resetPasswordRequestDto: ResetPasswordRequestDto) {
         val (token, password, passwordConfirmation) = resetPasswordRequestDto
         if (password != passwordConfirmation) {
-            throw CustomException(HttpStatus.BAD_REQUEST, "Password and Confirm Password does not match")
+            throw CustomException(
+                HttpStatus.BAD_REQUEST,
+                "Password and Confirm Password does not match"
+            )
         }
         val userId = resetPasswordService.processResetPasswordTokenAndGetUserId(token)
         userService.updateUserPassword(userId, password)
