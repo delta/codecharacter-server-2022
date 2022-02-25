@@ -8,5 +8,5 @@ import java.util.UUID
 @Repository
 interface ResetPasswordRepository : MongoRepository<ResetPasswordEntity, UUID> {
     fun findFirstByPasswordResetToken(token: String): Optional<ResetPasswordEntity>
-    fun findFirstByUserId(userId: UUID): Optional<ResetPasswordEntity>
+    fun deleteResetPasswordEntityByPasswordResetToken(token: String): Optional<ResetPasswordEntity>
 }

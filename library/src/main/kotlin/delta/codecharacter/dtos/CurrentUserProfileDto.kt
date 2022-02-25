@@ -12,7 +12,7 @@ import javax.validation.constraints.Pattern
  * @param email
  * @param country
  * @param college
- * @param isAdmin
+ * @param isProfileComplete
  */
 data class CurrentUserProfileDto(
 
@@ -43,7 +43,7 @@ data class CurrentUserProfileDto(
 
     @ApiModelProperty(example = "null", required = true, value = "")
     @field:JsonProperty(
-        "isAdmin",
+        "isProfileComplete",
         required = true
-    ) val isAdmin: Boolean = false
+    ) val isProfileComplete: Boolean = false
 )

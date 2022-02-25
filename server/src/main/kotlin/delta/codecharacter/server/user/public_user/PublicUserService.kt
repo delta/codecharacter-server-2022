@@ -31,7 +31,7 @@ class PublicUserService(@Autowired private val publicUserRepository: PublicUserR
                 country = country,
                 college = college,
                 avatarId = avatarId,
-                rating = 0.0,
+                rating = 1500.0,
                 wins = 0,
                 losses = 0,
                 ties = 0,
@@ -91,5 +91,9 @@ class PublicUserService(@Autowired private val publicUserRepository: PublicUserR
 
     fun getPublicUserByUsername(username: String): PublicUserEntity {
         return publicUserRepository.findByUsername(username).get()
+    }
+
+    fun isUsernameUnique(username: String): Boolean {
+        return publicUserRepository.findByUsername(username).isEmpty
     }
 }

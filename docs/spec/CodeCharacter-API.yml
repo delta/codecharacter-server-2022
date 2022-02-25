@@ -62,40 +62,6 @@ paths:
                   value:
                     message: Some specific error message
     parameters: []
-  /auth/login/external:
-    post:
-      summary: External Login
-      operationId: externalLogin
-      tags:
-        - auth
-      description: Redirect to challenge for the given external login provider
-      parameters: []
-      security: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/ExternalLoginRequest'
-            examples:
-              Example:
-                value:
-                  provider: GOOGLE
-        description: ''
-      responses:
-        '302':
-          description: Found
-        '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GenericError'
-              examples:
-                Example:
-                  value:
-                    message: Some specific error message
-    parameters: []
   /auth/reset-password:
     parameters: []
     post:
@@ -126,6 +92,26 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/ResetPasswordRequest'
+  /auth/status:
+    get:
+      summary: Get authentication status
+      tags:
+        - auth
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthStatusResponse'
+              examples:
+                Example:
+                  value:
+                    status: AUTHENTICATED
+      operationId: getAuthStatus
+      description: >-
+        Get authentication status: fully authenticated, activation pending and
+        incomplete profile
   /auth/forgot-password:
     post:
       summary: Forgot password
@@ -549,7 +535,7 @@ paths:
                     email: user@example.com
                     country: IN
                     college: NITT
-                    isAdmin: false
+                    isProfileComplete: true
         '401':
           description: Unauthorized
       operationId: getCurrentUser
@@ -587,6 +573,32 @@ paths:
                   college: NIT Trichy
       tags:
         - current-user
+  /user/complete-profile:
+    post:
+      summary: Complete user profile
+      operationId: completeUserProfile
+      responses:
+        '200':
+          description: OK
+        '401':
+          description: Unauthorized
+      description: Complete the user profile for users who registered using OAuth
+      tags:
+        - current-user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CompleteProfileRequest'
+            examples:
+              Example:
+                value:
+                  username: TestUser
+                  name: Test User
+                  country: IN
+                  college: Test
+                  avatarId: 1
   /user/password:
     parameters: []
     post:
@@ -1145,18 +1157,6 @@ components:
       required:
         - email
         - password
-    ExternalLoginRequest:
-      title: ExternalLoginRequest
-      type: object
-      description: External Login request
-      properties:
-        provider:
-          type: string
-          enum:
-            - GOOGLE
-            - GITHUB
-      required:
-        - provider
     PasswordLoginResponse:
       title: LoginResponse
       type: object
@@ -1518,7 +1518,7 @@ components:
         college:
           type: string
           example: Test
-        isAdmin:
+        isProfileComplete:
           type: boolean
           default: false
       required:
@@ -1528,7 +1528,7 @@ components:
         - email
         - country
         - college
-        - isAdmin
+        - isProfileComplete
     UpdateCurrentUserProfile:
       title: UpdateCurrentUserProfile
       type: object
@@ -1550,6 +1550,32 @@ components:
           type: integer
           example: 1
           nullable: true
+    CompleteProfileRequest:
+      title: CompleteProfileRequest
+      type: object
+      description: Model for complete profile request
+      properties:
+        username:
+          type: string
+          example: TestUser
+        name:
+          type: string
+          example: Test User
+        country:
+          type: string
+          example: IN
+        college:
+          type: string
+          example: Test
+        avatarId:
+          type: integer
+          example: 1
+      required:
+        - username
+        - name
+        - country
+        - college
+        - avatarId
     RegisterUserRequest:
       title: RegisterUserRequest
       type: object
@@ -1645,8 +1671,7 @@ components:
           $ref: '#/components/schemas/MatchMode'
         opponentUsername:
           type: string
-          format: uuid
-          description: User ID of the opponent
+          description: Username of the opponent
           nullable: true
         mapRevisionId:
           type: string
@@ -1743,6 +1768,16 @@ components:
         - EXECUTING
         - EXECUTED
         - EXECUTE_ERROR
+    AuthStatusResponse:
+      title: AuthStatusResponse
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+            - AUTHENTICATED
+            - PROFILE_INCOMPLETE
+            - ACTIVATION_PENDING
   securitySchemes:
     oauth2-google:
       type: oauth2

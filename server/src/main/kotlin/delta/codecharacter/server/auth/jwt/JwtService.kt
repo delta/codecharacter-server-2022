@@ -1,4 +1,4 @@
-package delta.codecharacter.server.auth
+package delta.codecharacter.server.auth.jwt
 
 import delta.codecharacter.server.exception.CustomException
 import delta.codecharacter.server.user.UserEntity
@@ -12,11 +12,11 @@ import java.util.Date
 import java.util.function.Function
 
 @Service
-class AuthUtil {
+class JwtService {
 
     @Value("\${jwt.secret}") private lateinit var secret: String
 
-    fun getUsernameFromToken(token: String): String {
+    fun getEmailFromToken(token: String): String {
         return getClaimFromToken(token) { obj: Claims -> obj.subject }
     }
 
@@ -58,8 +58,8 @@ class AuthUtil {
     }
 
     fun validateToken(token: String, userDetails: UserEntity) {
-        val username = getUsernameFromToken(token)
-        if (username != userDetails.email || isTokenExpired(token)) {
+        val email = getEmailFromToken(token)
+        if (email != userDetails.email || isTokenExpired(token)) {
             throw CustomException(HttpStatus.UNAUTHORIZED, "Token is invalid")
         }
     }

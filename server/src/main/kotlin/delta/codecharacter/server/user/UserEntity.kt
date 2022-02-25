@@ -12,18 +12,19 @@ import java.util.UUID
 data class UserEntity(
     @Id val id: UUID,
     @Indexed(unique = true) val email: String,
-    @Indexed(unique = true) private val username: String,
+    val loginType: LoginType,
     private val password: String,
+    val isProfileComplete: Boolean,
     private val isEnabled: Boolean = false,
     private val isCredentialsNonExpired: Boolean = true,
     private val isAccountNonExpired: Boolean = true,
     private val isAccountNonLocked: Boolean = true,
+    val userAuthorities: MutableCollection<out GrantedAuthority> =
+        mutableListOf(SimpleGrantedAuthority("ROLE_USER")),
 ) : UserDetails {
-    override fun getAuthorities(): Set<GrantedAuthority> {
-        return setOf(SimpleGrantedAuthority("ROLE_USER"))
-    }
+    override fun getAuthorities(): MutableCollection<out GrantedAuthority> = userAuthorities
     override fun getPassword(): String = password
-    override fun getUsername(): String = username
+    override fun getUsername(): String = email
     override fun isAccountNonExpired(): Boolean = isAccountNonExpired
     override fun isAccountNonLocked(): Boolean = isAccountNonLocked
     override fun isCredentialsNonExpired(): Boolean = isCredentialsNonExpired

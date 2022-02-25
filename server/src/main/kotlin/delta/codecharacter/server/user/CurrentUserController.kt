@@ -1,6 +1,7 @@
 package delta.codecharacter.server.user
 
 import delta.codecharacter.core.CurrentUserApi
+import delta.codecharacter.dtos.CompleteProfileRequestDto
 import delta.codecharacter.dtos.CurrentUserProfileDto
 import delta.codecharacter.dtos.UpdateCurrentUserProfileDto
 import delta.codecharacter.dtos.UpdatePasswordRequestDto
@@ -16,6 +17,14 @@ class CurrentUserController(
     @Autowired private val userService: UserService,
     @Autowired private val publicUserService: PublicUserService
 ) : CurrentUserApi {
+    @Secured(value = ["ROLE_USER_INCOMPLETE_PROFILE"])
+    override fun completeUserProfile(
+        completeProfileRequestDto: CompleteProfileRequestDto
+    ): ResponseEntity<Unit> {
+        val user = SecurityContextHolder.getContext().authentication.principal as UserEntity
+        userService.completeUserProfile(user.id, completeProfileRequestDto)
+        return ResponseEntity.ok().build()
+    }
 
     @Secured(value = ["ROLE_USER"])
     override fun getCurrentUser(): ResponseEntity<CurrentUserProfileDto> {
@@ -23,7 +32,7 @@ class CurrentUserController(
         return ResponseEntity.ok(publicUserService.getUserProfile(user.id, user.email))
     }
 
-    @Secured("ROLE_USER")
+    @Secured(value = ["ROLE_USER"])
     override fun updateCurrentUser(
         updateCurrentUserProfileDto: UpdateCurrentUserProfileDto
     ): ResponseEntity<Unit> {
@@ -32,7 +41,7 @@ class CurrentUserController(
         return ResponseEntity.ok().build()
     }
 
-    @Secured("ROLE_USER")
+    @Secured(value = ["ROLE_USER"])
     override fun updatePassword(
         updatePasswordRequestDto: UpdatePasswordRequestDto
     ): ResponseEntity<Unit> {

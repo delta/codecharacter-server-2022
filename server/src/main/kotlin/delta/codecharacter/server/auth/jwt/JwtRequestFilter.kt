@@ -1,4 +1,4 @@
-package delta.codecharacter.server.auth
+package delta.codecharacter.server.auth.jwt
 
 import delta.codecharacter.server.user.UserService
 import org.springframework.beans.factory.annotation.Autowired
@@ -14,7 +14,7 @@ import javax.servlet.http.HttpServletResponse
 @Component
 class JwtRequestFilter : OncePerRequestFilter() {
     @Autowired private lateinit var userService: UserService
-    @Autowired private lateinit var authUtil: AuthUtil
+    @Autowired private lateinit var authUtil: JwtService
 
     override fun doFilterInternal(
         request: HttpServletRequest,
@@ -30,7 +30,7 @@ class JwtRequestFilter : OncePerRequestFilter() {
 
         if (SecurityContextHolder.getContext().authentication == null) {
             try {
-                val email = authUtil.getUsernameFromToken(jwt)
+                val email = authUtil.getEmailFromToken(jwt)
                 val userDetails = userService.loadUserByUsername(email)
                 authUtil.validateToken(jwt, userDetails)
                 val usernamePasswordAuthenticationToken =

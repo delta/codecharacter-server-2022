@@ -1,5 +1,6 @@
 package delta.codecharacter.server
 
+import delta.codecharacter.server.user.LoginType
 import delta.codecharacter.server.user.UserEntity
 import delta.codecharacter.server.user.public_user.PublicUserEntity
 import org.springframework.amqp.rabbit.connection.ConnectionFactory
@@ -19,17 +20,18 @@ class TestAttributes {
         val user =
             UserEntity(
                 id = UUID.randomUUID(),
-                username = "user",
                 password = "password",
                 email = "user@test.com",
                 isEnabled = true,
                 isAccountNonExpired = true,
                 isAccountNonLocked = true,
+                loginType = LoginType.PASSWORD,
+                isProfileComplete = true,
             )
         val publicUser =
             PublicUserEntity(
                 userId = user.id,
-                username = user.username,
+                username = "TestUser",
                 name = "Test User",
                 country = "Test Country",
                 college = "Test College",

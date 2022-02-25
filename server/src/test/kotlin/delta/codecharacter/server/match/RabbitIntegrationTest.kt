@@ -138,9 +138,7 @@ internal class RabbitIntegrationTest(@Autowired val mockMvc: MockMvc) {
     fun `should create match with two games for manual mode`() {
         val opponentUser =
             mongoTemplate.save(
-                TestAttributes.user.copy(
-                    id = UUID.randomUUID(), username = "opponent", email = "opponent@test.com"
-                )
+                TestAttributes.user.copy(id = UUID.randomUUID(), email = "opponent@test.com")
             )
         val opponentPublicUser =
             mongoTemplate.save(

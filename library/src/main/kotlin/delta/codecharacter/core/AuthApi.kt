@@ -5,7 +5,7 @@
  */
 package delta.codecharacter.core
 
-import delta.codecharacter.dtos.ExternalLoginRequestDto
+import delta.codecharacter.dtos.AuthStatusResponseDto
 import delta.codecharacter.dtos.ForgotPasswordRequestDto
 import delta.codecharacter.dtos.GenericErrorDto
 import delta.codecharacter.dtos.PasswordLoginRequestDto
@@ -16,6 +16,7 @@ import io.swagger.annotations.ApiOperation
 import io.swagger.annotations.ApiParam
 import io.swagger.annotations.ApiResponse
 import io.swagger.annotations.ApiResponses
+import io.swagger.annotations.Authorization
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.validation.annotation.Validated
@@ -28,36 +29,6 @@ import javax.validation.Valid
 @Api(value = "Auth", description = "The Auth API")
 @RequestMapping("\${api.base-path:}")
 interface AuthApi {
-
-    @ApiOperation(
-        value = "External Login",
-        nickname = "externalLogin",
-        notes = "Redirect to challenge for the given external login provider"
-    )
-    @ApiResponses(
-        value = [ApiResponse(
-            code = 302,
-            message = "Found"
-        ), ApiResponse(
-            code = 400,
-            message = "Bad Request",
-            response = GenericErrorDto::class
-        )]
-    )
-    @RequestMapping(
-        method = [RequestMethod.POST],
-        value = ["/auth/login/external"],
-        produces = ["application/json"],
-        consumes = ["application/json"]
-    )
-    fun externalLogin(
-        @ApiParam(
-            value = "",
-            required = true
-        ) @Valid @RequestBody externalLoginRequestDto: ExternalLoginRequestDto
-    ): ResponseEntity<Unit> {
-        return ResponseEntity(HttpStatus.NOT_IMPLEMENTED)
-    }
 
     @ApiOperation(
         value = "Forgot password",
@@ -86,6 +57,29 @@ interface AuthApi {
             required = true
         ) @Valid @RequestBody forgotPasswordRequestDto: ForgotPasswordRequestDto
     ): ResponseEntity<Unit> {
+        return ResponseEntity(HttpStatus.NOT_IMPLEMENTED)
+    }
+
+    @ApiOperation(
+        value = "Get authentication status",
+        nickname = "getAuthStatus",
+        notes = "Get authentication status: fully authenticated, activation pending and incomplete profile",
+        response = AuthStatusResponseDto::class,
+        authorizations = [Authorization(value = "http-bearer")]
+    )
+    @ApiResponses(
+        value = [ApiResponse(
+            code = 200,
+            message = "OK",
+            response = AuthStatusResponseDto::class
+        )]
+    )
+    @RequestMapping(
+        method = [RequestMethod.GET],
+        value = ["/auth/status"],
+        produces = ["application/json"]
+    )
+    fun getAuthStatus(): ResponseEntity<AuthStatusResponseDto> {
         return ResponseEntity(HttpStatus.NOT_IMPLEMENTED)
     }
 
