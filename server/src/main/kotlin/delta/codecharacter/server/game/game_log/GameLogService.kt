@@ -15,4 +15,9 @@ class GameLogService(@Autowired private val gameLogRepository: GameLogRepository
             ""
         }
     }
+
+    fun saveGameLog(gameId: UUID, log: String) {
+        val gameLog = GameLogEntity(gameId, log)
+        gameLogRepository.save(gameLog)
+    }
 }

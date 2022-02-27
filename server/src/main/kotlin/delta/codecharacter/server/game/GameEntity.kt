@@ -10,6 +10,5 @@ data class GameEntity(
     val coinsUsed: Int,
     val destruction: Double,
     val status: GameStatusEnum,
-    val verdict: GameVerdictEnum,
     val matchId: UUID
 )

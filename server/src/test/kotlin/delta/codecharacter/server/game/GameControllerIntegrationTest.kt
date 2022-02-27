@@ -42,7 +42,6 @@ internal class GameControllerIntegrationTest(@Autowired val mockMvc: MockMvc) {
                 destruction = 100.0,
                 coinsUsed = 100,
                 status = GameStatusEnum.EXECUTED,
-                verdict = GameVerdictEnum.TIE,
                 matchId = UUID.randomUUID(),
             )
         mongoTemplate.save<GameEntity>(gameEntity)

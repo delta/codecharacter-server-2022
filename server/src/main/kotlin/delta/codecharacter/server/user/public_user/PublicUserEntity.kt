@@ -17,4 +17,5 @@ data class PublicUserEntity(
     val wins: Int,
     val losses: Int,
     val ties: Int,
+    val isActivated: Boolean = true,
 )

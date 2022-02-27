@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import delta.codecharacter.server.code.LanguageEnum
 import delta.codecharacter.server.config.GameConfiguration
 import delta.codecharacter.server.exception.CustomException
+import delta.codecharacter.server.game.game_log.GameLogService
 import delta.codecharacter.server.game.queue.entities.GameRequestEntity
 import delta.codecharacter.server.game.queue.entities.GameResultEntity
 import delta.codecharacter.server.game.queue.entities.GameStatusUpdateEntity
@@ -24,6 +25,7 @@ import java.util.UUID
 internal class GameServiceTest {
     private lateinit var gameRepository: GameRepository
     private lateinit var gameService: GameService
+    private lateinit var gameLogService: GameLogService
     private lateinit var rabbitTemplate: RabbitTemplate
     private lateinit var mapper: ObjectMapper
     private lateinit var gameParameters: GameParameters
@@ -31,12 +33,13 @@ internal class GameServiceTest {
     @BeforeEach
     fun setUp() {
         gameRepository = mockk(relaxed = true)
+        gameLogService = mockk(relaxed = true)
         rabbitTemplate = mockk(relaxed = true)
         mapper = ObjectMapper()
         val gameConfiguration = GameConfiguration()
         gameParameters = gameConfiguration.gameParameters()
 
-        gameService = GameService(gameRepository, rabbitTemplate, gameParameters)
+        gameService = GameService(gameRepository, gameLogService, rabbitTemplate, gameParameters)
     }
 
     @Test
@@ -121,7 +124,6 @@ internal class GameServiceTest {
                 coinsUsed = 0,
                 destruction = 0.0,
                 status = GameStatusEnum.IDLE,
-                verdict = GameVerdictEnum.TIE,
                 matchId = UUID.randomUUID(),
             )
         val gameStatusUpdate =
@@ -135,12 +137,7 @@ internal class GameServiceTest {
         every {
             gameRepository.save(
                 GameEntity(
-                    game.id,
-                    game.coinsUsed,
-                    game.destruction,
-                    GameStatusEnum.EXECUTING,
-                    game.verdict,
-                    game.matchId
+                    game.id, game.coinsUsed, game.destruction, GameStatusEnum.EXECUTING, game.matchId
                 )
             )
         } returns mockk()
@@ -151,12 +148,7 @@ internal class GameServiceTest {
         verify {
             gameRepository.save(
                 GameEntity(
-                    game.id,
-                    game.coinsUsed,
-                    game.destruction,
-                    GameStatusEnum.EXECUTING,
-                    game.verdict,
-                    game.matchId
+                    game.id, game.coinsUsed, game.destruction, GameStatusEnum.EXECUTING, game.matchId
                 )
             )
         }
@@ -171,7 +163,6 @@ internal class GameServiceTest {
                 coinsUsed = 0,
                 destruction = 0.0,
                 status = GameStatusEnum.IDLE,
-                verdict = GameVerdictEnum.TIE,
                 matchId = UUID.randomUUID(),
             )
         val gameStatusUpdate =
@@ -184,19 +175,17 @@ internal class GameServiceTest {
                 ),
             )
 
-        every { gameRepository.findById(game.id) } returns Optional.of(game)
-        every {
-            gameRepository.save(
-                GameEntity(
-                    game.id,
-                    gameStatusUpdate.gameResult!!.coinsUsed,
-                    gameStatusUpdate.gameResult!!.destructionPercentage,
-                    GameStatusEnum.EXECUTED,
-                    GameVerdictEnum.PLAYER2,
-                    game.matchId
-                )
+        val updatedGameEntity =
+            GameEntity(
+                game.id,
+                gameStatusUpdate.gameResult!!.coinsUsed,
+                gameStatusUpdate.gameResult!!.destructionPercentage,
+                GameStatusEnum.EXECUTED,
+                game.matchId
             )
-        } returns mockk()
+
+        every { gameRepository.findById(game.id) } returns Optional.of(game)
+        every { gameRepository.save(updatedGameEntity) } returns updatedGameEntity
 
         gameService.updateGameStatus(mapper.writeValueAsString(gameStatusUpdate))
 
@@ -208,7 +197,6 @@ internal class GameServiceTest {
                     gameStatusUpdate.gameResult!!.coinsUsed,
                     gameStatusUpdate.gameResult!!.destructionPercentage,
                     GameStatusEnum.EXECUTED,
-                    GameVerdictEnum.PLAYER2,
                     game.matchId
                 )
             )
