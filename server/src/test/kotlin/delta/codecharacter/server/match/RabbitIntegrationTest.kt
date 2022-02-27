@@ -10,7 +10,6 @@ import delta.codecharacter.server.code.code_revision.CodeRevisionEntity
 import delta.codecharacter.server.code.locked_code.LockedCodeEntity
 import delta.codecharacter.server.game.GameEntity
 import delta.codecharacter.server.game.GameStatusEnum
-import delta.codecharacter.server.game.GameVerdictEnum
 import delta.codecharacter.server.game.game_log.GameLogEntity
 import delta.codecharacter.server.game.queue.entities.GameRequestEntity
 import delta.codecharacter.server.game.queue.entities.GameResultEntity
@@ -240,14 +239,13 @@ internal class RabbitIntegrationTest(@Autowired val mockMvc: MockMvc) {
                     status = GameStatusEnum.IDLE,
                     coinsUsed = 0,
                     destruction = 0.0,
-                    verdict = GameVerdictEnum.TIE,
                     matchId = UUID.randomUUID()
                 )
             )
         mongoTemplate.save(
             MatchEntity(
                 id = game.matchId,
-                games = setOf(game),
+                games = listOf(game),
                 mode = MatchModeEnum.SELF,
                 verdict = MatchVerdictEnum.TIE,
                 createdAt = Instant.now(),
@@ -285,14 +283,13 @@ internal class RabbitIntegrationTest(@Autowired val mockMvc: MockMvc) {
                     status = GameStatusEnum.IDLE,
                     coinsUsed = 0,
                     destruction = 0.0,
-                    verdict = GameVerdictEnum.TIE,
                     matchId = UUID.randomUUID()
                 )
             )
         mongoTemplate.save(
             MatchEntity(
                 id = game.matchId,
-                games = setOf(game),
+                games = listOf(game),
                 mode = MatchModeEnum.SELF,
                 verdict = MatchVerdictEnum.TIE,
                 createdAt = Instant.now(),
@@ -322,7 +319,9 @@ internal class RabbitIntegrationTest(@Autowired val mockMvc: MockMvc) {
         assertThat(updatedGame?.status).isEqualTo(GameStatusEnum.EXECUTED)
         assertThat(updatedGame?.coinsUsed).isEqualTo(gameResult.coinsUsed)
         assertThat(updatedGame?.destruction).isEqualTo(gameResult.destructionPercentage)
-        assertThat(updatedGame?.verdict).isEqualTo(GameVerdictEnum.PLAYER1)
+
+        val gameLog = mongoTemplate.findById<GameLogEntity>(game.id)
+        assertThat(gameLog?.log).isEqualTo(gameResult.log)
     }
 
     @AfterEach

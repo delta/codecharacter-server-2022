@@ -41,7 +41,11 @@ class RatingHistoryService(
         }
     }
 
-    fun updateRating(userId: UUID, opponentId: UUID, verdict: MatchVerdictEnum) {
+    fun updateRating(
+        userId: UUID,
+        opponentId: UUID,
+        verdict: MatchVerdictEnum
+    ): Pair<Double, Double> {
         val (_, userRating, userRatingDeviation, userRatingValidFrom) =
             ratingHistoryRepository.findFirstByUserIdOrderByValidFromDesc(userId)
         val (_, opponentRating, opponentRatingDeviation, opponentRatingValidFrom) =
@@ -86,5 +90,7 @@ class RatingHistoryService(
                 validFrom = currentInstant
             )
         )
+
+        return Pair(newUserRating.rating, newOpponentRating.rating)
     }
 }

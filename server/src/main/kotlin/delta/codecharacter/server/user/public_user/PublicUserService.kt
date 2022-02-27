@@ -5,9 +5,11 @@ import delta.codecharacter.dtos.LeaderboardEntryDto
 import delta.codecharacter.dtos.PublicUserDto
 import delta.codecharacter.dtos.UpdateCurrentUserProfileDto
 import delta.codecharacter.dtos.UserStatsDto
+import delta.codecharacter.server.exception.CustomException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
 import java.util.UUID
@@ -71,6 +73,7 @@ class PublicUserService(@Autowired private val publicUserRepository: PublicUserR
             name = user.name,
             country = user.country,
             college = user.college,
+            avatarId = user.avatarId,
         )
     }
 
@@ -85,12 +88,26 @@ class PublicUserService(@Autowired private val publicUserRepository: PublicUserR
         publicUserRepository.save(updatedUser)
     }
 
+    fun updatePublicRating(userId: UUID, isWinner: Boolean, isTie: Boolean, newRating: Double) {
+        val user = publicUserRepository.findById(userId).get()
+        val updatedUser =
+            user.copy(
+                rating = newRating,
+                wins = if (isWinner) user.wins + 1 else user.wins,
+                losses = if (isWinner) user.losses else user.losses + 1,
+                ties = if (isTie) user.ties + 1 else user.ties
+            )
+        publicUserRepository.save(updatedUser)
+    }
+
     fun getPublicUser(userId: UUID): PublicUserEntity {
         return publicUserRepository.findById(userId).get()
     }
 
     fun getPublicUserByUsername(username: String): PublicUserEntity {
-        return publicUserRepository.findByUsername(username).get()
+        return publicUserRepository.findByUsername(username).orElseThrow {
+            CustomException(HttpStatus.BAD_REQUEST, "Invalid username")
+        }
     }
 
     fun isUsernameUnique(username: String): Boolean {

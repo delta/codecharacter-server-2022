@@ -10,7 +10,6 @@ import javax.validation.Valid
  * @param destruction
  * @param coinsUsed
  * @param status
- * @param gameVerdict
  */
 data class GameDto(
 
@@ -32,12 +31,5 @@ data class GameDto(
 
     @field:Valid
     @ApiModelProperty(example = "null", required = true, value = "")
-    @field:JsonProperty("status", required = true) val status: GameStatusDto,
-
-    @field:Valid
-    @ApiModelProperty(example = "null", required = true, value = "")
-    @field:JsonProperty(
-        "gameVerdict",
-        required = true
-    ) val gameVerdict: VerdictDto
+    @field:JsonProperty("status", required = true) val status: GameStatusDto
 )

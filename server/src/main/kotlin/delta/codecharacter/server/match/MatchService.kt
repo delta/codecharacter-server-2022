@@ -1,5 +1,6 @@
 package delta.codecharacter.server.match
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import delta.codecharacter.dtos.CreateMatchRequestDto
 import delta.codecharacter.dtos.GameDto
 import delta.codecharacter.dtos.GameStatusDto
@@ -23,6 +24,8 @@ import delta.codecharacter.server.user.rating_history.RatingHistoryService
 import org.springframework.amqp.rabbit.annotation.RabbitListener
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder
+import org.springframework.messaging.simp.SimpMessagingTemplate
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
 import java.time.Instant
@@ -40,8 +43,12 @@ class MatchService(
     @Autowired private val lockedMapService: LockedMapService,
     @Autowired private val publicUserService: PublicUserService,
     @Autowired private val verdictAlgorithm: VerdictAlgorithm,
-    @Autowired private val ratingHistoryService: RatingHistoryService
+    @Autowired private val ratingHistoryService: RatingHistoryService,
+    @Autowired private val jackson2ObjectMapperBuilder: Jackson2ObjectMapperBuilder,
+    @Autowired private val simpMessagingTemplate: SimpMessagingTemplate,
 ) {
+    private var mapper: ObjectMapper = jackson2ObjectMapperBuilder.build()
+
     private fun createSelfMatch(userId: UUID, codeRevisionId: UUID?, mapRevisionId: UUID?) {
         val code: String
         val language: LanguageEnum
@@ -74,7 +81,7 @@ class MatchService(
         val match =
             MatchEntity(
                 id = matchId,
-                games = setOf(game),
+                games = listOf(game),
                 mode = MatchModeEnum.SELF,
                 verdict = MatchVerdictEnum.TIE,
                 createdAt = Instant.now(),
@@ -105,7 +112,7 @@ class MatchService(
         val match =
             MatchEntity(
                 id = matchId,
-                games = setOf(game1, game2),
+                games = listOf(game1, game2),
                 mode = MatchModeEnum.MANUAL,
                 verdict = MatchVerdictEnum.TIE,
                 createdAt = Instant.now(),
@@ -147,7 +154,6 @@ class MatchService(
                     .map { gameEntity ->
                         GameDto(
                             id = gameEntity.id,
-                            gameVerdict = VerdictDto.valueOf(gameEntity.verdict.name),
                             destruction = BigDecimal(gameEntity.destruction),
                             coinsUsed = gameEntity.coinsUsed,
                             status = GameStatusDto.valueOf(gameEntity.status.name),
@@ -190,6 +196,19 @@ class MatchService(
         val updatedGame = gameService.updateGameStatus(gameStatusUpdateJson)
 
         val match = matchRepository.findById(updatedGame.matchId).get()
+        if (match.mode != MatchModeEnum.AUTO && match.games.first().id == updatedGame.id) {
+            simpMessagingTemplate.convertAndSend(
+                "/updates/${match.player1.userId}",
+                mapper.writeValueAsString(
+                    GameDto(
+                        id = updatedGame.id,
+                        destruction = BigDecimal(updatedGame.destruction),
+                        coinsUsed = updatedGame.coinsUsed,
+                        status = GameStatusDto.valueOf(updatedGame.status.name),
+                    )
+                )
+            )
+        }
         if (match.mode != MatchModeEnum.SELF &&
             match.games.all { game ->
                 game.status == GameStatusEnum.EXECUTED || game.status == GameStatusEnum.EXECUTE_ERROR
@@ -207,7 +226,21 @@ class MatchService(
                     player2Game.destruction
                 )
             val finishedMatch = match.copy(verdict = verdict)
-            ratingHistoryService.updateRating(match.player1.userId, match.player2.userId, verdict)
+            val (newUserRating, newOpponentRating) =
+                ratingHistoryService.updateRating(match.player1.userId, match.player2.userId, verdict)
+
+            publicUserService.updatePublicRating(
+                userId = match.player1.userId,
+                isWinner = verdict == MatchVerdictEnum.PLAYER1,
+                isTie = verdict == MatchVerdictEnum.TIE,
+                newRating = newUserRating
+            )
+            publicUserService.updatePublicRating(
+                userId = match.player2.userId,
+                isWinner = verdict == MatchVerdictEnum.PLAYER2,
+                isTie = verdict == MatchVerdictEnum.TIE,
+                newRating = newOpponentRating
+            )
 
             matchRepository.save(finishedMatch)
         }

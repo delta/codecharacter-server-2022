@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import delta.codecharacter.server.code.LanguageEnum
 import delta.codecharacter.server.exception.CustomException
+import delta.codecharacter.server.game.game_log.GameLogService
 import delta.codecharacter.server.game.queue.entities.GameRequestEntity
 import delta.codecharacter.server.game.queue.entities.GameStatusUpdateEntity
 import delta.codecharacter.server.params.GameParameters
@@ -16,6 +17,7 @@ import java.util.UUID
 @Service
 class GameService(
     @Autowired private val gameRepository: GameRepository,
+    @Autowired private val gameLogService: GameLogService,
     @Autowired private val rabbitTemplate: RabbitTemplate,
     @Autowired private val parameters: GameParameters,
 ) {
@@ -33,7 +35,6 @@ class GameService(
                 id = UUID.randomUUID(),
                 coinsUsed = 0,
                 destruction = 0.0,
-                verdict = GameVerdictEnum.TIE,
                 status = GameStatusEnum.IDLE,
                 matchId = matchId,
             )
@@ -68,14 +69,6 @@ class GameService(
         val gameResult = gameStatusUpdateEntity.gameResult
 
         val (destructionPercentage, coinsUsed) = gameResult
-        val winner =
-            if (destructionPercentage > 50F) {
-                GameVerdictEnum.PLAYER1
-            } else if (destructionPercentage < 50F) {
-                GameVerdictEnum.PLAYER2
-            } else {
-                GameVerdictEnum.TIE
-            }
         val gameStatus =
             if (gameResult.hasErrors) {
                 GameStatusEnum.EXECUTE_ERROR
@@ -85,11 +78,10 @@ class GameService(
 
         val newGameEntity =
             oldGameEntity.copy(
-                destruction = destructionPercentage,
-                coinsUsed = coinsUsed,
-                verdict = winner,
-                status = gameStatus
+                destruction = destructionPercentage, coinsUsed = coinsUsed, status = gameStatus
             )
-        return gameRepository.save(newGameEntity)
+        val game = gameRepository.save(newGameEntity)
+        gameLogService.saveGameLog(game.id, gameResult.log)
+        return game
     }
 }

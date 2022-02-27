@@ -12,6 +12,7 @@ import javax.validation.constraints.Pattern
  * @param email
  * @param country
  * @param college
+ * @param avatarId
  * @param isProfileComplete
  */
 data class CurrentUserProfileDto(
@@ -40,6 +41,9 @@ data class CurrentUserProfileDto(
 
     @ApiModelProperty(example = "Test", required = true, value = "")
     @field:JsonProperty("college", required = true) val college: String,
+
+    @ApiModelProperty(example = "1", required = true, value = "")
+    @field:JsonProperty("avatarId", required = true) val avatarId: Int,
 
     @ApiModelProperty(example = "null", required = true, value = "")
     @field:JsonProperty(

@@ -28,6 +28,8 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.springframework.http.HttpStatus
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder
+import org.springframework.messaging.simp.SimpMessagingTemplate
 import java.time.Instant
 import java.util.UUID
 
@@ -44,6 +46,8 @@ internal class MatchServiceTest {
     private lateinit var publicUserService: PublicUserService
     private lateinit var verdictAlgorithm: VerdictAlgorithm
     private lateinit var ratingHistoryService: RatingHistoryService
+    private lateinit var jackson2ObjectMapperBuilder: Jackson2ObjectMapperBuilder
+    private lateinit var simpMessagingTemplate: SimpMessagingTemplate
 
     private lateinit var matchService: MatchService
 
@@ -60,6 +64,8 @@ internal class MatchServiceTest {
         publicUserService = mockk(relaxed = true)
         verdictAlgorithm = mockk(relaxed = true)
         ratingHistoryService = mockk(relaxed = true)
+        jackson2ObjectMapperBuilder = Jackson2ObjectMapperBuilder()
+        simpMessagingTemplate = mockk(relaxed = true)
 
         matchService =
             MatchService(
@@ -73,7 +79,9 @@ internal class MatchServiceTest {
                 lockedMapService,
                 publicUserService,
                 verdictAlgorithm,
-                ratingHistoryService
+                ratingHistoryService,
+                jackson2ObjectMapperBuilder,
+                simpMessagingTemplate
             )
     }
 
