@@ -73,6 +73,7 @@ class PublicUserService(@Autowired private val publicUserRepository: PublicUserR
             name = user.name,
             country = user.country,
             college = user.college,
+            avatarId = user.avatarId,
         )
     }
 

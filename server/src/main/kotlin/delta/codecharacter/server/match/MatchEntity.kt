@@ -11,7 +11,7 @@ import java.util.UUID
 @Document(collection = "match")
 data class MatchEntity(
     @Id val id: UUID,
-    val games: List<GameEntity>,
+    @DocumentReference(lazy = true) val games: List<GameEntity>,
     val mode: MatchModeEnum,
     val verdict: MatchVerdictEnum,
     val createdAt: Instant,
