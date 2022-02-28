@@ -6,6 +6,7 @@ import delta.codecharacter.dtos.PublicUserDto
 import delta.codecharacter.dtos.UpdateCurrentUserProfileDto
 import delta.codecharacter.dtos.UserStatsDto
 import delta.codecharacter.server.exception.CustomException
+import delta.codecharacter.server.match.MatchVerdictEnum
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
@@ -88,14 +89,29 @@ class PublicUserService(@Autowired private val publicUserRepository: PublicUserR
         publicUserRepository.save(updatedUser)
     }
 
-    fun updatePublicRating(userId: UUID, isWinner: Boolean, isTie: Boolean, newRating: Double) {
+    fun updatePublicRating(
+        userId: UUID,
+        isInitiator: Boolean,
+        verdict: MatchVerdictEnum,
+        newRating: Double
+    ) {
         val user = publicUserRepository.findById(userId).get()
         val updatedUser =
             user.copy(
                 rating = newRating,
-                wins = if (isWinner) user.wins + 1 else user.wins,
-                losses = if (isWinner) user.losses else user.losses + 1,
-                ties = if (isTie) user.ties + 1 else user.ties
+                wins =
+                if ((isInitiator && verdict == MatchVerdictEnum.PLAYER1) ||
+                    (!isInitiator && verdict == MatchVerdictEnum.PLAYER2)
+                )
+                    user.wins + 1
+                else user.wins,
+                losses =
+                if ((isInitiator && verdict == MatchVerdictEnum.PLAYER2) ||
+                    (!isInitiator && verdict == MatchVerdictEnum.PLAYER1)
+                )
+                    user.losses + 1
+                else user.losses,
+                ties = if (verdict == MatchVerdictEnum.TIE) user.ties + 1 else user.ties
             )
         publicUserRepository.save(updatedUser)
     }
