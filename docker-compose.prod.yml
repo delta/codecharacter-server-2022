@@ -20,6 +20,9 @@ services:
     volumes:
       - ./config/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf
       - ./data/rabbitmq_prod:/var/lib/rabbitmq/mnesia/
+    ports:
+      - "5672:5672"
+      - "15672:15672"
     networks:
       - common
     restart: always
@@ -34,8 +37,6 @@ services:
     depends_on:
       - db
       - rabbitmq
-    volumes:
-      - ./storage:/server/storage
     networks:
       - common
     restart: always

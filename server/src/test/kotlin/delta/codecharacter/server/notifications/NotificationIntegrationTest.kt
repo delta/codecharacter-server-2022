@@ -22,8 +22,6 @@ import org.springframework.messaging.simp.stomp.StompSessionHandlerAdapter
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.web.socket.client.standard.StandardWebSocketClient
 import org.springframework.web.socket.messaging.WebSocketStompClient
-import org.springframework.web.socket.sockjs.client.SockJsClient
-import org.springframework.web.socket.sockjs.client.WebSocketTransport
 
 @AutoConfigureMockMvc
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -47,8 +45,7 @@ class NotificationIntegrationTest(@Autowired val mockMvc: MockMvc) {
 
         mongoTemplate.save<UserEntity>(TestAttributes.user)
 
-        stompClient =
-            WebSocketStompClient(SockJsClient(listOf(WebSocketTransport(StandardWebSocketClient()))))
+        stompClient = WebSocketStompClient(StandardWebSocketClient())
         stompClient.messageConverter = StringMessageConverter()
 
         stompSession =

@@ -17,6 +17,7 @@ import delta.codecharacter.server.game_map.latest_map.LatestMapService
 import delta.codecharacter.server.game_map.locked_map.LockedMapService
 import delta.codecharacter.server.game_map.map_revision.MapRevisionService
 import delta.codecharacter.server.logic.verdict.VerdictAlgorithm
+import delta.codecharacter.server.notifications.NotificationService
 import delta.codecharacter.server.user.public_user.PublicUserService
 import delta.codecharacter.server.user.rating_history.RatingHistoryService
 import io.mockk.confirmVerified
@@ -46,6 +47,7 @@ internal class MatchServiceTest {
     private lateinit var publicUserService: PublicUserService
     private lateinit var verdictAlgorithm: VerdictAlgorithm
     private lateinit var ratingHistoryService: RatingHistoryService
+    private lateinit var notificationService: NotificationService
     private lateinit var jackson2ObjectMapperBuilder: Jackson2ObjectMapperBuilder
     private lateinit var simpMessagingTemplate: SimpMessagingTemplate
 
@@ -64,6 +66,7 @@ internal class MatchServiceTest {
         publicUserService = mockk(relaxed = true)
         verdictAlgorithm = mockk(relaxed = true)
         ratingHistoryService = mockk(relaxed = true)
+        notificationService = mockk(relaxed = true)
         jackson2ObjectMapperBuilder = Jackson2ObjectMapperBuilder()
         simpMessagingTemplate = mockk(relaxed = true)
 
@@ -80,6 +83,7 @@ internal class MatchServiceTest {
                 publicUserService,
                 verdictAlgorithm,
                 ratingHistoryService,
+                notificationService,
                 jackson2ObjectMapperBuilder,
                 simpMessagingTemplate
             )
