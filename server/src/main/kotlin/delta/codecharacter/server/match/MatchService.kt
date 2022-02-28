@@ -252,10 +252,10 @@ class MatchService(
                 notificationService.sendNotification(
                     match.player1.userId,
                     "Match Result",
-                    "Match execution complete. Result: ${when (verdict) {
-                        MatchVerdictEnum.PLAYER1 -> "won"
-                        MatchVerdictEnum.PLAYER2 -> "lost"
-                        MatchVerdictEnum.TIE -> "tied"
+                    "${when (verdict) {
+                        MatchVerdictEnum.PLAYER1 -> "Won"
+                        MatchVerdictEnum.PLAYER2 -> "Lost"
+                        MatchVerdictEnum.TIE -> "Tied"
                     }} against ${match.player2.username}",
                 )
             }
