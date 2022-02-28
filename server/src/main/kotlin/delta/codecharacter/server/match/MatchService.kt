@@ -19,6 +19,7 @@ import delta.codecharacter.server.game_map.latest_map.LatestMapService
 import delta.codecharacter.server.game_map.locked_map.LockedMapService
 import delta.codecharacter.server.game_map.map_revision.MapRevisionService
 import delta.codecharacter.server.logic.verdict.VerdictAlgorithm
+import delta.codecharacter.server.notifications.NotificationService
 import delta.codecharacter.server.user.public_user.PublicUserService
 import delta.codecharacter.server.user.rating_history.RatingHistoryService
 import org.springframework.amqp.rabbit.annotation.RabbitListener
@@ -44,6 +45,7 @@ class MatchService(
     @Autowired private val publicUserService: PublicUserService,
     @Autowired private val verdictAlgorithm: VerdictAlgorithm,
     @Autowired private val ratingHistoryService: RatingHistoryService,
+    @Autowired private val notificationService: NotificationService,
     @Autowired private val jackson2ObjectMapperBuilder: Jackson2ObjectMapperBuilder,
     @Autowired private val simpMessagingTemplate: SimpMessagingTemplate,
 ) {
@@ -97,6 +99,10 @@ class MatchService(
         val publicUser = publicUserService.getPublicUser(userId)
         val publicOpponent = publicUserService.getPublicUserByUsername(opponentUsername)
         val opponentId = publicOpponent.userId
+
+        if (userId == opponentId) {
+            throw CustomException(HttpStatus.BAD_REQUEST, "You cannot play against yourself")
+        }
 
         val (userLanguage, userCode) = lockedCodeService.getLockedCode(userId)
         val userMap = lockedMapService.getLockedMap(userId)
@@ -231,16 +237,28 @@ class MatchService(
 
             publicUserService.updatePublicRating(
                 userId = match.player1.userId,
-                isWinner = verdict == MatchVerdictEnum.PLAYER1,
-                isTie = verdict == MatchVerdictEnum.TIE,
+                isInitiator = true,
+                verdict = verdict,
                 newRating = newUserRating
             )
             publicUserService.updatePublicRating(
                 userId = match.player2.userId,
-                isWinner = verdict == MatchVerdictEnum.PLAYER2,
-                isTie = verdict == MatchVerdictEnum.TIE,
+                isInitiator = false,
+                verdict = verdict,
                 newRating = newOpponentRating
             )
+
+            if (match.mode == MatchModeEnum.MANUAL) {
+                notificationService.sendNotification(
+                    match.player1.userId,
+                    "Match Result",
+                    "Match execution complete. Result: ${when (verdict) {
+                        MatchVerdictEnum.PLAYER1 -> "won"
+                        MatchVerdictEnum.PLAYER2 -> "lost"
+                        MatchVerdictEnum.TIE -> "tied"
+                    }} against ${match.player2.username}",
+                )
+            }
 
             matchRepository.save(finishedMatch)
         }
