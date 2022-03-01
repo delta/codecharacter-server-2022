@@ -193,7 +193,7 @@ class MatchService(
 
     fun getUserMatches(userId: UUID): List<MatchDto> {
         val publicUser = publicUserService.getPublicUser(userId)
-        val matches = matchRepository.findByPlayer1OrPlayer2OrderByCreatedAtDesc(publicUser, publicUser)
+        val matches = matchRepository.findByPlayer1OrderByCreatedAtDesc(publicUser)
         return mapMatchEntitiesToDtos(matches)
     }
 

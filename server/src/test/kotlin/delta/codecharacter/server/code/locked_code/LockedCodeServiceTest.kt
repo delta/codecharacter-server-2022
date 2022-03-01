@@ -3,6 +3,7 @@ package delta.codecharacter.server.code.locked_code
 import delta.codecharacter.dtos.LanguageDto
 import delta.codecharacter.dtos.UpdateLatestCodeRequestDto
 import delta.codecharacter.server.code.LanguageEnum
+import delta.codecharacter.server.config.DefaultCodeMapConfiguration
 import io.mockk.confirmVerified
 import io.mockk.every
 import io.mockk.mockk
@@ -16,11 +17,13 @@ import java.util.UUID
 internal class LockedCodeServiceTest {
     private lateinit var lockedCodeRepository: LockedCodeRepository
     private lateinit var lockedCodeService: LockedCodeService
+    private lateinit var defaultCodeMapConfiguration: DefaultCodeMapConfiguration
 
     @BeforeEach
     fun setUp() {
         lockedCodeRepository = mockk()
-        lockedCodeService = LockedCodeService(lockedCodeRepository)
+        defaultCodeMapConfiguration = mockk()
+        lockedCodeService = LockedCodeService(lockedCodeRepository, defaultCodeMapConfiguration)
     }
 
     @Test
@@ -29,6 +32,8 @@ internal class LockedCodeServiceTest {
         val lockedCodeEntity =
             LockedCodeEntity(code = "code", language = LanguageEnum.C, userId = userId)
 
+        every { defaultCodeMapConfiguration.defaultCode } returns "code"
+        every { defaultCodeMapConfiguration.defaultLanguage } returns LanguageEnum.C
         every { lockedCodeRepository.findById(userId) } returns Optional.of(lockedCodeEntity)
 
         val latestCode = lockedCodeService.getLockedCode(userId)

@@ -1,6 +1,7 @@
 package delta.codecharacter.server.game_map.locked_map
 
 import delta.codecharacter.dtos.UpdateLatestMapRequestDto
+import delta.codecharacter.server.config.DefaultCodeMapConfiguration
 import delta.codecharacter.server.logic.validation.MapValidator
 import io.mockk.confirmVerified
 import io.mockk.every
@@ -15,13 +16,16 @@ import java.util.UUID
 internal class LockedMapServiceTest {
     private lateinit var lockedMapRepository: LockedMapRepository
     private lateinit var lockedMapService: LockedMapService
+    private lateinit var defaultCodeMapConfiguration: DefaultCodeMapConfiguration
     private lateinit var mapValidator: MapValidator
 
     @BeforeEach
     fun setUp() {
         lockedMapRepository = mockk()
         mapValidator = mockk()
-        lockedMapService = LockedMapService(lockedMapRepository, mapValidator)
+        defaultCodeMapConfiguration = mockk()
+        lockedMapService =
+            LockedMapService(lockedMapRepository, defaultCodeMapConfiguration, mapValidator)
     }
 
     @Test
@@ -29,6 +33,7 @@ internal class LockedMapServiceTest {
         val userId = UUID.randomUUID()
         val lockedMapEntity = LockedMapEntity(map = "map", userId = userId)
 
+        every { defaultCodeMapConfiguration.defaultMap } returns "[[0]]"
         every { lockedMapRepository.findById(userId) } returns Optional.of(lockedMapEntity)
 
         val latestMap = lockedMapService.getLockedMap(userId)
