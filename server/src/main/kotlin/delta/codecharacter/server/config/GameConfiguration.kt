@@ -22,8 +22,8 @@ class GameConfiguration {
                 Defender(id = 1, hp = 400, range = 4, attackPower = 10, price = 25),
                 Defender(id = 2, hp = 600, range = 6, attackPower = 20, price = 50),
             ),
-            numberOfTurns = 100,
-            numberOfCoins = 1000,
+            numberOfTurns = 500,
+            numberOfCoins = 1500,
             mapCoins = 5000,
         )
     }
