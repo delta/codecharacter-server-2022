@@ -38,3 +38,4 @@ jwt:
   secret: 'example'
 
 base-url: your-base-url
+frontend-domain: localhost
