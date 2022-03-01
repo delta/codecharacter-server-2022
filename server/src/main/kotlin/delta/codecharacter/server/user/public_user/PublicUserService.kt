@@ -85,6 +85,7 @@ class PublicUserService(@Autowired private val publicUserRepository: PublicUserR
                 name = updateCurrentUserProfileDto.name ?: user.name,
                 country = updateCurrentUserProfileDto.country ?: user.country,
                 college = updateCurrentUserProfileDto.college ?: user.college,
+                avatarId = updateCurrentUserProfileDto.avatarId ?: user.avatarId
             )
         publicUserRepository.save(updatedUser)
     }
