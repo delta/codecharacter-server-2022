@@ -20,17 +20,17 @@ class WinnerAlgorithm : VerdictAlgorithm {
 
         val totalCoins = gameConfiguration.gameParameters().numberOfCoins
 
-        val player1CoinUsagePercentage = (player1CoinsUsed.toDouble() / totalCoins) * 100
-        val player2CoinUsagePercentage = (player2CoinsUsed.toDouble() / totalCoins) * 100
+        val player1CoinLeftPercentage = ((totalCoins - player1CoinsUsed.toDouble()) / totalCoins) * 100
+        val player2CoinLeftPercentage = ((totalCoins - player2CoinsUsed.toDouble()) / totalCoins) * 100
 
         val scoreCalculator =
-            { coinsUsedPercent: Double, destructionPercent: Double,
+            { coinsLeftPercent: Double, destructionPercent: Double,
                 ->
-                coinsUsedPercent + (2 * destructionPercent)
+                coinsLeftPercent + (2 * destructionPercent)
             }
 
-        val player1Score = scoreCalculator(player1CoinUsagePercentage, player1Destruction)
-        val player2Score = scoreCalculator(player2CoinUsagePercentage, player2Destruction)
+        val player1Score = scoreCalculator(player1CoinLeftPercentage, player1Destruction)
+        val player2Score = scoreCalculator(player2CoinLeftPercentage, player2Destruction)
 
         if (player1Score == player2Score) return MatchVerdictEnum.TIE
         if (player1Score > player2Score) return MatchVerdictEnum.PLAYER1
