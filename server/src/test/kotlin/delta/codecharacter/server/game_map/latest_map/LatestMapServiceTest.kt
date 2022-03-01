@@ -1,6 +1,7 @@
 package delta.codecharacter.server.game_map.latest_map
 
 import delta.codecharacter.dtos.UpdateLatestMapRequestDto
+import delta.codecharacter.server.config.DefaultCodeMapConfiguration
 import delta.codecharacter.server.logic.validation.MapValidator
 import io.mockk.confirmVerified
 import io.mockk.every
@@ -16,13 +17,16 @@ import java.util.UUID
 internal class LatestMapServiceTest {
     private lateinit var latestMapRepository: LatestMapRepository
     private lateinit var latestMapService: LatestMapService
+    private lateinit var defaultCodeMapConfiguration: DefaultCodeMapConfiguration
     private lateinit var mapValidator: MapValidator
 
     @BeforeEach
     fun setUp() {
         latestMapRepository = mockk()
         mapValidator = mockk()
-        latestMapService = LatestMapService(latestMapRepository, mapValidator)
+        defaultCodeMapConfiguration = mockk()
+        latestMapService =
+            LatestMapService(latestMapRepository, defaultCodeMapConfiguration, mapValidator)
     }
 
     @Test
@@ -31,6 +35,7 @@ internal class LatestMapServiceTest {
         val latestMapEntity =
             LatestMapEntity(map = "[[0]]", userId = userId, lastSavedAt = Instant.now())
 
+        every { defaultCodeMapConfiguration.defaultMap } returns "[[0]]"
         every { latestMapRepository.findById(userId) } returns Optional.of(latestMapEntity)
 
         val latestMap = latestMapService.getLatestMap(userId)

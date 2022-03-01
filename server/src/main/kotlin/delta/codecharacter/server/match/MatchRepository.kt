@@ -8,8 +8,5 @@ import java.util.UUID
 @Repository
 interface MatchRepository : MongoRepository<MatchEntity, UUID> {
     fun findTop10ByOrderByTotalPointsDesc(): List<MatchEntity>
-    fun findByPlayer1OrPlayer2OrderByCreatedAtDesc(
-        player1: PublicUserEntity,
-        player2: PublicUserEntity
-    ): List<MatchEntity>
+    fun findByPlayer1OrderByCreatedAtDesc(player1: PublicUserEntity): List<MatchEntity>
 }

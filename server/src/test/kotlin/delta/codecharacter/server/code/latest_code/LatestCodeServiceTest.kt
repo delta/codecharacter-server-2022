@@ -3,6 +3,7 @@ package delta.codecharacter.server.code.latest_code
 import delta.codecharacter.dtos.LanguageDto
 import delta.codecharacter.dtos.UpdateLatestCodeRequestDto
 import delta.codecharacter.server.code.LanguageEnum
+import delta.codecharacter.server.config.DefaultCodeMapConfiguration
 import io.mockk.confirmVerified
 import io.mockk.every
 import io.mockk.mockk
@@ -17,11 +18,13 @@ import java.util.UUID
 internal class LatestCodeServiceTest {
     private lateinit var latestCodeRepository: LatestCodeRepository
     private lateinit var latestCodeService: LatestCodeService
+    private lateinit var defaultCodeMapConfiguration: DefaultCodeMapConfiguration
 
     @BeforeEach
     fun setUp() {
         latestCodeRepository = mockk()
-        latestCodeService = LatestCodeService(latestCodeRepository)
+        defaultCodeMapConfiguration = mockk()
+        latestCodeService = LatestCodeService(latestCodeRepository, defaultCodeMapConfiguration)
     }
 
     @Test
@@ -32,6 +35,8 @@ internal class LatestCodeServiceTest {
                 code = "code", language = LanguageEnum.C, userId = userId, lastSavedAt = Instant.now()
             )
 
+        every { defaultCodeMapConfiguration.defaultCode } returns "code"
+        every { defaultCodeMapConfiguration.defaultLanguage } returns LanguageEnum.C
         every { latestCodeRepository.findById(userId) } returns Optional.of(latestCodeEntity)
 
         val latestCode = latestCodeService.getLatestCode(userId)

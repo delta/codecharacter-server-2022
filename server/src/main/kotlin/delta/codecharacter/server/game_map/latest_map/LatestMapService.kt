@@ -2,6 +2,7 @@ package delta.codecharacter.server.game_map.latest_map
 
 import delta.codecharacter.dtos.GameMapDto
 import delta.codecharacter.dtos.UpdateLatestMapRequestDto
+import delta.codecharacter.server.config.DefaultCodeMapConfiguration
 import delta.codecharacter.server.logic.validation.MapValidator
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
@@ -12,13 +13,20 @@ import java.util.UUID
 @Service
 class LatestMapService(
     @Autowired private val latestMapRepository: LatestMapRepository,
+    @Autowired private val defaultCodeMapConfiguration: DefaultCodeMapConfiguration,
     @Autowired private val mapValidator: MapValidator,
 ) {
 
     fun getLatestMap(userId: UUID): GameMapDto {
         return latestMapRepository
             .findById(userId)
-            .orElseThrow { throw Exception("Latest code not found for user $userId") }
+            .orElse(
+                LatestMapEntity(
+                    userId,
+                    map = defaultCodeMapConfiguration.defaultMap,
+                    lastSavedAt = Instant.MIN,
+                )
+            )
             .let { latestMap -> GameMapDto(map = latestMap.map, lastSavedAt = latestMap.lastSavedAt) }
     }
 
