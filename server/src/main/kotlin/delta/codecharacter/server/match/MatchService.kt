@@ -232,21 +232,22 @@ class MatchService(
                     player2Game.destruction
                 )
             val finishedMatch = match.copy(verdict = verdict)
-            val (newUserRating, newOpponentRating) =
-                ratingHistoryService.updateRating(match.player1.userId, match.player2.userId, verdict)
-
-            publicUserService.updatePublicRating(
-                userId = match.player1.userId,
-                isInitiator = true,
-                verdict = verdict,
-                newRating = newUserRating
-            )
-            publicUserService.updatePublicRating(
-                userId = match.player2.userId,
-                isInitiator = false,
-                verdict = verdict,
-                newRating = newOpponentRating
-            )
+            //            val (newUserRating, newOpponentRating) =
+            //                ratingHistoryService.updateRating(match.player1.userId,
+            // match.player2.userId, verdict)
+            //
+            //            publicUserService.updatePublicRating(
+            //                userId = match.player1.userId,
+            //                isInitiator = true,
+            //                verdict = verdict,
+            //                newRating = newUserRating
+            //            )
+            //            publicUserService.updatePublicRating(
+            //                userId = match.player2.userId,
+            //                isInitiator = false,
+            //                verdict = verdict,
+            //                newRating = newOpponentRating
+            //            )
 
             if (match.mode == MatchModeEnum.MANUAL) {
                 notificationService.sendNotification(
