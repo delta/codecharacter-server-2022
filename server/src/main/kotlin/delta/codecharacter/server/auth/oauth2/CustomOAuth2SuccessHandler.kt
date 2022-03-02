@@ -53,7 +53,7 @@ class CustomOAuth2SuccessHandler(@Lazy @Autowired private val authService: AuthS
                 } else {
                     response?.setHeader(
                         "Set-Cookie",
-                        "bearer-token=$token; Domain=$frontendDomain;Expires=$plusOneSecond; Path=/; SameSite=false"
+                        "bearer-token=$token; Domain=$frontendDomain; Expires=$plusOneSecond; Path=/; SameSite=false"
                     )
                 }
                 response?.sendRedirect("$baseUrl/#/dashboard")
