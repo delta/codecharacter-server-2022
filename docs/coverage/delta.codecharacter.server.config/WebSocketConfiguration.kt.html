@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>WebSocketConfiguration.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">server</a> &gt; <a href="index.source.html" class="el_package">delta.codecharacter.server.config</a> &gt; <span class="el_source">WebSocketConfiguration.kt</span></div><h1>WebSocketConfiguration.kt</h1><pre class="source lang-java linenums">package delta.codecharacter.server.config
+
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.context.annotation.Configuration
+import org.springframework.messaging.simp.config.MessageBrokerRegistry
+import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker
+import org.springframework.web.socket.config.annotation.StompEndpointRegistry
+import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer
+
+<span class="fc" id="L10">@Configuration</span>
+@EnableWebSocketMessageBroker
+<span class="fc" id="L12">class WebSocketConfiguration : WebSocketMessageBrokerConfigurer {</span>
+
+    @Value(&quot;\${cors.allowed-origin}&quot;) private lateinit var allowedOrigin: String
+
+    override fun registerStompEndpoints(registry: StompEndpointRegistry) {
+<span class="pc bpc" id="L17" title="1 of 2 branches missed.">        registry.addEndpoint(&quot;/ws&quot;).setAllowedOriginPatterns(allowedOrigin)</span>
+<span class="fc" id="L18">    }</span>
+
+    override fun configureMessageBroker(registry: MessageBrokerRegistry) {
+<span class="fc" id="L21">        registry.enableSimpleBroker(&quot;/notifications&quot;, &quot;/updates&quot;)</span>
+<span class="fc" id="L22">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

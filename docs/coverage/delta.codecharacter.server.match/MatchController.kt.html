@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MatchController.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">server</a> &gt; <a href="index.source.html" class="el_package">delta.codecharacter.server.match</a> &gt; <span class="el_source">MatchController.kt</span></div><h1>MatchController.kt</h1><pre class="source lang-java linenums">package delta.codecharacter.server.match
+
+import delta.codecharacter.core.MatchApi
+import delta.codecharacter.dtos.CreateMatchRequestDto
+import delta.codecharacter.dtos.MatchDto
+import delta.codecharacter.dtos.MatchModeDto
+import delta.codecharacter.server.exception.CustomException
+import delta.codecharacter.server.user.UserEntity
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
+import org.springframework.security.access.annotation.Secured
+import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.web.bind.annotation.RestController
+
+<span class="fc" id="L16">@RestController</span>
+<span class="fc" id="L17">class MatchController(@Autowired private val matchService: MatchService) : MatchApi {</span>
+
+    @Secured(&quot;ROLE_USER&quot;)
+    override fun createMatch(createMatchRequestDto: CreateMatchRequestDto): ResponseEntity&lt;Unit&gt; {
+<span class="pc bpc" id="L21" title="1 of 2 branches missed.">        if (createMatchRequestDto.mode == MatchModeDto.AUTO) {</span>
+<span class="nc" id="L22">            throw CustomException(HttpStatus.BAD_REQUEST, &quot;Users cannot create auto match&quot;)</span>
+        }
+<span class="pc bpc" id="L24" title="1 of 2 branches missed.">        val user = SecurityContextHolder.getContext().authentication.principal as UserEntity</span>
+<span class="fc" id="L25">        matchService.createMatch(user.id, createMatchRequestDto)</span>
+<span class="fc" id="L26">        return ResponseEntity.ok().build()</span>
+    }
+
+    @Secured(&quot;ROLE_USER&quot;)
+    override fun getTopMatches(): ResponseEntity&lt;List&lt;MatchDto&gt;&gt; {
+<span class="nc" id="L31">        return ResponseEntity.ok(matchService.getTopMatches())</span>
+    }
+
+    @Secured(&quot;ROLE_USER&quot;)
+    override fun getUserMatches(): ResponseEntity&lt;List&lt;MatchDto&gt;&gt; {
+<span class="nc bnc" id="L36" title="All 2 branches missed.">        val user = SecurityContextHolder.getContext().authentication.principal as UserEntity</span>
+<span class="nc" id="L37">        return ResponseEntity.ok(matchService.getUserMatches(user.id))</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

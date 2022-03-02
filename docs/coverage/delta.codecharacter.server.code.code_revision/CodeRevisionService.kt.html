@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CodeRevisionService.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">server</a> &gt; <a href="index.source.html" class="el_package">delta.codecharacter.server.code.code_revision</a> &gt; <span class="el_source">CodeRevisionService.kt</span></div><h1>CodeRevisionService.kt</h1><pre class="source lang-java linenums">package delta.codecharacter.server.code.code_revision
+
+import delta.codecharacter.dtos.CodeRevisionDto
+import delta.codecharacter.dtos.CreateCodeRevisionRequestDto
+import delta.codecharacter.dtos.LanguageDto
+import delta.codecharacter.server.code.LanguageEnum
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.stereotype.Service
+import java.time.Instant
+import java.util.UUID
+
+/** Service for code revision. */
+<span class="fc" id="L13">@Service</span>
+<span class="fc" id="L14">class CodeRevisionService(@Autowired private val codeRevisionRepository: CodeRevisionRepository) {</span>
+
+    fun createCodeRevision(userId: UUID, createCodeRevisionRequestDto: CreateCodeRevisionRequestDto) {
+<span class="fc" id="L17">        val (code, message, language) = createCodeRevisionRequestDto</span>
+<span class="fc" id="L18">        val parentCodeRevision =</span>
+<span class="fc" id="L19">            codeRevisionRepository.findFirstByUserIdOrderByCreatedAtDesc(userId).orElse(null)</span>
+<span class="fc" id="L20">        codeRevisionRepository.save(</span>
+<span class="fc" id="L21">            CodeRevisionEntity(</span>
+<span class="fc" id="L22">                id = UUID.randomUUID(),</span>
+<span class="fc" id="L23">                code = code,</span>
+<span class="fc" id="L24">                message = message,</span>
+<span class="fc" id="L25">                language = LanguageEnum.valueOf(language.name),</span>
+<span class="fc" id="L26">                userId = userId,</span>
+<span class="fc" id="L27">                parentRevision = parentCodeRevision,</span>
+<span class="fc" id="L28">                createdAt = Instant.now()</span>
+            )
+        )
+<span class="fc" id="L31">    }</span>
+
+    fun getCodeRevisions(userId: UUID): List&lt;CodeRevisionDto&gt; {
+<span class="fc" id="L34">        return codeRevisionRepository.findAllByUserIdOrderByCreatedAtDesc(userId).map {</span>
+<span class="fc" id="L35">            CodeRevisionDto(</span>
+<span class="fc" id="L36">                id = it.id,</span>
+<span class="fc" id="L37">                code = it.code,</span>
+<span class="fc" id="L38">                message = it.message,</span>
+<span class="fc" id="L39">                language = LanguageDto.valueOf(it.language.name),</span>
+<span class="fc" id="L40">                createdAt = it.createdAt,</span>
+<span class="fc bfc" id="L41" title="All 2 branches covered.">                parentRevision = it.parentRevision?.id</span>
+            )
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

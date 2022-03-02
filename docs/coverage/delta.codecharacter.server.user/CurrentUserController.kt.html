@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CurrentUserController.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">server</a> &gt; <a href="index.source.html" class="el_package">delta.codecharacter.server.user</a> &gt; <span class="el_source">CurrentUserController.kt</span></div><h1>CurrentUserController.kt</h1><pre class="source lang-java linenums">package delta.codecharacter.server.user
+
+import delta.codecharacter.core.CurrentUserApi
+import delta.codecharacter.dtos.CompleteProfileRequestDto
+import delta.codecharacter.dtos.CurrentUserProfileDto
+import delta.codecharacter.dtos.UpdateCurrentUserProfileDto
+import delta.codecharacter.dtos.UpdatePasswordRequestDto
+import delta.codecharacter.server.user.public_user.PublicUserService
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.ResponseEntity
+import org.springframework.security.access.annotation.Secured
+import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.web.bind.annotation.RestController
+
+<span class="fc" id="L15">@RestController</span>
+<span class="fc" id="L16">class CurrentUserController(</span>
+<span class="fc" id="L17">    @Autowired private val userService: UserService,</span>
+<span class="fc" id="L18">    @Autowired private val publicUserService: PublicUserService</span>
+) : CurrentUserApi {
+    @Secured(value = [&quot;ROLE_USER_INCOMPLETE_PROFILE&quot;])
+    override fun completeUserProfile(
+        completeProfileRequestDto: CompleteProfileRequestDto
+    ): ResponseEntity&lt;Unit&gt; {
+<span class="nc bnc" id="L24" title="All 2 branches missed.">        val user = SecurityContextHolder.getContext().authentication.principal as UserEntity</span>
+<span class="nc" id="L25">        userService.completeUserProfile(user.id, completeProfileRequestDto)</span>
+<span class="nc" id="L26">        return ResponseEntity.ok().build()</span>
+    }
+
+    @Secured(value = [&quot;ROLE_USER&quot;])
+    override fun getCurrentUser(): ResponseEntity&lt;CurrentUserProfileDto&gt; {
+<span class="nc bnc" id="L31" title="All 2 branches missed.">        val user = SecurityContextHolder.getContext().authentication.principal as UserEntity</span>
+<span class="nc" id="L32">        return ResponseEntity.ok(publicUserService.getUserProfile(user.id, user.email))</span>
+    }
+
+    @Secured(value = [&quot;ROLE_USER&quot;])
+    override fun updateCurrentUser(
+        updateCurrentUserProfileDto: UpdateCurrentUserProfileDto
+    ): ResponseEntity&lt;Unit&gt; {
+<span class="nc bnc" id="L39" title="All 2 branches missed.">        val user = SecurityContextHolder.getContext().authentication.principal as UserEntity</span>
+<span class="nc" id="L40">        publicUserService.updateUserProfile(user.id, updateCurrentUserProfileDto)</span>
+<span class="nc" id="L41">        return ResponseEntity.ok().build()</span>
+    }
+
+    @Secured(value = [&quot;ROLE_USER&quot;])
+    override fun updatePassword(
+        updatePasswordRequestDto: UpdatePasswordRequestDto
+    ): ResponseEntity&lt;Unit&gt; {
+<span class="nc bnc" id="L48" title="All 2 branches missed.">        val user = SecurityContextHolder.getContext().authentication.principal as UserEntity</span>
+<span class="nc" id="L49">        userService.updatePassword(user.id, updatePasswordRequestDto)</span>
+<span class="nc" id="L50">        return ResponseEntity.ok().build()</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

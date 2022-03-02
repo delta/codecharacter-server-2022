@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CodeController.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">server</a> &gt; <a href="index.source.html" class="el_package">delta.codecharacter.server.code</a> &gt; <span class="el_source">CodeController.kt</span></div><h1>CodeController.kt</h1><pre class="source lang-java linenums">package delta.codecharacter.server.code
+
+import delta.codecharacter.core.CodeApi
+import delta.codecharacter.dtos.CodeDto
+import delta.codecharacter.dtos.CodeRevisionDto
+import delta.codecharacter.dtos.CreateCodeRevisionRequestDto
+import delta.codecharacter.dtos.UpdateLatestCodeRequestDto
+import delta.codecharacter.server.code.code_revision.CodeRevisionService
+import delta.codecharacter.server.code.latest_code.LatestCodeService
+import delta.codecharacter.server.code.locked_code.LockedCodeService
+import delta.codecharacter.server.user.UserEntity
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.ResponseEntity
+import org.springframework.security.access.annotation.Secured
+import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.web.bind.annotation.RestController
+
+<span class="fc" id="L18">@RestController</span>
+<span class="fc" id="L19">class CodeController(</span>
+<span class="fc" id="L20">    @Autowired private val codeRevisionService: CodeRevisionService,</span>
+<span class="fc" id="L21">    @Autowired private val latestCodeService: LatestCodeService,</span>
+<span class="fc" id="L22">    @Autowired private val lockedCodeService: LockedCodeService</span>
+) : CodeApi {
+
+    @Secured(value = [&quot;ROLE_USER&quot;])
+    override fun createCodeRevision(
+        createCodeRevisionRequestDto: CreateCodeRevisionRequestDto
+    ): ResponseEntity&lt;Unit&gt; {
+<span class="pc bpc" id="L29" title="1 of 2 branches missed.">        val user = SecurityContextHolder.getContext().authentication.principal as UserEntity</span>
+<span class="fc" id="L30">        codeRevisionService.createCodeRevision(user.id, createCodeRevisionRequestDto)</span>
+<span class="fc" id="L31">        return ResponseEntity.ok().build()</span>
+    }
+
+    @Secured(value = [&quot;ROLE_USER&quot;])
+    override fun getCodeRevisions(): ResponseEntity&lt;List&lt;CodeRevisionDto&gt;&gt; {
+<span class="pc bpc" id="L36" title="1 of 2 branches missed.">        val user = SecurityContextHolder.getContext().authentication.principal as UserEntity</span>
+<span class="fc" id="L37">        return ResponseEntity.ok(codeRevisionService.getCodeRevisions(user.id))</span>
+    }
+
+    @Secured(value = [&quot;ROLE_USER&quot;])
+    override fun getLatestCode(): ResponseEntity&lt;CodeDto&gt; {
+<span class="pc bpc" id="L42" title="1 of 2 branches missed.">        val user = SecurityContextHolder.getContext().authentication.principal as UserEntity</span>
+<span class="fc" id="L43">        return ResponseEntity.ok(latestCodeService.getLatestCode(user.id))</span>
+    }
+
+    @Secured(value = [&quot;ROLE_USER&quot;])
+    override fun updateLatestCode(
+        updateLatestCodeRequestDto: UpdateLatestCodeRequestDto
+    ): ResponseEntity&lt;Unit&gt; {
+<span class="pc bpc" id="L50" title="1 of 2 branches missed.">        val user = SecurityContextHolder.getContext().authentication.principal as UserEntity</span>
+<span class="fc" id="L51">        latestCodeService.updateLatestCode(user.id, updateLatestCodeRequestDto)</span>
+<span class="fc bfc" id="L52" title="All 2 branches covered.">        if (updateLatestCodeRequestDto.lock == true) {</span>
+<span class="fc" id="L53">            lockedCodeService.updateLockedCode(user.id, updateLatestCodeRequestDto)</span>
+        }
+<span class="fc" id="L55">        return ResponseEntity.ok().build()</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

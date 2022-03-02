@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ServerApplication.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">server</a> &gt; <a href="index.source.html" class="el_package">delta.codecharacter.server</a> &gt; <span class="el_source">ServerApplication.kt</span></div><h1>ServerApplication.kt</h1><pre class="source lang-java linenums">package delta.codecharacter.server
+
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.boot.autoconfigure.SpringBootApplication
+import org.springframework.boot.runApplication
+import org.springframework.context.annotation.Bean
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
+import org.springframework.web.servlet.config.annotation.CorsRegistry
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
+
+<span class="fc" id="L12">@EnableWebSecurity</span>
+@EnableGlobalMethodSecurity(securedEnabled = true)
+@SpringBootApplication
+<span class="fc" id="L15">class ServerApplication {</span>
+
+    @Value(&quot;\${cors.allowed-origin}&quot;) private lateinit var allowedOrigin: String
+
+    @Bean
+    fun corsConfigurer(): WebMvcConfigurer {
+<span class="fc" id="L21">        return object : WebMvcConfigurer {</span>
+            override fun addCorsMappings(registry: CorsRegistry) {
+<span class="fc" id="L23">                registry</span>
+<span class="fc" id="L24">                    .addMapping(&quot;/**&quot;)</span>
+<span class="pc bpc" id="L25" title="1 of 2 branches missed.">                    .allowedOrigins(allowedOrigin)</span>
+<span class="fc" id="L26">                    .allowedMethods(&quot;*&quot;)</span>
+<span class="fc" id="L27">                    .allowedHeaders(&quot;*&quot;)</span>
+<span class="fc" id="L28">                    .allowCredentials(true)</span>
+<span class="fc" id="L29">                    .maxAge(3600)</span>
+<span class="fc" id="L30">            }</span>
+        }
+    }
+}
+
+fun main(args: Array&lt;String&gt;) {
+<span class="nc" id="L36">    runApplication&lt;ServerApplication&gt;(*args)</span>
+<span class="nc" id="L37">}</span>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

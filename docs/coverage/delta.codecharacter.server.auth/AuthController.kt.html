@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AuthController.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">server</a> &gt; <a href="index.source.html" class="el_package">delta.codecharacter.server.auth</a> &gt; <span class="el_source">AuthController.kt</span></div><h1>AuthController.kt</h1><pre class="source lang-java linenums">package delta.codecharacter.server.auth
+
+import delta.codecharacter.core.AuthApi
+import delta.codecharacter.dtos.AuthStatusResponseDto
+import delta.codecharacter.dtos.ForgotPasswordRequestDto
+import delta.codecharacter.dtos.PasswordLoginRequestDto
+import delta.codecharacter.dtos.PasswordLoginResponseDto
+import delta.codecharacter.dtos.ResetPasswordRequestDto
+import delta.codecharacter.server.user.UserEntity
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
+import org.springframework.security.access.annotation.Secured
+import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RestController
+
+<span class="fc" id="L18">@RestController</span>
+<span class="fc" id="L19">class AuthController(@Autowired private val authService: AuthService) : AuthApi {</span>
+
+    @Secured(value = [&quot;ROLE_ANONYMOUS&quot;])
+    override fun passwordLogin(
+        @RequestBody passwordLoginRequestDto: PasswordLoginRequestDto
+    ): ResponseEntity&lt;PasswordLoginResponseDto&gt; {
+<span class="nc" id="L25">        return ResponseEntity.ok(authService.passwordLogin(passwordLoginRequestDto))</span>
+    }
+
+    @Secured(value = [&quot;ROLE_ANONYMOUS&quot;])
+    override fun forgotPassword(
+        forgotPasswordRequestDto: ForgotPasswordRequestDto
+    ): ResponseEntity&lt;Unit&gt; {
+<span class="nc" id="L32">        authService.forgotPassword(forgotPasswordRequestDto)</span>
+<span class="nc" id="L33">        return ResponseEntity.status(HttpStatus.ACCEPTED).body(Unit)</span>
+    }
+
+    @Secured(value = [&quot;ROLE_ANONYMOUS&quot;])
+    override fun resetPassword(
+        resetPasswordRequestDto: ResetPasswordRequestDto
+    ): ResponseEntity&lt;Unit&gt; {
+<span class="nc" id="L40">        authService.resetPassword(resetPasswordRequestDto)</span>
+<span class="nc" id="L41">        return ResponseEntity.status(HttpStatus.ACCEPTED).body(Unit)</span>
+    }
+
+    @Secured(value = [&quot;ROLE_USER&quot;, &quot;ROLE_USER_INCOMPLETE_PROFILE&quot;])
+    override fun getAuthStatus(): ResponseEntity&lt;AuthStatusResponseDto&gt; {
+<span class="nc bnc" id="L46" title="All 2 branches missed.">        val user = SecurityContextHolder.getContext().authentication.principal as UserEntity</span>
+<span class="nc" id="L47">        return ResponseEntity.ok(authService.getAuthStatus(user))</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

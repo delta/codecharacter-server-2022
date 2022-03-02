@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UserEntity.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">server</a> &gt; <a href="index.source.html" class="el_package">delta.codecharacter.server.user</a> &gt; <span class="el_source">UserEntity.kt</span></div><h1>UserEntity.kt</h1><pre class="source lang-java linenums">package delta.codecharacter.server.user
+
+import org.springframework.data.annotation.Id
+import org.springframework.data.mongodb.core.index.Indexed
+import org.springframework.data.mongodb.core.mapping.Document
+import org.springframework.security.core.GrantedAuthority
+import org.springframework.security.core.authority.SimpleGrantedAuthority
+import org.springframework.security.core.userdetails.UserDetails
+import java.util.UUID
+
+<span class="fc" id="L11">@Document(collection = &quot;user&quot;)</span>
+<span class="fc" id="L12">data class UserEntity(</span>
+<span class="fc" id="L13">    @Id val id: UUID,</span>
+<span class="fc" id="L14">    @Indexed(unique = true) val email: String,</span>
+<span class="fc" id="L15">    val loginType: LoginType,</span>
+<span class="fc" id="L16">    private val password: String,</span>
+<span class="fc" id="L17">    val isProfileComplete: Boolean,</span>
+<span class="pc" id="L18">    private val isEnabled: Boolean = false,</span>
+<span class="fc" id="L19">    private val isCredentialsNonExpired: Boolean = true,</span>
+<span class="pc" id="L20">    private val isAccountNonExpired: Boolean = true,</span>
+<span class="pc" id="L21">    private val isAccountNonLocked: Boolean = true,</span>
+<span class="fc" id="L22">    val userAuthorities: MutableCollection&lt;out GrantedAuthority&gt; =</span>
+<span class="fc" id="L23">        mutableListOf(SimpleGrantedAuthority(&quot;ROLE_USER&quot;)),</span>
+) : UserDetails {
+<span class="fc" id="L25">    override fun getAuthorities(): MutableCollection&lt;out GrantedAuthority&gt; = userAuthorities</span>
+<span class="fc" id="L26">    override fun getPassword(): String = password</span>
+<span class="fc" id="L27">    override fun getUsername(): String = email</span>
+<span class="nc" id="L28">    override fun isAccountNonExpired(): Boolean = isAccountNonExpired</span>
+<span class="nc" id="L29">    override fun isAccountNonLocked(): Boolean = isAccountNonLocked</span>
+<span class="nc" id="L30">    override fun isCredentialsNonExpired(): Boolean = isCredentialsNonExpired</span>
+<span class="nc" id="L31">    override fun isEnabled(): Boolean = isEnabled</span>
+<span class="fc" id="L32">}</span>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JwtRequestFilter.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">server</a> &gt; <a href="index.source.html" class="el_package">delta.codecharacter.server.auth.jwt</a> &gt; <span class="el_source">JwtRequestFilter.kt</span></div><h1>JwtRequestFilter.kt</h1><pre class="source lang-java linenums">package delta.codecharacter.server.auth.jwt
+
+import delta.codecharacter.server.user.UserService
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
+import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource
+import org.springframework.stereotype.Component
+import org.springframework.web.filter.OncePerRequestFilter
+import javax.servlet.FilterChain
+import javax.servlet.http.HttpServletRequest
+import javax.servlet.http.HttpServletResponse
+
+@Component
+<span class="fc" id="L15">class JwtRequestFilter : OncePerRequestFilter() {</span>
+    @Autowired private lateinit var userService: UserService
+    @Autowired private lateinit var authUtil: JwtService
+
+    override fun doFilterInternal(
+        request: HttpServletRequest,
+        response: HttpServletResponse,
+        filterChain: FilterChain
+    ) {
+<span class="fc" id="L24">        val authorizationHeader = request.getHeader(&quot;Authorization&quot;)</span>
+<span class="pc bpc" id="L25" title="3 of 4 branches missed.">        if (authorizationHeader == null || !authorizationHeader.startsWith(&quot;Bearer &quot;)) {</span>
+<span class="fc" id="L26">            filterChain.doFilter(request, response)</span>
+<span class="fc" id="L27">            return</span>
+        }
+<span class="nc" id="L29">        val jwt = authorizationHeader.substring(7)</span>
+
+<span class="nc bnc" id="L31" title="All 2 branches missed.">        if (SecurityContextHolder.getContext().authentication == null) {</span>
+<span class="nc" id="L32">            try {</span>
+<span class="nc bnc" id="L33" title="All 2 branches missed.">                val email = authUtil.getEmailFromToken(jwt)</span>
+<span class="nc bnc" id="L34" title="All 2 branches missed.">                val userDetails = userService.loadUserByUsername(email)</span>
+<span class="nc bnc" id="L35" title="All 2 branches missed.">                authUtil.validateToken(jwt, userDetails)</span>
+<span class="nc" id="L36">                val usernamePasswordAuthenticationToken =</span>
+<span class="nc" id="L37">                    UsernamePasswordAuthenticationToken(userDetails, null, userDetails.authorities)</span>
+<span class="nc" id="L38">                usernamePasswordAuthenticationToken.details =</span>
+<span class="nc" id="L39">                    WebAuthenticationDetailsSource().buildDetails(request)</span>
+<span class="nc" id="L40">                SecurityContextHolder.getContext().authentication = usernamePasswordAuthenticationToken</span>
+<span class="nc" id="L41">            } catch (e: Exception) {</span>
+<span class="nc" id="L42">                response.status = HttpServletResponse.SC_UNAUTHORIZED</span>
+<span class="nc" id="L43">                return</span>
+            }
+        }
+<span class="nc" id="L46">        filterChain.doFilter(request, response)</span>
+<span class="nc" id="L47">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta http-equiv="x-ua-compatible" content="IE=edge"/>
+<title>Test results - GameServiceTest</title>
+<link href="../css/base-style.css" rel="stylesheet" type="text/css"/>
+<link href="../css/style.css" rel="stylesheet" type="text/css"/>
+<script src="../js/report.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="content">
+<h1>GameServiceTest</h1>
+<div class="breadcrumbs">
+<a href="../index.html">all</a> &gt; 
+<a href="../packages/delta.codecharacter.server.game.html">delta.codecharacter.server.game</a> &gt; GameServiceTest</div>
+<div id="summary">
+<table>
+<tr>
+<td>
+<div class="summaryGroup">
+<table>
+<tr>
+<td>
+<div class="infoBox" id="tests">
+<div class="counter">6</div>
+<p>tests</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="failures">
+<div class="counter">0</div>
+<p>failures</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="ignored">
+<div class="counter">0</div>
+<p>ignored</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="duration">
+<div class="counter">1.703s</div>
+<p>duration</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</td>
+<td>
+<div class="infoBox success" id="successRate">
+<div class="percent">100%</div>
+<p>successful</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div id="tabs">
+<ul class="tabLinks">
+<li>
+<a href="#tab0">Tests</a>
+</li>
+<li>
+<a href="#tab1">Standard output</a>
+</li>
+</ul>
+<div id="tab0" class="tab">
+<h2>Tests</h2>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Duration</th>
+<th>Result</th>
+</tr>
+</thead>
+<tr>
+<td class="success">should create game()</td>
+<td class="success">0.011s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">should receive game status update with result()</td>
+<td class="success">0.048s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">should receive game status update()</td>
+<td class="success">0.859s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">should return game by id()</td>
+<td class="success">0.032s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">should send game request()</td>
+<td class="success">0.741s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">should throw exception when game not found()</td>
+<td class="success">0.012s</td>
+<td class="success">passed</td>
+</tr>
+</table>
+</div>
+<div id="tab1" class="tab">
+<h2>Standard output</h2>
+<span class="code">
+<pre>2022-03-02 15:02:32.582  INFO 2310 --- [       Thread-7] o.s.b.a.mongo.embedded.EmbeddedMongo     : {&quot;t&quot;:{&quot;$date&quot;:&quot;2022-03-02T15:02:32.582+00:00&quot;},&quot;s&quot;:&quot;I&quot;,  &quot;c&quot;:&quot;STORAGE&quot;,  &quot;id&quot;:22260,   &quot;ctx&quot;:&quot;TimestampMonitor&quot;,&quot;msg&quot;:&quot;Removing drop-pending idents with drop timestamps before timestamp&quot;,&quot;attr&quot;:{&quot;timestamp&quot;:{&quot;$timestamp&quot;:{&quot;t&quot;:0,&quot;i&quot;:0}}}}
+2022-03-02 15:02:32.583  INFO 2310 --- [       Thread-7] o.s.b.a.mongo.embedded.EmbeddedMongo     : {&quot;t&quot;:{&quot;$date&quot;:&quot;2022-03-02T15:02:32.582+00:00&quot;},&quot;s&quot;:&quot;I&quot;,  &quot;c&quot;:&quot;STORAGE&quot;,  &quot;id&quot;:22237,   &quot;ctx&quot;:&quot;TimestampMonitor&quot;,&quot;msg&quot;:&quot;Completing drop for ident&quot;,&quot;attr&quot;:{&quot;ident&quot;:&quot;index-34--3213531206115516651&quot;,&quot;dropTimestamp&quot;:{&quot;$timestamp&quot;:{&quot;t&quot;:0,&quot;i&quot;:0}}}}
+2022-03-02 15:02:32.586  INFO 2310 --- [       Thread-7] o.s.b.a.mongo.embedded.EmbeddedMongo     : {&quot;t&quot;:{&quot;$date&quot;:&quot;2022-03-02T15:02:32.585+00:00&quot;},&quot;s&quot;:&quot;I&quot;,  &quot;c&quot;:&quot;STORAGE&quot;,  &quot;id&quot;:22237,   &quot;ctx&quot;:&quot;TimestampMonitor&quot;,&quot;msg&quot;:&quot;Completing drop for ident&quot;,&quot;attr&quot;:{&quot;ident&quot;:&quot;collection-33--3213531206115516651&quot;,&quot;dropTimestamp&quot;:{&quot;$timestamp&quot;:{&quot;t&quot;:0,&quot;i&quot;:0}}}}
+2022-03-02 15:02:32.591  INFO 2310 --- [       Thread-7] o.s.b.a.mongo.embedded.EmbeddedMongo     : {&quot;t&quot;:{&quot;$date&quot;:&quot;2022-03-02T15:02:32.590+00:00&quot;},&quot;s&quot;:&quot;I&quot;,  &quot;c&quot;:&quot;STORAGE&quot;,  &quot;id&quot;:22237,   &quot;ctx&quot;:&quot;TimestampMonitor&quot;,&quot;msg&quot;:&quot;Completing drop for ident&quot;,&quot;attr&quot;:{&quot;ident&quot;:&quot;index-36--3213531206115516651&quot;,&quot;dropTimestamp&quot;:{&quot;$timestamp&quot;:{&quot;t&quot;:0,&quot;i&quot;:0}}}}
+2022-03-02 15:02:32.593  INFO 2310 --- [       Thread-7] o.s.b.a.mongo.embedded.EmbeddedMongo     : {&quot;t&quot;:{&quot;$date&quot;:&quot;2022-03-02T15:02:32.593+00:00&quot;},&quot;s&quot;:&quot;I&quot;,  &quot;c&quot;:&quot;STORAGE&quot;,  &quot;id&quot;:22237,   &quot;ctx&quot;:&quot;TimestampMonitor&quot;,&quot;msg&quot;:&quot;Completing drop for ident&quot;,&quot;attr&quot;:{&quot;ident&quot;:&quot;collection-35--3213531206115516651&quot;,&quot;dropTimestamp&quot;:{&quot;$timestamp&quot;:{&quot;t&quot;:0,&quot;i&quot;:0}}}}
+2022-03-02 15:02:32.596  INFO 2310 --- [       Thread-7] o.s.b.a.mongo.embedded.EmbeddedMongo     : {&quot;t&quot;:{&quot;$date&quot;:&quot;2022-03-02T15:02:32.595+00:00&quot;},&quot;s&quot;:&quot;I&quot;,  &quot;c&quot;:&quot;STORAGE&quot;,  &quot;id&quot;:22237,   &quot;ctx&quot;:&quot;TimestampMonitor&quot;,&quot;msg&quot;:&quot;Completing drop for ident&quot;,&quot;attr&quot;:{&quot;ident&quot;:&quot;index-38--3213531206115516651&quot;,&quot;dropTimestamp&quot;:{&quot;$timestamp&quot;:{&quot;t&quot;:0,&quot;i&quot;:0}}}}
+2022-03-02 15:02:32.598  INFO 2310 --- [       Thread-7] o.s.b.a.mongo.embedded.EmbeddedMongo     : {&quot;t&quot;:{&quot;$date&quot;:&quot;2022-03-02T15:02:32.598+00:00&quot;},&quot;s&quot;:&quot;I&quot;,  &quot;c&quot;:&quot;STORAGE&quot;,  &quot;id&quot;:22237,   &quot;ctx&quot;:&quot;TimestampMonitor&quot;,&quot;msg&quot;:&quot;Completing drop for ident&quot;,&quot;attr&quot;:{&quot;ident&quot;:&quot;collection-37--3213531206115516651&quot;,&quot;dropTimestamp&quot;:{&quot;$timestamp&quot;:{&quot;t&quot;:0,&quot;i&quot;:0}}}}
+2022-03-02 15:02:32.601  INFO 2310 --- [       Thread-7] o.s.b.a.mongo.embedded.EmbeddedMongo     : {&quot;t&quot;:{&quot;$date&quot;:&quot;2022-03-02T15:02:32.600+00:00&quot;},&quot;s&quot;:&quot;I&quot;,  &quot;c&quot;:&quot;STORAGE&quot;,  &quot;id&quot;:22237,   &quot;ctx&quot;:&quot;TimestampMonitor&quot;,&quot;msg&quot;:&quot;Completing drop for ident&quot;,&quot;attr&quot;:{&quot;ident&quot;:&quot;index-40--3213531206115516651&quot;,&quot;dropTimestamp&quot;:{&quot;$timestamp&quot;:{&quot;t&quot;:0,&quot;i&quot;:0}}}}
+2022-03-02 15:02:32.603  INFO 2310 --- [       Thread-7] o.s.b.a.mongo.embedded.EmbeddedMongo     : {&quot;t&quot;:{&quot;$date&quot;:&quot;2022-03-02T15:02:32.603+00:00&quot;},&quot;s&quot;:&quot;I&quot;,  &quot;c&quot;:&quot;STORAGE&quot;,  &quot;id&quot;:22237,   &quot;ctx&quot;:&quot;TimestampMonitor&quot;,&quot;msg&quot;:&quot;Completing drop for ident&quot;,&quot;attr&quot;:{&quot;ident&quot;:&quot;collection-39--3213531206115516651&quot;,&quot;dropTimestamp&quot;:{&quot;$timestamp&quot;:{&quot;t&quot;:0,&quot;i&quot;:0}}}}
+</pre>
+</span>
+</div>
+</div>
+<div id="footer">
+<p>
+<div>
+<label class="hidden" id="label-for-line-wrapping-toggle" for="line-wrapping-toggle">Wrap lines
+<input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
+</label>
+</div>Generated by 
+<a href="http://www.gradle.org">Gradle 7.3.3</a> at Mar 2, 2022, 3:02:48 PM</p>
+</div>
+</div>
+</body>
+</html>

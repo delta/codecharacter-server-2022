@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MapRevisionService.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">server</a> &gt; <a href="index.source.html" class="el_package">delta.codecharacter.server.game_map.map_revision</a> &gt; <span class="el_source">MapRevisionService.kt</span></div><h1>MapRevisionService.kt</h1><pre class="source lang-java linenums">package delta.codecharacter.server.game_map.map_revision
+
+import delta.codecharacter.dtos.CreateMapRevisionRequestDto
+import delta.codecharacter.dtos.GameMapRevisionDto
+import delta.codecharacter.server.logic.validation.MapValidator
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.stereotype.Service
+import java.time.Instant
+import java.util.UUID
+
+/** Service for map revision. */
+<span class="fc" id="L12">@Service</span>
+<span class="fc" id="L13">class MapRevisionService(</span>
+<span class="fc" id="L14">    @Autowired private val mapRevisionRepository: MapRevisionRepository,</span>
+<span class="fc" id="L15">    @Autowired private val mapValidator: MapValidator,</span>
+) {
+
+    fun createMapRevision(userId: UUID, createMapRevisionRequestDto: CreateMapRevisionRequestDto) {
+<span class="fc" id="L19">        val (map, message) = createMapRevisionRequestDto</span>
+<span class="fc" id="L20">        mapValidator.validateMap(map)</span>
+<span class="fc" id="L21">        val parentCodeRevision =</span>
+<span class="fc" id="L22">            mapRevisionRepository.findFirstByUserIdOrderByCreatedAtDesc(userId).orElse(null)</span>
+<span class="fc" id="L23">        mapRevisionRepository.save(</span>
+<span class="fc" id="L24">            MapRevisionEntity(</span>
+<span class="fc" id="L25">                id = UUID.randomUUID(),</span>
+<span class="fc" id="L26">                map = map,</span>
+<span class="fc" id="L27">                message = message,</span>
+<span class="fc" id="L28">                userId = userId,</span>
+<span class="fc" id="L29">                parentRevision = parentCodeRevision,</span>
+<span class="fc" id="L30">                createdAt = Instant.now()</span>
+            )
+        )
+<span class="fc" id="L33">    }</span>
+
+    fun getMapRevisions(userId: UUID): List&lt;GameMapRevisionDto&gt; {
+<span class="fc" id="L36">        return mapRevisionRepository.findAllByUserIdOrderByCreatedAtDesc(userId).map {</span>
+<span class="fc" id="L37">            GameMapRevisionDto(</span>
+<span class="fc" id="L38">                id = it.id,</span>
+<span class="fc" id="L39">                map = it.map,</span>
+<span class="fc" id="L40">                message = it.message,</span>
+<span class="fc bfc" id="L41" title="All 2 branches covered.">                parentRevision = it.parentRevision?.id,</span>
+<span class="fc" id="L42">                createdAt = it.createdAt</span>
+            )
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

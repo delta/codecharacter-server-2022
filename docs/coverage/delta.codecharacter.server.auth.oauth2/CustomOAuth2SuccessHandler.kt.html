@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CustomOAuth2SuccessHandler.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">server</a> &gt; <a href="index.source.html" class="el_package">delta.codecharacter.server.auth.oauth2</a> &gt; <span class="el_source">CustomOAuth2SuccessHandler.kt</span></div><h1>CustomOAuth2SuccessHandler.kt</h1><pre class="source lang-java linenums">package delta.codecharacter.server.auth.oauth2
+
+import delta.codecharacter.server.auth.AuthService
+import delta.codecharacter.server.exception.CustomException
+import delta.codecharacter.server.user.LoginType
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.context.annotation.Lazy
+import org.springframework.security.core.Authentication
+import org.springframework.security.oauth2.core.OAuth2AuthenticatedPrincipal
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler
+import org.springframework.stereotype.Component
+import java.time.Instant
+import java.time.ZoneId
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
+import javax.servlet.http.HttpServletRequest
+import javax.servlet.http.HttpServletResponse
+
+<span class="fc" id="L22">@Component</span>
+<span class="fc" id="L23">class CustomOAuth2SuccessHandler(@Lazy @Autowired private val authService: AuthService) :</span>
+    AuthenticationSuccessHandler {
+
+<span class="fc" id="L26">    @Value(&quot;\${base-url}&quot;) private val baseUrl: String = &quot;&quot;</span>
+<span class="fc" id="L27">    @Value(&quot;\${frontend-domain}&quot;) private val frontendDomain: String = &quot;&quot;</span>
+
+<span class="fc" id="L29">    private val logger: Logger = LoggerFactory.getLogger(CustomOAuth2SuccessHandler::class.java)</span>
+
+    override fun onAuthenticationSuccess(
+        request: HttpServletRequest?,
+        response: HttpServletResponse?,
+        authentication: Authentication?
+    ) {
+<span class="nc bnc" id="L36" title="All 2 branches missed.">        val principal = authentication?.principal</span>
+<span class="nc bnc" id="L37" title="All 2 branches missed.">        if (principal is OAuth2AuthenticatedPrincipal) {</span>
+<span class="nc" id="L38">            val attributes = principal.attributes</span>
+<span class="nc bnc" id="L39" title="All 2 branches missed.">            val email = attributes[&quot;email&quot;] as String</span>
+<span class="nc" id="L40">            val provider = attributes[&quot;provider&quot;] as String?</span>
+<span class="nc bnc" id="L41" title="All 2 branches missed.">            val loginType = LoginType.valueOf(provider ?: &quot;GOOGLE&quot;)</span>
+<span class="nc" id="L42">            try {</span>
+<span class="nc" id="L43">                val token = authService.oAuth2Login(email, loginType)</span>
+<span class="nc" id="L44">                val instant = Instant.now()</span>
+<span class="nc" id="L45">                val zoneId = ZoneId.of(&quot;GMT&quot;)</span>
+<span class="nc" id="L46">                val zonedDateTimePlus = ZonedDateTime.ofInstant(instant.plusSeconds(60), zoneId)</span>
+<span class="nc" id="L47">                val plusOneSecond = zonedDateTimePlus.format(DateTimeFormatter.RFC_1123_DATE_TIME)</span>
+<span class="nc bnc" id="L48" title="All 2 branches missed.">                if (baseUrl.contains(&quot;https&quot;)) {</span>
+<span class="nc bnc" id="L49" title="All 2 branches missed.">                    response?.setHeader(</span>
+<span class="nc" id="L50">                        &quot;Set-Cookie&quot;,</span>
+<span class="nc" id="L51">                        &quot;bearer-token=$token; Domain=$frontendDomain; Path=/; Expires=$plusOneSecond; Secure; SameSite=None&quot;</span>
+                    )
+                } else {
+<span class="nc bnc" id="L54" title="All 2 branches missed.">                    response?.setHeader(</span>
+<span class="nc" id="L55">                        &quot;Set-Cookie&quot;,</span>
+<span class="nc" id="L56">                        &quot;bearer-token=$token; Domain=$frontendDomain; Expires=$plusOneSecond; Path=/; SameSite=false&quot;</span>
+                    )
+                }
+<span class="nc bnc" id="L59" title="All 2 branches missed.">                response?.sendRedirect(&quot;$baseUrl/#/dashboard&quot;)</span>
+<span class="nc" id="L60">            } catch (e: CustomException) {</span>
+<span class="nc bnc" id="L61" title="All 2 branches missed.">                response?.sendRedirect(&quot;$baseUrl/#/login?error=${e.message}&quot;)</span>
+<span class="nc" id="L62">            } catch (e: Exception) {</span>
+<span class="nc" id="L63">                logger.error(&quot;Unexpected error&quot;, e)</span>
+<span class="nc bnc" id="L64" title="All 2 branches missed.">                response?.sendRedirect(&quot;$baseUrl/#/login?error=Internal Server Error&quot;)</span>
+            }
+        } else {
+<span class="nc bnc" id="L67" title="All 2 branches missed.">            response?.sendRedirect(&quot;$baseUrl/#/login?error=Invalid login, please try again&quot;)</span>
+        }
+<span class="nc" id="L69">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

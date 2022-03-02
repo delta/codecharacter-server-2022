@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>JwtService.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">server</a> &gt; <a href="index.source.html" class="el_package">delta.codecharacter.server.auth.jwt</a> &gt; <span class="el_source">JwtService.kt</span></div><h1>JwtService.kt</h1><pre class="source lang-java linenums">package delta.codecharacter.server.auth.jwt
+
+import delta.codecharacter.server.exception.CustomException
+import delta.codecharacter.server.user.UserEntity
+import io.jsonwebtoken.Claims
+import io.jsonwebtoken.Jwts
+import io.jsonwebtoken.SignatureAlgorithm
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.http.HttpStatus
+import org.springframework.stereotype.Service
+import java.util.Date
+import java.util.function.Function
+
+<span class="fc" id="L14">@Service</span>
+<span class="fc" id="L15">class JwtService {</span>
+
+    @Value(&quot;\${jwt.secret}&quot;) private lateinit var secret: String
+
+    fun getEmailFromToken(token: String): String {
+<span class="nc" id="L20">        return getClaimFromToken(token) { obj: Claims -&gt; obj.subject }</span>
+    }
+
+    fun getExpirationDateFromToken(token: String): Date {
+<span class="nc" id="L24">        return getClaimFromToken(token) { obj: Claims -&gt; obj.expiration }</span>
+    }
+
+    fun &lt;T&gt; getClaimFromToken(token: String, claimsResolver: Function&lt;Claims, T&gt;): T {
+<span class="nc" id="L28">        val claims = getAllClaimsFromToken(token)</span>
+<span class="nc" id="L29">        return claimsResolver.apply(claims)</span>
+    }
+
+    private fun getAllClaimsFromToken(token: String): Claims {
+<span class="nc bnc" id="L33" title="All 2 branches missed.">        return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).body</span>
+    }
+
+    private fun isTokenExpired(token: String): Boolean {
+<span class="nc" id="L37">        val expiration = getExpirationDateFromToken(token)</span>
+<span class="nc" id="L38">        return expiration.before(Date())</span>
+    }
+
+    fun generateToken(userDetails: UserEntity): String {
+<span class="nc" id="L42">        val claims: Map&lt;String, Any&gt; = HashMap()</span>
+<span class="nc" id="L43">        return doGenerateToken(claims, userDetails.email)</span>
+    }
+
+    private fun doGenerateToken(claims: Map&lt;String, Any&gt;, subject: String): String {
+<span class="nc" id="L47">        val jwt =</span>
+<span class="nc" id="L48">            Jwts.builder()</span>
+<span class="nc" id="L49">                .apply {</span>
+<span class="nc" id="L50">                    setClaims(claims)</span>
+<span class="nc" id="L51">                    setSubject(subject)</span>
+<span class="nc" id="L52">                    setIssuedAt(Date(System.currentTimeMillis()))</span>
+<span class="nc" id="L53">                    setExpiration(Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24 * 24))</span>
+<span class="nc bnc" id="L54" title="All 2 branches missed.">                    signWith(SignatureAlgorithm.HS512, secret)</span>
+<span class="nc" id="L55">                }</span>
+<span class="nc" id="L56">                .compact()</span>
+<span class="nc" id="L57">        return jwt</span>
+    }
+
+    fun validateToken(token: String, userDetails: UserEntity) {
+<span class="nc" id="L61">        val email = getEmailFromToken(token)</span>
+<span class="nc bnc" id="L62" title="All 4 branches missed.">        if (email != userDetails.email || isTokenExpired(token)) {</span>
+<span class="nc" id="L63">            throw CustomException(HttpStatus.UNAUTHORIZED, &quot;Token is invalid&quot;)</span>
+        }
+<span class="nc" id="L65">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

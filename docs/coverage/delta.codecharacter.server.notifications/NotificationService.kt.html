@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>NotificationService.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">server</a> &gt; <a href="index.source.html" class="el_package">delta.codecharacter.server.notifications</a> &gt; <span class="el_source">NotificationService.kt</span></div><h1>NotificationService.kt</h1><pre class="source lang-java linenums">package delta.codecharacter.server.notifications
+
+import com.fasterxml.jackson.databind.ObjectMapper
+import delta.codecharacter.dtos.NotificationDto
+import delta.codecharacter.server.exception.CustomException
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.HttpStatus
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder
+import org.springframework.messaging.simp.SimpMessagingTemplate
+import org.springframework.stereotype.Service
+import java.time.Instant
+import java.util.UUID
+
+<span class="fc" id="L14">@Service</span>
+<span class="fc" id="L15">class NotificationService(</span>
+<span class="fc" id="L16">    @Autowired private val notificationRepository: NotificationRepository,</span>
+<span class="fc" id="L17">    @Autowired private val jackson2ObjectMapperBuilder: Jackson2ObjectMapperBuilder,</span>
+<span class="fc" id="L18">    @Autowired private val simpMessagingTemplate: SimpMessagingTemplate,</span>
+) {
+<span class="fc" id="L20">    private var mapper: ObjectMapper = jackson2ObjectMapperBuilder.build()</span>
+
+    fun getAllNotifications(userId: UUID): List&lt;NotificationDto&gt; {
+<span class="fc" id="L23">        return notificationRepository.findAllByUserId(userId).map { notificationEntity -&gt;</span>
+<span class="fc" id="L24">            NotificationDto(</span>
+<span class="fc" id="L25">                id = notificationEntity.id,</span>
+<span class="fc" id="L26">                title = notificationEntity.title,</span>
+<span class="fc" id="L27">                content = notificationEntity.content,</span>
+<span class="fc" id="L28">                createdAt = notificationEntity.createdAt,</span>
+<span class="fc" id="L29">                read = notificationEntity.read</span>
+            )
+        }
+    }
+
+    fun saveNotificationReadStatus(userId: UUID, notificationId: UUID, read: Boolean) {
+<span class="fc" id="L35">        val notification =</span>
+<span class="pc bpc" id="L36" title="3 of 6 branches missed.">            notificationRepository.findAllByUserId(userId).find { it.id == notificationId }</span>
+<span class="nc" id="L37">                ?: throw CustomException(HttpStatus.NOT_FOUND, &quot;Notification not found&quot;)</span>
+<span class="fc" id="L38">        notificationRepository.save(notification.copy(read = read))</span>
+<span class="fc" id="L39">    }</span>
+
+    fun sendNotification(userId: UUID, title: String, content: String) {
+<span class="fc" id="L42">        val notification =</span>
+<span class="fc" id="L43">            NotificationEntity(</span>
+<span class="fc" id="L44">                id = UUID.randomUUID(),</span>
+<span class="fc" id="L45">                userId = userId,</span>
+<span class="fc" id="L46">                title = title,</span>
+<span class="fc" id="L47">                content = content,</span>
+<span class="fc" id="L48">                createdAt = Instant.now(),</span>
+<span class="fc" id="L49">                read = false</span>
+            )
+<span class="fc" id="L51">        notificationRepository.save(notification)</span>
+<span class="fc" id="L52">        simpMessagingTemplate.convertAndSend(</span>
+<span class="fc" id="L53">            &quot;/notifications/$userId&quot;,</span>
+<span class="fc" id="L54">            mapper.writeValueAsString(</span>
+<span class="fc" id="L55">                NotificationDto(</span>
+<span class="fc" id="L56">                    id = notification.id,</span>
+<span class="fc" id="L57">                    title = notification.title,</span>
+<span class="fc" id="L58">                    content = notification.content,</span>
+<span class="fc" id="L59">                    createdAt = notification.createdAt,</span>
+<span class="fc" id="L60">                    read = notification.read</span>
+                )
+            )
+        )
+<span class="fc" id="L64">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

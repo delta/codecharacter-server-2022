@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GameMapController.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">server</a> &gt; <a href="index.source.html" class="el_package">delta.codecharacter.server.game_map</a> &gt; <span class="el_source">GameMapController.kt</span></div><h1>GameMapController.kt</h1><pre class="source lang-java linenums">package delta.codecharacter.server.game_map
+
+import delta.codecharacter.core.MapApi
+import delta.codecharacter.dtos.CreateMapRevisionRequestDto
+import delta.codecharacter.dtos.GameMapDto
+import delta.codecharacter.dtos.GameMapRevisionDto
+import delta.codecharacter.dtos.UpdateLatestMapRequestDto
+import delta.codecharacter.server.game_map.latest_map.LatestMapService
+import delta.codecharacter.server.game_map.locked_map.LockedMapService
+import delta.codecharacter.server.game_map.map_revision.MapRevisionService
+import delta.codecharacter.server.user.UserEntity
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.ResponseEntity
+import org.springframework.security.access.annotation.Secured
+import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.web.bind.annotation.RestController
+
+<span class="fc" id="L18">@RestController</span>
+<span class="fc" id="L19">class GameMapController(</span>
+<span class="fc" id="L20">    @Autowired private val mapRevisionService: MapRevisionService,</span>
+<span class="fc" id="L21">    @Autowired private val latestMapService: LatestMapService,</span>
+<span class="fc" id="L22">    @Autowired private val lockedMapService: LockedMapService</span>
+) : MapApi {
+
+    @Secured(value = [&quot;ROLE_USER&quot;])
+    override fun createMapRevision(
+        createMapRevisionRequestDto: CreateMapRevisionRequestDto
+    ): ResponseEntity&lt;Unit&gt; {
+<span class="pc bpc" id="L29" title="1 of 2 branches missed.">        val user = SecurityContextHolder.getContext().authentication.principal as UserEntity</span>
+<span class="fc" id="L30">        mapRevisionService.createMapRevision(user.id, createMapRevisionRequestDto)</span>
+<span class="fc" id="L31">        return ResponseEntity.ok().build()</span>
+    }
+
+    @Secured(value = [&quot;ROLE_USER&quot;])
+    override fun getMapRevisions(): ResponseEntity&lt;List&lt;GameMapRevisionDto&gt;&gt; {
+<span class="pc bpc" id="L36" title="1 of 2 branches missed.">        val user = SecurityContextHolder.getContext().authentication.principal as UserEntity</span>
+<span class="fc" id="L37">        return ResponseEntity.ok(mapRevisionService.getMapRevisions(user.id))</span>
+    }
+
+    @Secured(value = [&quot;ROLE_USER&quot;])
+    override fun getLatestMap(): ResponseEntity&lt;GameMapDto&gt; {
+<span class="pc bpc" id="L42" title="1 of 2 branches missed.">        val user = SecurityContextHolder.getContext().authentication.principal as UserEntity</span>
+<span class="fc" id="L43">        return ResponseEntity.ok(latestMapService.getLatestMap(user.id))</span>
+    }
+
+    @Secured(value = [&quot;ROLE_USER&quot;])
+    override fun updateLatestMap(
+        updateLatestMapRequestDto: UpdateLatestMapRequestDto
+    ): ResponseEntity&lt;Unit&gt; {
+<span class="pc bpc" id="L50" title="1 of 2 branches missed.">        val user = SecurityContextHolder.getContext().authentication.principal as UserEntity</span>
+<span class="fc" id="L51">        latestMapService.updateLatestMap(user.id, updateLatestMapRequestDto)</span>
+<span class="fc bfc" id="L52" title="All 2 branches covered.">        if (updateLatestMapRequestDto.lock == true) {</span>
+<span class="fc" id="L53">            lockedMapService.updateLockedMap(user.id, updateLatestMapRequestDto)</span>
+        }
+<span class="fc" id="L55">        return ResponseEntity.ok().build()</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

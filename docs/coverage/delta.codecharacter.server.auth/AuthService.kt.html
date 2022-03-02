@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AuthService.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">server</a> &gt; <a href="index.source.html" class="el_package">delta.codecharacter.server.auth</a> &gt; <span class="el_source">AuthService.kt</span></div><h1>AuthService.kt</h1><pre class="source lang-java linenums">package delta.codecharacter.server.auth
+
+import delta.codecharacter.dtos.AuthStatusResponseDto
+import delta.codecharacter.dtos.ForgotPasswordRequestDto
+import delta.codecharacter.dtos.PasswordLoginRequestDto
+import delta.codecharacter.dtos.PasswordLoginResponseDto
+import delta.codecharacter.dtos.ResetPasswordRequestDto
+import delta.codecharacter.server.auth.jwt.JwtService
+import delta.codecharacter.server.auth.reset_password.ResetPasswordService
+import delta.codecharacter.server.exception.CustomException
+import delta.codecharacter.server.user.LoginType
+import delta.codecharacter.server.user.UserEntity
+import delta.codecharacter.server.user.UserService
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.HttpStatus
+import org.springframework.security.core.userdetails.UsernameNotFoundException
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
+import org.springframework.stereotype.Service
+
+<span class="fc" id="L20">@Service</span>
+<span class="fc" id="L21">class AuthService(</span>
+<span class="fc" id="L22">    @Autowired private val userService: UserService,</span>
+<span class="fc" id="L23">    @Autowired private val jwtService: JwtService,</span>
+<span class="fc" id="L24">    @Autowired private val resetPasswordService: ResetPasswordService,</span>
+<span class="fc" id="L25">    @Autowired private val passwordEncoder: BCryptPasswordEncoder,</span>
+) {
+    fun passwordLogin(passwordLoginRequestDto: PasswordLoginRequestDto): PasswordLoginResponseDto {
+<span class="nc" id="L28">        val email = passwordLoginRequestDto.email</span>
+<span class="nc" id="L29">        val password = passwordLoginRequestDto.password</span>
+        val user: UserEntity
+<span class="nc" id="L31">        try {</span>
+<span class="nc" id="L32">            user = userService.loadUserByUsername(email)</span>
+<span class="nc" id="L33">        } catch (e: UsernameNotFoundException) {</span>
+<span class="nc" id="L34">            throw CustomException(HttpStatus.UNAUTHORIZED, &quot;Invalid credentials&quot;)</span>
+        }
+<span class="nc bnc" id="L36" title="All 2 branches missed.">        if (user.loginType != LoginType.PASSWORD) {</span>
+<span class="nc" id="L37">            throw CustomException(HttpStatus.UNAUTHORIZED, &quot;Invalid credentials&quot;)</span>
+        }
+<span class="nc bnc" id="L39" title="All 2 branches missed.">        if (passwordEncoder.matches(password, user.password)) {</span>
+<span class="nc" id="L40">            return PasswordLoginResponseDto(jwtService.generateToken(user))</span>
+<span class="nc" id="L41">        } else throw CustomException(HttpStatus.UNAUTHORIZED, &quot;Invalid credentials&quot;)</span>
+    }
+
+    fun forgotPassword(forgotPasswordRequestDto: ForgotPasswordRequestDto) {
+<span class="nc" id="L45">        val email = forgotPasswordRequestDto.email</span>
+<span class="nc" id="L46">        val user =</span>
+<span class="nc" id="L47">            userService.getUserByEmail(email).orElseThrow {</span>
+<span class="nc" id="L48">                throw CustomException(HttpStatus.BAD_REQUEST, &quot;Invalid credentials&quot;)</span>
+            }
+<span class="nc bnc" id="L50" title="All 2 branches missed.">        if (user.loginType != LoginType.PASSWORD) {</span>
+<span class="nc" id="L51">            throw CustomException(HttpStatus.BAD_REQUEST, &quot;User not registered with password&quot;)</span>
+        }
+<span class="nc" id="L53">        resetPasswordService.sendResetPasswordEmail(user)</span>
+<span class="nc" id="L54">    }</span>
+
+    fun resetPassword(resetPasswordRequestDto: ResetPasswordRequestDto) {
+<span class="nc" id="L57">        val (token, password, passwordConfirmation) = resetPasswordRequestDto</span>
+<span class="nc bnc" id="L58" title="All 2 branches missed.">        if (password != passwordConfirmation) {</span>
+<span class="nc" id="L59">            throw CustomException(HttpStatus.BAD_REQUEST, &quot;Password and Confirm Password does not match&quot;)</span>
+        }
+<span class="nc" id="L61">        val userId = resetPasswordService.processResetPasswordTokenAndGetUserId(token)</span>
+<span class="nc" id="L62">        userService.updateUserPassword(userId, password)</span>
+<span class="nc" id="L63">    }</span>
+
+    fun oAuth2Login(email: String, loginType: LoginType): String {
+<span class="nc" id="L66">        val user = userService.getUserByEmail(email)</span>
+        val userEntity: UserEntity
+<span class="nc bnc" id="L68" title="All 2 branches missed.">        if (user.isEmpty) {</span>
+<span class="nc" id="L69">            userEntity = userService.createUserWithOAuth(email, loginType)</span>
+        } else {
+<span class="nc" id="L71">            userEntity = user.get()</span>
+<span class="nc bnc" id="L72" title="All 2 branches missed.">            if (userEntity.loginType != loginType) {</span>
+<span class="nc" id="L73">                throw CustomException(HttpStatus.BAD_REQUEST, &quot;Incorrect login provider&quot;)</span>
+            }
+        }
+<span class="nc" id="L76">        return jwtService.generateToken(userEntity)</span>
+    }
+
+    fun getAuthStatus(user: UserEntity): AuthStatusResponseDto {
+<span class="nc" id="L80">        val status: AuthStatusResponseDto.Status =</span>
+<span class="nc bnc" id="L81" title="All 2 branches missed.">            if (!user.isProfileComplete) {</span>
+<span class="nc" id="L82">                AuthStatusResponseDto.Status.PROFILE_INCOMPLETE</span>
+<span class="nc bnc" id="L83" title="All 2 branches missed.">            } else if (!user.isEnabled) {</span>
+<span class="nc" id="L84">                AuthStatusResponseDto.Status.ACTIVATION_PENDING</span>
+            } else {
+<span class="nc" id="L86">                AuthStatusResponseDto.Status.AUTHENTICATED</span>
+            }
+<span class="nc" id="L88">        return AuthStatusResponseDto(status)</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

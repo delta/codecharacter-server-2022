@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>GameRequestEntity.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">server</a> &gt; <a href="index.source.html" class="el_package">delta.codecharacter.server.game.queue.entities</a> &gt; <span class="el_source">GameRequestEntity.kt</span></div><h1>GameRequestEntity.kt</h1><pre class="source lang-java linenums">package delta.codecharacter.server.game.queue.entities
+
+import com.fasterxml.jackson.annotation.JsonProperty
+import delta.codecharacter.server.code.LanguageEnum
+import delta.codecharacter.server.params.GameParameters
+import java.util.UUID
+
+<span class="fc" id="L8">data class GameRequestEntity(</span>
+<span class="fc" id="L9">    @field:JsonProperty(&quot;game_id&quot;, required = true) val gameId: UUID,</span>
+<span class="fc" id="L10">    @field:JsonProperty(&quot;parameters&quot;, required = true) val parameters: GameParameters,</span>
+<span class="fc" id="L11">    @field:JsonProperty(&quot;source_code&quot;, required = true) val sourceCode: String,</span>
+<span class="fc" id="L12">    @field:JsonProperty(&quot;language&quot;, required = true) val language: LanguageEnum,</span>
+<span class="fc" id="L13">    @field:JsonProperty(&quot;map&quot;, required = true) val map: String,</span>
+)
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

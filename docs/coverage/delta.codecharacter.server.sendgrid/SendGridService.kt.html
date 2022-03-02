@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SendGridService.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">server</a> &gt; <a href="index.source.html" class="el_package">delta.codecharacter.server.sendgrid</a> &gt; <span class="el_source">SendGridService.kt</span></div><h1>SendGridService.kt</h1><pre class="source lang-java linenums">package delta.codecharacter.server.sendgrid
+
+import com.sendgrid.Method
+import com.sendgrid.Request
+import com.sendgrid.Response
+import com.sendgrid.SendGrid
+import com.sendgrid.helpers.mail.Mail
+import com.sendgrid.helpers.mail.objects.Email
+import delta.codecharacter.server.exception.CustomException
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.http.HttpStatus
+import org.springframework.stereotype.Service
+import java.util.UUID
+
+<span class="fc" id="L18">@Service</span>
+<span class="fc" id="L19">class SendGridService {</span>
+
+<span class="fc" id="L21">    private val logger: Logger = LoggerFactory.getLogger(SendGridService::class.java)</span>
+
+    @Autowired private lateinit var sendGrid: SendGrid
+
+    @Value(&quot;\${spring.sendgrid.template-id}&quot;) private lateinit var templateId: String
+
+    @Value(&quot;\${spring.sendgrid.sender-email}&quot;) private lateinit var senderEmail: String
+
+    @Value(&quot;\${base-url}&quot;) private lateinit var baseUrl: String
+
+    fun activateUserEmail(userId: UUID, token: String, name: String, email: String) {
+<span class="nc bnc" id="L32" title="All 2 branches missed.">        val link = &quot;$baseUrl#/activate?id=$userId&amp;token=$token&quot;</span>
+<span class="nc" id="L33">        val linkName = &quot;User Activation link&quot;</span>
+<span class="nc" id="L34">        val message = &quot;Please click the button to activate your account&quot;</span>
+<span class="nc" id="L35">        val buttonName = &quot;Activate&quot;</span>
+<span class="nc" id="L36">        val subjectInfo = &quot;CodeCharacter Account Activation Link&quot;</span>
+<span class="nc" id="L37">        sendTemplateEmail(email, name, linkName, link, message, buttonName, subjectInfo)</span>
+<span class="nc" id="L38">    }</span>
+
+    fun resetPasswordEmail(userId: UUID, token: String, name: String, email: String) {
+<span class="nc bnc" id="L41" title="All 2 branches missed.">        val link = &quot;$baseUrl#/reset-password?id=$userId&amp;token=$token&quot;</span>
+<span class="nc" id="L42">        val linkName = &quot;Reset-Password link&quot;</span>
+<span class="nc" id="L43">        val message = &quot;Please click the button to reset your password&quot;</span>
+<span class="nc" id="L44">        val buttonName = &quot;Reset Password&quot;</span>
+<span class="nc" id="L45">        val subjectInfo = &quot;CodeCharacter Reset-Password Link&quot;</span>
+<span class="nc" id="L46">        sendTemplateEmail(email, name, linkName, link, message, buttonName, subjectInfo)</span>
+<span class="nc" id="L47">    }</span>
+
+    fun sendTemplateEmail(
+        emailTo: String,
+        name: String,
+        linkName: String,
+        link: String,
+        message: String,
+        buttonName: String,
+        subjectInfo: String
+    ) {
+<span class="nc" id="L58">        val mail = Mail()</span>
+<span class="nc" id="L59">        val personalization = DynamicTemplatePersonalization()</span>
+<span class="nc" id="L60">        personalization.addTo(Email(emailTo))</span>
+<span class="nc bnc" id="L61" title="All 2 branches missed.">        mail.setFrom(Email(senderEmail))</span>
+<span class="nc" id="L62">        mail.setSubject(subjectInfo)</span>
+<span class="nc" id="L63">        personalization.addDynamicTemplateData(&quot;name&quot;, name)</span>
+<span class="nc" id="L64">        personalization.addDynamicTemplateData(&quot;link_name&quot;, linkName)</span>
+<span class="nc" id="L65">        personalization.addDynamicTemplateData(&quot;message&quot;, message)</span>
+<span class="nc" id="L66">        personalization.addDynamicTemplateData(&quot;link&quot;, link)</span>
+<span class="nc" id="L67">        personalization.addDynamicTemplateData(&quot;button_name&quot;, buttonName)</span>
+<span class="nc" id="L68">        personalization.addDynamicTemplateData(&quot;subject&quot;, subjectInfo)</span>
+<span class="nc" id="L69">        mail.addPersonalization(personalization)</span>
+<span class="nc bnc" id="L70" title="All 2 branches missed.">        mail.setTemplateId(templateId)</span>
+<span class="nc" id="L71">        val request = Request()</span>
+<span class="nc" id="L72">        try {</span>
+<span class="nc" id="L73">            request.apply {</span>
+<span class="nc" id="L74">                method = Method.POST</span>
+<span class="nc" id="L75">                endpoint = &quot;mail/send&quot;</span>
+<span class="nc" id="L76">                body = mail.build()</span>
+<span class="nc" id="L77">            }</span>
+<span class="nc bnc" id="L78" title="All 2 branches missed.">            val response: Response = sendGrid.api(request)</span>
+<span class="nc bnc" id="L79" title="All 2 branches missed.">            if (response.statusCode &gt;= 400) {</span>
+<span class="nc" id="L80">                logger.error(</span>
+<span class="nc" id="L81">                    &quot;Error while sending email with status: ${response.statusCode}. Error: ${response.body}&quot;</span>
+                )
+<span class="nc" id="L83">                throw CustomException(</span>
+<span class="nc" id="L84">                    HttpStatus.INTERNAL_SERVER_ERROR, &quot;Unknown error. Please contact event admins.&quot;</span>
+                )
+            }
+<span class="nc" id="L87">        } catch (e: Exception) {</span>
+<span class="nc" id="L88">            logger.error(&quot;Error while sending email: ${e.message}&quot;)</span>
+<span class="nc" id="L89">            throw CustomException(</span>
+<span class="nc" id="L90">                HttpStatus.INTERNAL_SERVER_ERROR, &quot;Unknown error. Please contact event admins.&quot;</span>
+            )
+        }
+<span class="nc" id="L93">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

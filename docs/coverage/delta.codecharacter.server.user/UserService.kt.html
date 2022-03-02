@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UserService.kt</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">server</a> &gt; <a href="index.source.html" class="el_package">delta.codecharacter.server.user</a> &gt; <span class="el_source">UserService.kt</span></div><h1>UserService.kt</h1><pre class="source lang-java linenums">package delta.codecharacter.server.user
+
+import delta.codecharacter.dtos.CompleteProfileRequestDto
+import delta.codecharacter.dtos.RegisterUserRequestDto
+import delta.codecharacter.dtos.UpdatePasswordRequestDto
+import delta.codecharacter.server.exception.CustomException
+import delta.codecharacter.server.user.activate_user.ActivateUserService
+import delta.codecharacter.server.user.public_user.PublicUserService
+import delta.codecharacter.server.user.rating_history.RatingHistoryService
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.context.annotation.Lazy
+import org.springframework.dao.DuplicateKeyException
+import org.springframework.http.HttpStatus
+import org.springframework.security.core.authority.SimpleGrantedAuthority
+import org.springframework.security.core.userdetails.UserDetailsService
+import org.springframework.security.core.userdetails.UsernameNotFoundException
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
+import org.springframework.stereotype.Service
+import java.util.Optional
+import java.util.UUID
+
+<span class="fc" id="L22">@Service</span>
+<span class="fc" id="L23">class UserService(</span>
+<span class="fc" id="L24">    @Autowired private val userRepository: UserRepository,</span>
+<span class="fc" id="L25">    @Autowired private val publicUserService: PublicUserService,</span>
+<span class="fc" id="L26">    @Autowired private val ratingHistoryService: RatingHistoryService,</span>
+<span class="fc" id="L27">    @Autowired private val activateUserService: ActivateUserService</span>
+) : UserDetailsService {
+
+    @Lazy @Autowired private lateinit var passwordEncoder: BCryptPasswordEncoder
+
+    override fun loadUserByUsername(email: String?): UserEntity {
+<span class="nc bnc" id="L33" title="All 2 branches missed.">        if (email == null) {</span>
+<span class="nc" id="L34">            throw UsernameNotFoundException(&quot;User not found&quot;)</span>
+        }
+<span class="nc" id="L36">        val user = userRepository.findFirstByEmail(email)</span>
+<span class="nc bnc" id="L37" title="All 2 branches missed.">        if (user.isEmpty) {</span>
+<span class="nc" id="L38">            throw UsernameNotFoundException(&quot;User not found&quot;)</span>
+<span class="nc bnc" id="L39" title="All 2 branches missed.">        } else if (!user.get().isEnabled) {</span>
+<span class="nc" id="L40">            throw CustomException(HttpStatus.UNAUTHORIZED, &quot;Email not verified&quot;)</span>
+<span class="nc bnc" id="L41" title="All 2 branches missed.">        } else if (!user.get().isAccountNonExpired) {</span>
+<span class="nc" id="L42">            throw CustomException(HttpStatus.UNAUTHORIZED, &quot;Account expired&quot;)</span>
+        } else {
+<span class="nc" id="L44">            return user.get()</span>
+        }
+    }
+
+    private fun createUserWithPassword(userId: UUID, password: String, email: String) {
+<span class="nc" id="L49">        val user =</span>
+<span class="nc" id="L50">            UserEntity(</span>
+<span class="nc" id="L51">                id = userId,</span>
+<span class="nc bnc" id="L52" title="All 2 branches missed.">                password = passwordEncoder.encode(password),</span>
+<span class="nc" id="L53">                email = email,</span>
+<span class="nc" id="L54">                loginType = LoginType.PASSWORD,</span>
+<span class="nc" id="L55">                isProfileComplete = true,</span>
+<span class="nc" id="L56">                isEnabled = false,</span>
+<span class="nc" id="L57">                isAccountNonExpired = true,</span>
+<span class="nc" id="L58">                isAccountNonLocked = true,</span>
+<span class="nc" id="L59">                isCredentialsNonExpired = true,</span>
+<span class="nc" id="L60">                userAuthorities = mutableListOf(SimpleGrantedAuthority(&quot;ROLE_USER&quot;))</span>
+            )
+<span class="nc" id="L62">        userRepository.save(user)</span>
+<span class="nc" id="L63">    }</span>
+
+    fun createUserWithOAuth(email: String, oauthProvider: LoginType): UserEntity {
+<span class="nc" id="L66">        val userId = UUID.randomUUID()</span>
+<span class="nc" id="L67">        val user =</span>
+<span class="nc" id="L68">            UserEntity(</span>
+<span class="nc" id="L69">                id = userId,</span>
+<span class="nc bnc" id="L70" title="All 2 branches missed.">                password = passwordEncoder.encode(UUID.randomUUID().toString()),</span>
+<span class="nc" id="L71">                email = email,</span>
+<span class="nc" id="L72">                loginType = oauthProvider,</span>
+<span class="nc" id="L73">                isProfileComplete = false,</span>
+<span class="nc" id="L74">                isEnabled = true,</span>
+<span class="nc" id="L75">                isAccountNonExpired = true,</span>
+<span class="nc" id="L76">                isAccountNonLocked = true,</span>
+<span class="nc" id="L77">                isCredentialsNonExpired = true,</span>
+<span class="nc" id="L78">                userAuthorities = mutableListOf(SimpleGrantedAuthority(&quot;ROLE_USER_INCOMPLETE_PROFILE&quot;))</span>
+            )
+<span class="nc" id="L80">        ratingHistoryService.create(userId)</span>
+<span class="nc" id="L81">        return userRepository.save(user)</span>
+    }
+
+    fun getUserByEmail(email: String): Optional&lt;UserEntity&gt; {
+<span class="nc" id="L85">        return userRepository.findFirstByEmail(email)</span>
+    }
+
+    fun updateUserPassword(userId: UUID, password: String) {
+<span class="nc" id="L89">        val user = userRepository.findById(userId).get()</span>
+<span class="nc bnc" id="L90" title="All 2 branches missed.">        userRepository.save(user.copy(password = passwordEncoder.encode(password)))</span>
+<span class="nc" id="L91">    }</span>
+
+    fun verifyUserPassword(userId: UUID, password: String): Boolean {
+<span class="nc" id="L94">        val user = userRepository.findById(userId)</span>
+<span class="nc bnc" id="L95" title="All 2 branches missed.">        return passwordEncoder.matches(password, user.get().password)</span>
+    }
+
+    fun updatePassword(userId: UUID, updatePasswordRequestDto: UpdatePasswordRequestDto) {
+<span class="nc" id="L99">        val (oldPassword, password, passwordConfirmation) = updatePasswordRequestDto</span>
+<span class="nc bnc" id="L100" title="All 2 branches missed.">        if (password != passwordConfirmation) {</span>
+<span class="nc" id="L101">            throw CustomException(HttpStatus.BAD_REQUEST, &quot;Passwords do not match&quot;)</span>
+        }
+<span class="nc bnc" id="L103" title="All 2 branches missed.">        if (verifyUserPassword(userId, oldPassword)) {</span>
+<span class="nc" id="L104">            val user = userRepository.findById(userId).get()</span>
+<span class="nc bnc" id="L105" title="All 2 branches missed.">            userRepository.save(user.copy(password = passwordEncoder.encode(password)))</span>
+        } else {
+<span class="nc" id="L107">            throw CustomException(HttpStatus.BAD_REQUEST, &quot;Old password is incorrect&quot;)</span>
+        }
+<span class="nc" id="L109">    }</span>
+
+    fun registerUser(registerUserRequestDto: RegisterUserRequestDto) {
+<span class="nc" id="L112">        val (username, name, email, password, passwordConfirmation, country, college, avatarId) =</span>
+<span class="nc" id="L113">            registerUserRequestDto</span>
+
+<span class="nc bnc" id="L115" title="All 2 branches missed.">        if (password != passwordConfirmation) {</span>
+<span class="nc" id="L116">            throw CustomException(</span>
+<span class="nc" id="L117">                HttpStatus.BAD_REQUEST, &quot;Password and password confirmation don't match&quot;</span>
+            )
+        }
+
+<span class="nc bnc" id="L121" title="All 2 branches missed.">        if (!publicUserService.isUsernameUnique(username)) {</span>
+<span class="nc" id="L122">            throw CustomException(HttpStatus.BAD_REQUEST, &quot;Username already taken&quot;)</span>
+        }
+
+<span class="nc" id="L125">        val userId = UUID.randomUUID()</span>
+<span class="nc" id="L126">        try {</span>
+<span class="nc" id="L127">            createUserWithPassword(userId, password, email)</span>
+<span class="nc" id="L128">            publicUserService.create(userId, username, name, country, college, avatarId)</span>
+<span class="nc" id="L129">            ratingHistoryService.create(userId)</span>
+<span class="nc" id="L130">            activateUserService.sendActivationToken(userId, name, email)</span>
+<span class="nc" id="L131">        } catch (duplicateError: DuplicateKeyException) {</span>
+<span class="nc" id="L132">            throw CustomException(HttpStatus.BAD_REQUEST, &quot;Username/Email already exists&quot;)</span>
+        }
+<span class="nc" id="L134">    }</span>
+
+    fun activateUser(userId: UUID, token: String) {
+<span class="nc" id="L137">        activateUserService.processActivationToken(userId, token)</span>
+<span class="nc" id="L138">        val user = userRepository.findFirstById((userId)).get()</span>
+<span class="nc" id="L139">        val activatedUser = user.copy(isEnabled = true)</span>
+<span class="nc" id="L140">        userRepository.save(activatedUser)</span>
+<span class="nc" id="L141">    }</span>
+
+    fun completeUserProfile(userId: UUID, completeProfileRequestDto: CompleteProfileRequestDto) {
+<span class="nc" id="L144">        val (username, name, country, college, avatarId) = completeProfileRequestDto</span>
+<span class="nc" id="L145">        val user = userRepository.findFirstById(userId).get()</span>
+<span class="nc" id="L146">        publicUserService.create(userId, username, name, country, college, avatarId)</span>
+<span class="nc" id="L147">        userRepository.save(</span>
+<span class="nc" id="L148">            user.copy(</span>
+<span class="nc" id="L149">                isProfileComplete = true,</span>
+<span class="nc" id="L150">                userAuthorities = mutableListOf(SimpleGrantedAuthority(&quot;ROLE_USER&quot;))</span>
+            )
+        )
+<span class="nc" id="L153">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>
