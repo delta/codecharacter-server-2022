@@ -36,5 +36,17 @@ class MapValidator {
         ) {
             throw CustomException(HttpStatus.BAD_REQUEST, invalidMapMessage)
         }
+
+        var totalCoins = 0
+        map.forEach { row ->
+            row.forEach { cell ->
+                if (cell != 0) {
+                    totalCoins += gameParameters.defenders.first { it.id == cell }.price
+                }
+            }
+        }
+        if (totalCoins > gameParameters.mapCoins) {
+            throw CustomException(HttpStatus.BAD_REQUEST, invalidMapMessage)
+        }
     }
 }
