@@ -12,8 +12,10 @@ import org.springframework.security.core.Authentication
 import org.springframework.security.oauth2.core.OAuth2AuthenticatedPrincipal
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler
 import org.springframework.stereotype.Component
-import java.util.Date
-import java.util.TimeZone
+import java.time.Instant
+import java.time.ZoneId
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
@@ -39,17 +41,19 @@ class CustomOAuth2SuccessHandler(@Lazy @Autowired private val authService: AuthS
             val loginType = LoginType.valueOf(provider ?: "GOOGLE")
             try {
                 val token = authService.oAuth2Login(email, loginType)
-                TimeZone.setDefault(TimeZone.getTimeZone("GMT"))
-                val date = Date()
+                val instant = Instant.now()
+                val zoneId = ZoneId.of("GMT")
+                val zonedDateTimePlus = ZonedDateTime.ofInstant(instant.plusSeconds(60), zoneId)
+                val plusOneSecond = zonedDateTimePlus.format(DateTimeFormatter.RFC_1123_DATE_TIME)
                 if (baseUrl.contains("https")) {
                     response?.setHeader(
                         "Set-Cookie",
-                        "bearer-token=$token; Domain=$frontendDomain; Path=/;Expires=${Date(date.time + 1000 * 60)}; Secure; SameSite=None"
+                        "bearer-token=$token; Domain=$frontendDomain; Path=/;Expires=$plusOneSecond; Secure; SameSite=None"
                     )
                 } else {
                     response?.setHeader(
                         "Set-Cookie",
-                        "bearer-token=$token; Domain=$frontendDomain;Expires=${Date(date.time + 1000 * 60)}; Path=/; SameSite=false"
+                        "bearer-token=$token; Domain=$frontendDomain;Expires=$plusOneSecond; Path=/; SameSite=false"
                     )
                 }
                 response?.sendRedirect("$baseUrl/#/dashboard")
