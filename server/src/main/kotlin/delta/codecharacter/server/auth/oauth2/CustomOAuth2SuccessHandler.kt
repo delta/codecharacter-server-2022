@@ -12,6 +12,8 @@ import org.springframework.security.core.Authentication
 import org.springframework.security.oauth2.core.OAuth2AuthenticatedPrincipal
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler
 import org.springframework.stereotype.Component
+import java.util.Date
+import java.util.TimeZone
 import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
@@ -37,14 +39,17 @@ class CustomOAuth2SuccessHandler(@Lazy @Autowired private val authService: AuthS
             val loginType = LoginType.valueOf(provider ?: "GOOGLE")
             try {
                 val token = authService.oAuth2Login(email, loginType)
+                TimeZone.setDefault(TimeZone.getTimeZone("GMT"))
+                val date = Date()
                 if (baseUrl.contains("https")) {
                     response?.setHeader(
                         "Set-Cookie",
-                        "bearer-token=$token; Domain=$frontendDomain; Path=/; Secure; SameSite=None"
+                        "bearer-token=$token; Domain=$frontendDomain; Path=/;Expires=${Date(date.time + 1000 * 60)}; Secure; SameSite=None"
                     )
                 } else {
                     response?.setHeader(
-                        "Set-Cookie", "bearer-token=$token; Domain=$frontendDomain; Path=/; SameSite=false"
+                        "Set-Cookie",
+                        "bearer-token=$token; Domain=$frontendDomain;Expires=${Date(date.time + 1000 * 60)}; Path=/; SameSite=false"
                     )
                 }
                 response?.sendRedirect("$baseUrl/#/dashboard")
