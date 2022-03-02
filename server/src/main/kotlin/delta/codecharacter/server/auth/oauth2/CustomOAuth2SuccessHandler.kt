@@ -48,7 +48,7 @@ class CustomOAuth2SuccessHandler(@Lazy @Autowired private val authService: AuthS
                 if (baseUrl.contains("https")) {
                     response?.setHeader(
                         "Set-Cookie",
-                        "bearer-token=$token; Domain=$frontendDomain; Path=/;Expires=$plusOneSecond; Secure; SameSite=None"
+                        "bearer-token=$token; Domain=$frontendDomain; Path=/; Expires=$plusOneSecond; Secure; SameSite=None"
                     )
                 } else {
                     response?.setHeader(
