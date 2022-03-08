@@ -6,4 +6,5 @@ import java.util.UUID
 interface RatingHistoryRepository : MongoRepository<RatingHistoryEntity, String> {
     fun findAllByUserId(userId: UUID): List<RatingHistoryEntity>
     fun findFirstByUserIdOrderByValidFromDesc(userId: UUID): RatingHistoryEntity
+    fun findFirstByUserIdInOrderByValidFromDesc(userIds: List<UUID>): List<RatingHistoryEntity>
 }

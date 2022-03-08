@@ -3,6 +3,7 @@ package delta.codecharacter.server.user.rating_history
 import delta.codecharacter.dtos.RatingHistoryDto
 import delta.codecharacter.server.logic.rating.GlickoRating
 import delta.codecharacter.server.logic.rating.RatingAlgorithm
+import delta.codecharacter.server.match.MatchEntity
 import delta.codecharacter.server.match.MatchVerdictEnum
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
@@ -44,7 +45,9 @@ class RatingHistoryService(
     fun updateRating(
         userId: UUID,
         opponentId: UUID,
-        verdict: MatchVerdictEnum
+        verdict: MatchVerdictEnum,
+        isUserInTop15: Boolean,
+        isOpponentInTop15: Boolean
     ): Pair<Double, Double> {
         val (_, userRating, userRatingDeviation, userRatingValidFrom) =
             ratingHistoryRepository.findFirstByUserIdOrderByValidFromDesc(userId)
@@ -77,7 +80,7 @@ class RatingHistoryService(
         ratingHistoryRepository.save(
             RatingHistoryEntity(
                 userId = userId,
-                rating = newUserRating.rating,
+                rating = if (isUserInTop15) userRating else newUserRating.rating,
                 ratingDeviation = newUserRating.ratingDeviation,
                 validFrom = currentInstant
             )
@@ -85,12 +88,92 @@ class RatingHistoryService(
         ratingHistoryRepository.save(
             RatingHistoryEntity(
                 userId = opponentId,
-                rating = newOpponentRating.rating,
+                rating = if (isOpponentInTop15) opponentRating else newOpponentRating.rating,
                 ratingDeviation = newOpponentRating.ratingDeviation,
                 validFrom = currentInstant
             )
         )
 
-        return Pair(newUserRating.rating, newOpponentRating.rating)
+        return Pair(
+            if (isUserInTop15) userRating else newUserRating.rating,
+            if (isOpponentInTop15) opponentRating else newOpponentRating.rating
+        )
+    }
+
+    private fun getNewRatingAfterAutoMatches(
+        userId: UUID,
+        userRatingEntities: List<RatingHistoryEntity>,
+        autoMatches: List<MatchEntity>
+    ): GlickoRating {
+        val userAsInitiatorMatches = autoMatches.filter { it.player1.userId == userId }
+        val userAsOpponentMatches = autoMatches.filter { it.player2.userId == userId }
+
+        val usersWeightedRatingDeviations =
+            userRatingEntities.map {
+                ratingAlgorithm.getWeightedRatingDeviationSinceLastCompetition(
+                    it.ratingDeviation, it.validFrom
+                )
+            }
+
+        val ratingsForUserAsInitiator =
+            userAsInitiatorMatches.map { match ->
+                GlickoRating(
+                    match.player2.rating,
+                    usersWeightedRatingDeviations[
+                        userRatingEntities.indexOfFirst { ratingEntity ->
+                            ratingEntity.userId == match.player2.userId
+                        }
+                    ]
+                )
+            }
+        val verdictsForUserAsInitiator =
+            userAsInitiatorMatches.map { match -> convertVerdictToMatchResult(match.verdict) }
+
+        val ratingsForUserAsOpponent =
+            userAsOpponentMatches.map { match ->
+                GlickoRating(
+                    match.player1.rating,
+                    usersWeightedRatingDeviations[
+                        userRatingEntities.indexOfFirst { ratingEntity ->
+                            ratingEntity.userId == match.player1.userId
+                        }
+                    ]
+                )
+            }
+        val verdictsForUserAsOpponent =
+            userAsOpponentMatches.map { match -> 1.0 - convertVerdictToMatchResult(match.verdict) }
+
+        val ratings = ratingsForUserAsInitiator + ratingsForUserAsOpponent
+        val verdicts = verdictsForUserAsInitiator + verdictsForUserAsOpponent
+
+        return ratingAlgorithm.calculateNewRating(
+            GlickoRating(
+                userRatingEntities.find { it.userId == userId }!!.rating,
+                usersWeightedRatingDeviations[userRatingEntities.indexOfFirst { it.userId == userId }]
+            ),
+            ratings,
+            verdicts
+        )
+    }
+
+    fun updateAutoMatchRatings(userIds: List<UUID>, matches: List<MatchEntity>) {
+        val ratingHistoryEntities =
+            ratingHistoryRepository.findFirstByUserIdInOrderByValidFromDesc(userIds)
+        val newRatings =
+            userIds.map { userId ->
+                val userRatingEntities = ratingHistoryEntities.filter { it.userId == userId }
+                getNewRatingAfterAutoMatches(userId, userRatingEntities, matches)
+            }
+        val currentInstant = Instant.now()
+        newRatings.forEachIndexed { index, rating ->
+            ratingHistoryRepository.save(
+                RatingHistoryEntity(
+                    userId = userIds[index],
+                    rating = rating.rating,
+                    ratingDeviation = rating.ratingDeviation,
+                    validFrom = currentInstant
+                )
+            )
+        }
     }
 }

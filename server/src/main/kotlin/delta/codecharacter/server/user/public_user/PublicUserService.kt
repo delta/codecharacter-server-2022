@@ -65,6 +65,10 @@ class PublicUserService(@Autowired private val publicUserRepository: PublicUserR
         }
     }
 
+    fun getTop15(): List<PublicUserEntity> {
+        return publicUserRepository.findTop15ByOrderByRatingDesc()
+    }
+
     fun getUserProfile(userId: UUID, email: String): CurrentUserProfileDto {
         val user = publicUserRepository.findById(userId).get()
         return CurrentUserProfileDto(
@@ -129,5 +133,9 @@ class PublicUserService(@Autowired private val publicUserRepository: PublicUserR
 
     fun isUsernameUnique(username: String): Boolean {
         return publicUserRepository.findByUsername(username).isEmpty
+    }
+
+    fun isInTop15(userId: UUID): Boolean {
+        return publicUserRepository.findTop15ByOrderByRatingDesc().any { it.userId == userId }
     }
 }

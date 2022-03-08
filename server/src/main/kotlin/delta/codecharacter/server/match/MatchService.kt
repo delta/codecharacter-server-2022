@@ -27,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder
 import org.springframework.messaging.simp.SimpMessagingTemplate
+import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
 import java.time.Instant
@@ -35,6 +36,7 @@ import java.util.UUID
 @Service
 class MatchService(
     @Autowired private val matchRepository: MatchRepository,
+    @Autowired private val autoMatchRepository: AutoMatchRepository,
     @Autowired private val gameService: GameService,
     @Autowired private val latestCodeService: LatestCodeService,
     @Autowired private val codeRevisionService: CodeRevisionService,
@@ -51,7 +53,7 @@ class MatchService(
 ) {
     private var mapper: ObjectMapper = jackson2ObjectMapperBuilder.build()
 
-    private fun createSelfMatch(userId: UUID, codeRevisionId: UUID?, mapRevisionId: UUID?) {
+    private fun createSelfMatch(userId: UUID, codeRevisionId: UUID?, mapRevisionId: UUID?): UUID {
         val code: String
         val language: LanguageEnum
         if (codeRevisionId == null) {
@@ -93,9 +95,11 @@ class MatchService(
             )
         matchRepository.save(match)
         gameService.sendGameRequest(game, code, LanguageEnum.valueOf(language.name), map)
+
+        return matchId
     }
 
-    fun createDualMatch(userId: UUID, opponentUsername: String) {
+    fun createDualMatch(userId: UUID, opponentUsername: String): UUID {
         val publicUser = publicUserService.getPublicUser(userId)
         val publicOpponent = publicUserService.getPublicUserByUsername(opponentUsername)
         val opponentId = publicOpponent.userId
@@ -130,6 +134,8 @@ class MatchService(
 
         gameService.sendGameRequest(game1, userCode, userLanguage, opponentMap)
         gameService.sendGameRequest(game2, opponentCode, opponentLanguage, userMap)
+
+        return matchId
     }
 
     fun createMatch(userId: UUID, createMatchRequestDto: CreateMatchRequestDto) {
@@ -138,11 +144,31 @@ class MatchService(
                 val (_, _, mapRevisionId, codeRevisionId) = createMatchRequestDto
                 createSelfMatch(userId, codeRevisionId, mapRevisionId)
             }
-            MatchModeDto.MANUAL, MatchModeDto.AUTO -> {
+            MatchModeDto.MANUAL -> {
                 if (createMatchRequestDto.opponentUsername == null) {
                     throw CustomException(HttpStatus.BAD_REQUEST, "Opponent ID is required")
                 }
                 createDualMatch(userId, createMatchRequestDto.opponentUsername!!)
+            }
+            MatchModeDto.AUTO -> {
+                throw CustomException(HttpStatus.BAD_REQUEST, "Users cannot create auto match")
+            }
+        }
+    }
+
+    @Scheduled(cron = "30 * * * * *")
+    fun createAutoMatches() {
+        autoMatchRepository.deleteAll()
+        val top15Users = publicUserService.getTop15()
+        val userIds = top15Users.map { it.userId }
+        val userNames = top15Users.map { it.username }
+        userIds.forEachIndexed { i, userId ->
+            run {
+                for (j in i + 1 until userIds.size) {
+                    val opponentUsername = userNames[j]
+                    val matchId = createDualMatch(userId, opponentUsername)
+                    autoMatchRepository.save(AutoMatchEntity(matchId, 0))
+                }
             }
         }
     }
@@ -193,7 +219,10 @@ class MatchService(
 
     fun getUserMatches(userId: UUID): List<MatchDto> {
         val publicUser = publicUserService.getPublicUser(userId)
-        val matches = matchRepository.findByPlayer1OrderByCreatedAtDesc(publicUser)
+        val matches =
+            matchRepository.findTop100ByPlayer1OrModeOrderByCreatedAtDesc(
+                publicUser, MatchModeEnum.AUTO
+            )
         return mapMatchEntitiesToDtos(matches)
     }
 
@@ -220,6 +249,18 @@ class MatchService(
                 game.status == GameStatusEnum.EXECUTED || game.status == GameStatusEnum.EXECUTE_ERROR
             }
         ) {
+            if (match.mode == MatchModeEnum.AUTO) {
+                if (match.games.any { game -> game.status == GameStatusEnum.EXECUTE_ERROR }) {
+                    val autoMatch = autoMatchRepository.findById(match.id).get()
+                    if (autoMatch.tries < 3) {
+                        autoMatchRepository.delete(autoMatch)
+                        val matchId = createDualMatch(match.player1.userId, match.player2.username)
+                        autoMatchRepository.save(AutoMatchEntity(matchId, autoMatch.tries + 1))
+                        return
+                    }
+                }
+            }
+
             val player1Game = match.games.first()
             val player2Game = match.games.last()
             val verdict =
@@ -232,35 +273,61 @@ class MatchService(
                     player2Game.destruction
                 )
             val finishedMatch = match.copy(verdict = verdict)
-            val (newUserRating, newOpponentRating) =
-                ratingHistoryService.updateRating(match.player1.userId, match.player2.userId, verdict)
-
-            publicUserService.updatePublicRating(
-                userId = match.player1.userId,
-                isInitiator = true,
-                verdict = verdict,
-                newRating = newUserRating
-            )
-            publicUserService.updatePublicRating(
-                userId = match.player2.userId,
-                isInitiator = false,
-                verdict = verdict,
-                newRating = newOpponentRating
-            )
 
             if (match.mode == MatchModeEnum.MANUAL) {
+                val isUserInTop15 = publicUserService.isInTop15(match.player1.userId)
+                val isOpponentInTop15 = publicUserService.isInTop15(match.player2.userId)
+                val (newUserRating, newOpponentRating) =
+                    ratingHistoryService.updateRating(
+                        match.player1.userId,
+                        match.player2.userId,
+                        verdict,
+                        isUserInTop15,
+                        isOpponentInTop15
+                    )
+
+                publicUserService.updatePublicRating(
+                    userId = match.player1.userId,
+                    isInitiator = true,
+                    verdict = verdict,
+                    newRating = newUserRating
+                )
+                publicUserService.updatePublicRating(
+                    userId = match.player2.userId,
+                    isInitiator = false,
+                    verdict = verdict,
+                    newRating = newOpponentRating
+                )
+
                 notificationService.sendNotification(
                     match.player1.userId,
                     "Match Result",
-                    "${when (verdict) {
+                    "${
+                    when (verdict) {
                         MatchVerdictEnum.PLAYER1 -> "Won"
                         MatchVerdictEnum.PLAYER2 -> "Lost"
                         MatchVerdictEnum.TIE -> "Tied"
-                    }} against ${match.player2.username}",
+                    }
+                    } against ${match.player2.username}",
                 )
             }
 
             matchRepository.save(finishedMatch)
+
+            if (match.mode == MatchModeEnum.AUTO) {
+                if (autoMatchRepository.findAll().all { autoMatch ->
+                    matchRepository.findById(autoMatch.matchId).get().games.all { game ->
+                        game.status == GameStatusEnum.EXECUTED || game.status == GameStatusEnum.EXECUTE_ERROR
+                    }
+                }
+                ) {
+                    val matches = matchRepository.findByIdIn(autoMatchRepository.findAll().map { it.matchId })
+                    val userIds =
+                        matches.map { it.player1.userId }.toSet() + matches.map { it.player2.userId }.toSet()
+                    ratingHistoryService.updateAutoMatchRatings(userIds.toList(), matches)
+                    autoMatchRepository.deleteAll()
+                }
+            }
         }
     }
 }

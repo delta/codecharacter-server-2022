@@ -37,6 +37,7 @@ import java.util.UUID
 internal class MatchServiceTest {
 
     private lateinit var matchRepository: MatchRepository
+    private lateinit var autoMatchRepository: AutoMatchRepository
     private lateinit var gameService: GameService
     private lateinit var latestCodeService: LatestCodeService
     private lateinit var codeRevisionService: CodeRevisionService
@@ -56,6 +57,7 @@ internal class MatchServiceTest {
     @BeforeEach
     fun setUp() {
         matchRepository = mockk(relaxed = true)
+        autoMatchRepository = mockk(relaxed = true)
         gameService = mockk(relaxed = true)
         latestCodeService = mockk(relaxed = true)
         codeRevisionService = mockk(relaxed = true)
@@ -73,6 +75,7 @@ internal class MatchServiceTest {
         matchService =
             MatchService(
                 matchRepository,
+                autoMatchRepository,
                 gameService,
                 latestCodeService,
                 codeRevisionService,
@@ -199,24 +202,6 @@ internal class MatchServiceTest {
     }
 
     @Test
-    @Throws(CustomException::class)
-    fun `should throw bad request if opponent id is empty in auto match`() {
-        val createMatchRequestDto =
-            CreateMatchRequestDto(
-                mode = MatchModeDto.AUTO,
-                codeRevisionId = UUID.randomUUID(),
-                mapRevisionId = UUID.randomUUID(),
-                opponentUsername = null
-            )
-
-        val exception =
-            assertThrows<CustomException> { matchService.createMatch(mockk(), createMatchRequestDto) }
-
-        assertThat(exception.status).isEqualTo(HttpStatus.BAD_REQUEST)
-        assertThat(exception.message).isEqualTo("Opponent ID is required")
-    }
-
-    @Test
     fun `should create manual match`() {
         val userId = UUID.randomUUID()
         val opponentId = UUID.randomUUID()
@@ -231,56 +216,6 @@ internal class MatchServiceTest {
         val createMatchRequestDto =
             CreateMatchRequestDto(
                 mode = MatchModeDto.MANUAL,
-                opponentUsername = opponentPublicUser.username,
-            )
-
-        every { publicUserService.getPublicUserByUsername(opponentPublicUser.username) } returns
-            opponentPublicUser
-        every { lockedCodeService.getLockedCode(userId) } returns userCode
-        every { lockedCodeService.getLockedCode(opponentId) } returns opponentCode
-        every { lockedMapService.getLockedMap(userId) } returns userMap
-        every { lockedMapService.getLockedMap(opponentId) } returns opponentMap
-        every { gameService.createGame(any()) } returns mockk()
-        every { matchRepository.save(any()) } returns mockk()
-        every { gameService.sendGameRequest(any(), userCode.second, userCode.first, userMap) } returns
-            Unit
-        every {
-            gameService.sendGameRequest(any(), opponentCode.second, opponentCode.first, opponentMap)
-        } returns Unit
-
-        matchService.createMatch(userId, createMatchRequestDto)
-
-        verify {
-            publicUserService.getPublicUserByUsername(opponentPublicUser.username)
-            lockedCodeService.getLockedCode(userId)
-            lockedCodeService.getLockedCode(opponentId)
-            lockedMapService.getLockedMap(userId)
-            lockedMapService.getLockedMap(opponentId)
-            gameService.createGame(any())
-            matchRepository.save(any())
-            gameService.sendGameRequest(any(), userCode.second, userCode.first, opponentMap)
-            gameService.sendGameRequest(any(), opponentCode.second, opponentCode.first, userMap)
-        }
-        confirmVerified(
-            codeRevisionService, mapRevisionService, gameService, matchRepository, gameService
-        )
-    }
-
-    @Test
-    fun `should create auto match`() {
-        val userId = UUID.randomUUID()
-        val opponentId = UUID.randomUUID()
-        val opponentPublicUser =
-            TestAttributes.publicUser.copy(userId = opponentId, username = "opponent")
-
-        val userCode = Pair(LanguageEnum.CPP, "user-code")
-        val opponentCode = Pair(LanguageEnum.PYTHON, "opponent-code")
-        val userMap = "user-map"
-        val opponentMap = "opponent-map"
-
-        val createMatchRequestDto =
-            CreateMatchRequestDto(
-                mode = MatchModeDto.AUTO,
                 opponentUsername = opponentPublicUser.username,
             )
 
