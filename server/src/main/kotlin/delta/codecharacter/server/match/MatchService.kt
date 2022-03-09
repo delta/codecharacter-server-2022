@@ -22,6 +22,8 @@ import delta.codecharacter.server.logic.verdict.VerdictAlgorithm
 import delta.codecharacter.server.notifications.NotificationService
 import delta.codecharacter.server.user.public_user.PublicUserService
 import delta.codecharacter.server.user.rating_history.RatingHistoryService
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.amqp.rabbit.annotation.RabbitListener
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
@@ -52,6 +54,8 @@ class MatchService(
     @Autowired private val simpMessagingTemplate: SimpMessagingTemplate,
 ) {
     private var mapper: ObjectMapper = jackson2ObjectMapperBuilder.build()
+
+    private val logger: Logger = LoggerFactory.getLogger(MatchService::class.java)
 
     private fun createSelfMatch(userId: UUID, codeRevisionId: UUID?, mapRevisionId: UUID?): UUID {
         val code: String
@@ -99,7 +103,7 @@ class MatchService(
         return matchId
     }
 
-    fun createDualMatch(userId: UUID, opponentUsername: String): UUID {
+    fun createDualMatch(mode: MatchModeEnum, userId: UUID, opponentUsername: String): UUID {
         val publicUser = publicUserService.getPublicUser(userId)
         val publicOpponent = publicUserService.getPublicUserByUsername(opponentUsername)
         val opponentId = publicOpponent.userId
@@ -123,7 +127,7 @@ class MatchService(
             MatchEntity(
                 id = matchId,
                 games = listOf(game1, game2),
-                mode = MatchModeEnum.MANUAL,
+                mode = mode,
                 verdict = MatchVerdictEnum.TIE,
                 createdAt = Instant.now(),
                 totalPoints = 0,
@@ -148,7 +152,7 @@ class MatchService(
                 if (createMatchRequestDto.opponentUsername == null) {
                     throw CustomException(HttpStatus.BAD_REQUEST, "Opponent ID is required")
                 }
-                createDualMatch(userId, createMatchRequestDto.opponentUsername!!)
+                createDualMatch(MatchModeEnum.MANUAL, userId, createMatchRequestDto.opponentUsername!!)
             }
             MatchModeDto.AUTO -> {
                 throw CustomException(HttpStatus.BAD_REQUEST, "Users cannot create auto match")
@@ -156,8 +160,9 @@ class MatchService(
         }
     }
 
-    @Scheduled(cron = "30 * * * * *")
+    @Scheduled(cron = "0 0 * * * *")
     fun createAutoMatches() {
+        logger.info("Starting auto-matches...")
         autoMatchRepository.deleteAll()
         val top15Users = publicUserService.getTop15()
         val userIds = top15Users.map { it.userId }
@@ -166,7 +171,7 @@ class MatchService(
             run {
                 for (j in i + 1 until userIds.size) {
                     val opponentUsername = userNames[j]
-                    val matchId = createDualMatch(userId, opponentUsername)
+                    val matchId = createDualMatch(MatchModeEnum.AUTO, userId, opponentUsername)
                     autoMatchRepository.save(AutoMatchEntity(matchId, 0))
                 }
             }
@@ -254,7 +259,8 @@ class MatchService(
                     val autoMatch = autoMatchRepository.findById(match.id).get()
                     if (autoMatch.tries < 3) {
                         autoMatchRepository.delete(autoMatch)
-                        val matchId = createDualMatch(match.player1.userId, match.player2.username)
+                        val matchId =
+                            createDualMatch(MatchModeEnum.AUTO, match.player1.userId, match.player2.username)
                         autoMatchRepository.save(AutoMatchEntity(matchId, autoMatch.tries + 1))
                         return
                     }
@@ -274,10 +280,13 @@ class MatchService(
                 )
             val finishedMatch = match.copy(verdict = verdict)
 
+            var userRating = match.player1.rating
+            var opponentRating = match.player2.rating
+
             if (match.mode == MatchModeEnum.MANUAL) {
                 val isUserInTop15 = publicUserService.isInTop15(match.player1.userId)
                 val isOpponentInTop15 = publicUserService.isInTop15(match.player2.userId)
-                val (newUserRating, newOpponentRating) =
+                val newRating =
                     ratingHistoryService.updateRating(
                         match.player1.userId,
                         match.player2.userId,
@@ -285,19 +294,8 @@ class MatchService(
                         isUserInTop15,
                         isOpponentInTop15
                     )
-
-                publicUserService.updatePublicRating(
-                    userId = match.player1.userId,
-                    isInitiator = true,
-                    verdict = verdict,
-                    newRating = newUserRating
-                )
-                publicUserService.updatePublicRating(
-                    userId = match.player2.userId,
-                    isInitiator = false,
-                    verdict = verdict,
-                    newRating = newOpponentRating
-                )
+                userRating = newRating.first
+                opponentRating = newRating.second
 
                 notificationService.sendNotification(
                     match.player1.userId,
@@ -312,6 +310,19 @@ class MatchService(
                 )
             }
 
+            publicUserService.updatePublicRating(
+                userId = match.player1.userId,
+                isInitiator = true,
+                verdict = verdict,
+                newRating = userRating
+            )
+            publicUserService.updatePublicRating(
+                userId = match.player2.userId,
+                isInitiator = false,
+                verdict = verdict,
+                newRating = opponentRating
+            )
+
             matchRepository.save(finishedMatch)
 
             if (match.mode == MatchModeEnum.AUTO) {
@@ -321,11 +332,15 @@ class MatchService(
                     }
                 }
                 ) {
+                    logger.info("All matches are executed")
                     val matches = matchRepository.findByIdIn(autoMatchRepository.findAll().map { it.matchId })
                     val userIds =
                         matches.map { it.player1.userId }.toSet() + matches.map { it.player2.userId }.toSet()
-                    ratingHistoryService.updateAutoMatchRatings(userIds.toList(), matches)
-                    autoMatchRepository.deleteAll()
+                    val newRatings =
+                        ratingHistoryService.updateAndGetAutoMatchRatings(userIds.toList(), matches)
+                    newRatings.forEach { (userId, newRating) ->
+                        publicUserService.updatePublicRating(userId = userId, newRating = newRating.rating)
+                    }
                 }
             }
         }

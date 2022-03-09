@@ -121,6 +121,12 @@ class PublicUserService(@Autowired private val publicUserRepository: PublicUserR
         publicUserRepository.save(updatedUser)
     }
 
+    fun updatePublicRating(userId: UUID, newRating: Double) {
+        val user = publicUserRepository.findById(userId).get()
+        val updatedUser = user.copy(rating = newRating)
+        publicUserRepository.save(updatedUser)
+    }
+
     fun getPublicUser(userId: UUID): PublicUserEntity {
         return publicUserRepository.findById(userId).get()
     }
