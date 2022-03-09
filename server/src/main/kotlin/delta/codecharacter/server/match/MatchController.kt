@@ -22,7 +22,8 @@ class MatchController(@Autowired private val matchService: MatchService) : Match
 
     @Secured("ROLE_USER")
     override fun getTopMatches(): ResponseEntity<List<MatchDto>> {
-        return ResponseEntity.ok(matchService.getTopMatches())
+        val user = SecurityContextHolder.getContext().authentication.principal as UserEntity
+        return ResponseEntity.ok(matchService.getTopMatches(user.id))
     }
 
     @Secured("ROLE_USER")

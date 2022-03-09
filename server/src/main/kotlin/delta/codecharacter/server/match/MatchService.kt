@@ -178,7 +178,10 @@ class MatchService(
         }
     }
 
-    private fun mapMatchEntitiesToDtos(matchEntities: List<MatchEntity>): List<MatchDto> {
+    private fun mapMatchEntitiesToDtos(
+        userId: UUID,
+        matchEntities: List<MatchEntity>
+    ): List<MatchDto> {
         return matchEntities.map { matchEntity ->
             MatchDto(
                 id = matchEntity.id,
@@ -188,9 +191,14 @@ class MatchService(
                 games =
                 matchEntity
                     .games
-                    .map { gameEntity ->
+                    .mapIndexed { i, gameEntity ->
                         GameDto(
-                            id = gameEntity.id,
+                            id =
+                            if (i == 0 && userId == matchEntity.player1.userId ||
+                                i == 1 && userId == matchEntity.player2.userId
+                            )
+                                gameEntity.id
+                            else UUID.randomUUID(),
                             destruction = BigDecimal(gameEntity.destruction),
                             coinsUsed = gameEntity.coinsUsed,
                             status = GameStatusDto.valueOf(gameEntity.status.name),
@@ -217,18 +225,20 @@ class MatchService(
         }
     }
 
-    fun getTopMatches(): List<MatchDto> {
+    fun getTopMatches(userId: UUID): List<MatchDto> {
         val matches = matchRepository.findTop10ByOrderByTotalPointsDesc()
-        return mapMatchEntitiesToDtos(matches)
+        return mapMatchEntitiesToDtos(userId, matches)
     }
 
     fun getUserMatches(userId: UUID): List<MatchDto> {
         val publicUser = publicUserService.getPublicUser(userId)
         val matches =
-            matchRepository.findTop100ByPlayer1OrModeOrderByCreatedAtDesc(
+            matchRepository.findTop500ByPlayer1OrModeOrderByCreatedAtDesc(
                 publicUser, MatchModeEnum.AUTO
             )
-        return mapMatchEntitiesToDtos(matches)
+        return mapMatchEntitiesToDtos(
+            userId, matches.filter { it.player2.userId == userId || it.player1.userId == userId }
+        )
     }
 
     @RabbitListener(queues = ["gameStatusUpdateQueue"], ackMode = "AUTO")

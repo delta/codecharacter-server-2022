@@ -8,7 +8,7 @@ import java.util.UUID
 @Repository
 interface MatchRepository : MongoRepository<MatchEntity, UUID> {
     fun findTop10ByOrderByTotalPointsDesc(): List<MatchEntity>
-    fun findTop100ByPlayer1OrModeOrderByCreatedAtDesc(
+    fun findTop500ByPlayer1OrModeOrderByCreatedAtDesc(
         player1: PublicUserEntity,
         mode: MatchModeEnum
     ): List<MatchEntity>
