@@ -66,6 +66,7 @@ class AuthService(
         val user = userService.getUserByEmail(email)
         val userEntity: UserEntity
         if (user.isEmpty) {
+            throw CustomException(HttpStatus.BAD_REQUEST, "Registration is closed")
             userEntity = userService.createUserWithOAuth(email, loginType)
         } else {
             userEntity = user.get()

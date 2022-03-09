@@ -4,6 +4,7 @@ import delta.codecharacter.core.UserApi
 import delta.codecharacter.dtos.ActivateUserRequestDto
 import delta.codecharacter.dtos.RatingHistoryDto
 import delta.codecharacter.dtos.RegisterUserRequestDto
+import delta.codecharacter.server.exception.CustomException
 import delta.codecharacter.server.user.rating_history.RatingHistoryService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
@@ -21,6 +22,7 @@ class UserController(
     override fun register(
         @Validated registerUserRequestDto: RegisterUserRequestDto
     ): ResponseEntity<Unit> {
+        throw CustomException(HttpStatus.BAD_REQUEST, "Registration is closed")
         userService.registerUser(registerUserRequestDto)
         return ResponseEntity.status(HttpStatus.CREATED).body(Unit)
     }
