@@ -160,7 +160,7 @@ class MatchService(
         }
     }
 
-    @Scheduled(cron = "0 0 * * * *", zone = "GMT+5:30")
+//    @Scheduled(cron = "0 0 * * * *", zone = "GMT+5:30")
     fun createAutoMatches() {
         logger.info("Starting auto-matches...")
         autoMatchRepository.deleteAll()
