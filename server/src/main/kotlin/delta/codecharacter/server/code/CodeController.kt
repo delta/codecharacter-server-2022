@@ -8,8 +8,10 @@ import delta.codecharacter.dtos.UpdateLatestCodeRequestDto
 import delta.codecharacter.server.code.code_revision.CodeRevisionService
 import delta.codecharacter.server.code.latest_code.LatestCodeService
 import delta.codecharacter.server.code.locked_code.LockedCodeService
+import delta.codecharacter.server.exception.CustomException
 import delta.codecharacter.server.user.UserEntity
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.annotation.Secured
 import org.springframework.security.core.context.SecurityContextHolder
@@ -26,6 +28,7 @@ class CodeController(
     override fun createCodeRevision(
         createCodeRevisionRequestDto: CreateCodeRevisionRequestDto
     ): ResponseEntity<Unit> {
+        throw CustomException(HttpStatus.BAD_REQUEST, "The game has ended!")
         val user = SecurityContextHolder.getContext().authentication.principal as UserEntity
         codeRevisionService.createCodeRevision(user.id, createCodeRevisionRequestDto)
         return ResponseEntity.ok().build()
@@ -47,6 +50,7 @@ class CodeController(
     override fun updateLatestCode(
         updateLatestCodeRequestDto: UpdateLatestCodeRequestDto
     ): ResponseEntity<Unit> {
+        throw CustomException(HttpStatus.BAD_REQUEST, "The game has ended!")
         val user = SecurityContextHolder.getContext().authentication.principal as UserEntity
         latestCodeService.updateLatestCode(user.id, updateLatestCodeRequestDto)
         if (updateLatestCodeRequestDto.lock == true) {

@@ -22,7 +22,7 @@ class UserController(
     override fun register(
         @Validated registerUserRequestDto: RegisterUserRequestDto
     ): ResponseEntity<Unit> {
-        throw CustomException(HttpStatus.BAD_REQUEST, "Registration is closed")
+        throw CustomException(HttpStatus.BAD_REQUEST, "Registration is closed!")
         userService.registerUser(registerUserRequestDto)
         return ResponseEntity.status(HttpStatus.CREATED).body(Unit)
     }
@@ -31,6 +31,7 @@ class UserController(
         userId: UUID,
         activateUserRequestDto: ActivateUserRequestDto
     ): ResponseEntity<Unit> {
+        throw CustomException(HttpStatus.BAD_REQUEST, "The game has ended!")
         userService.activateUser(userId, activateUserRequestDto.token)
         return ResponseEntity.status(HttpStatus.ACCEPTED).body(Unit)
     }

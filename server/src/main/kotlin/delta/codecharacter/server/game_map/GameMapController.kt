@@ -5,11 +5,13 @@ import delta.codecharacter.dtos.CreateMapRevisionRequestDto
 import delta.codecharacter.dtos.GameMapDto
 import delta.codecharacter.dtos.GameMapRevisionDto
 import delta.codecharacter.dtos.UpdateLatestMapRequestDto
+import delta.codecharacter.server.exception.CustomException
 import delta.codecharacter.server.game_map.latest_map.LatestMapService
 import delta.codecharacter.server.game_map.locked_map.LockedMapService
 import delta.codecharacter.server.game_map.map_revision.MapRevisionService
 import delta.codecharacter.server.user.UserEntity
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.annotation.Secured
 import org.springframework.security.core.context.SecurityContextHolder
@@ -26,6 +28,7 @@ class GameMapController(
     override fun createMapRevision(
         createMapRevisionRequestDto: CreateMapRevisionRequestDto
     ): ResponseEntity<Unit> {
+        throw CustomException(HttpStatus.BAD_REQUEST, "The game has ended!")
         val user = SecurityContextHolder.getContext().authentication.principal as UserEntity
         mapRevisionService.createMapRevision(user.id, createMapRevisionRequestDto)
         return ResponseEntity.ok().build()
@@ -47,6 +50,7 @@ class GameMapController(
     override fun updateLatestMap(
         updateLatestMapRequestDto: UpdateLatestMapRequestDto
     ): ResponseEntity<Unit> {
+        throw CustomException(HttpStatus.BAD_REQUEST, "The game has ended!")
         val user = SecurityContextHolder.getContext().authentication.principal as UserEntity
         latestMapService.updateLatestMap(user.id, updateLatestMapRequestDto)
         if (updateLatestMapRequestDto.lock == true) {
