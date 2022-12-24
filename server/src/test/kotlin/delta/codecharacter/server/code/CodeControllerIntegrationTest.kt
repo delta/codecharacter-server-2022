@@ -136,10 +136,9 @@ internal class CodeControllerIntegrationTest(@Autowired val mockMvc: MockMvc) {
                 language = LanguageEnum.CPP,
                 lastSavedAt = Instant.now().truncatedTo(ChronoUnit.MILLIS)
             )
-        mongoTemplate.insert<LatestCodeEntity>(oldCodeEntity)
+        mongoTemplate.insert<LatestCodeEntity> (oldCodeEntity)
 
         val dto = UpdateLatestCodeRequestDto(code = "import sys", language = LanguageDto.PYTHON)
-
         mockMvc
             .post("/user/code/latest") {
                 content = mapper.writeValueAsString(dto)

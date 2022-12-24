@@ -2,7 +2,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 
 plugins {
-    id("org.springframework.boot") version "2.7.6"
+    id("org.springframework.boot") version "3.0.0"
     id("io.spring.dependency-management") version "1.0.11.RELEASE"
     id("org.asciidoctor.convert") version "1.5.8"
     jacoco
@@ -20,6 +20,7 @@ configurations {
     compileOnly {
         extendsFrom(configurations.annotationProcessor.get())
     }
+
 }
 
 repositories {
@@ -29,7 +30,7 @@ repositories {
 val snippetsDir by extra { file("build/generated-snippets") }
 
 dependencies {
-
+    runtimeOnly("org.springframework.boot:spring-boot-properties-migrator")
     implementation("org.springframework.boot:spring-boot-starter-amqp:3.0.0")
     implementation("org.springframework.boot:spring-boot-starter-data-mongodb:3.0.0")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-client:3.0.0")
@@ -48,7 +49,7 @@ dependencies {
     implementation(project(":library"))
     implementation("org.junit.jupiter:junit-jupiter:5.8.2")
     testImplementation("com.ninja-squad:springmockk:4.0.0")
-    developmentOnly("org.springframework.boot:spring-boot-devtools:2.6.3")
+    developmentOnly("org.springframework.boot:spring-boot-devtools:3.0.0")
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor:3.0.0")
     testImplementation("org.springframework.boot:spring-boot-starter-test:3.0.0") {
         exclude(module = "mockito-core")
@@ -56,7 +57,7 @@ dependencies {
     testRuntimeOnly("de.flapdoodle.embed:de.flapdoodle.embed.mongo:4.3.3")
     testImplementation("org.springframework.amqp:spring-rabbit-test:2.4.7")
     testImplementation("org.springframework.restdocs:spring-restdocs-mockmvc:2.0.6.RELEASE")
-    testImplementation("org.springframework.security:spring-security-test:5.5.1")
+    testImplementation("org.springframework.security:spring-security-test:6.0.0")
 }
 
 allOpen {

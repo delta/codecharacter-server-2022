@@ -12,18 +12,14 @@ import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.context.request.WebRequest
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler
-import javax.validation.ConstraintViolationException
+import jakarta.validation.ConstraintViolationException
+import org.springframework.http.HttpStatusCode
 
 @Order(Ordered.HIGHEST_PRECEDENCE)
 @ControllerAdvice
 class RestExceptionHandler : ResponseEntityExceptionHandler() {
 
-    override fun handleHttpMessageNotReadable(
-        ex: HttpMessageNotReadableException,
-        headers: HttpHeaders,
-        status: HttpStatus,
-        request: WebRequest
-    ): ResponseEntity<Any> {
+    override fun handleHttpMessageNotReadable(ex: HttpMessageNotReadableException, headers: HttpHeaders, status: HttpStatusCode, request: WebRequest): ResponseEntity<Any>? {
         val cause = ex.cause
         return if (cause is MissingKotlinParameterException) {
             ResponseEntity.status(HttpStatus.BAD_REQUEST)
@@ -33,12 +29,7 @@ class RestExceptionHandler : ResponseEntityExceptionHandler() {
         }
     }
 
-    override fun handleMethodArgumentNotValid(
-        ex: MethodArgumentNotValidException,
-        headers: HttpHeaders,
-        status: HttpStatus,
-        request: WebRequest
-    ): ResponseEntity<Any> {
+    override fun handleMethodArgumentNotValid(ex: MethodArgumentNotValidException, headers: HttpHeaders, status: HttpStatusCode, request: WebRequest): ResponseEntity<Any>? {
         return if (ex.bindingResult.fieldErrors.isNotEmpty()) {
             val fields = mutableListOf<String>()
             ex.bindingResult.fieldErrors.forEach { fieldError -> fields.add(fieldError.field) }
