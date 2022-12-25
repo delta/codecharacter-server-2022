@@ -50,7 +50,7 @@ class NotificationIntegrationTest(@Autowired val mockMvc: MockMvc) {
 
         stompSession =
             stompClient
-                .connect("ws://localhost:$port/ws", object : StompSessionHandlerAdapter() {})
+                .connectAsync("ws://localhost:$port/ws", object : StompSessionHandlerAdapter() {})
                 .get()
     }
 
