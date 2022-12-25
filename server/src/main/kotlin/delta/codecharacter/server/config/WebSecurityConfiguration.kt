@@ -45,35 +45,36 @@ class WebSecurityConfiguration {
             http.oauth2Login { it ->
                 it.userInfoEndpoint {
                     it.oidcUserService(customOidcUserService)
-                    it.userService (customOAuth2UserService)
+                    it.userService(customOAuth2UserService)
                 }
             }
             http.oauth2Login().successHandler(customOAuth2SuccessHandler)
             http.oauth2Login().failureHandler(customOAuth2FailureHandler)
-            http.authorizeHttpRequests().requestMatchers(HttpMethod.POST,"/**").permitAll()
+            http.authorizeHttpRequests().requestMatchers(HttpMethod.POST, "/**").permitAll()
             http.authorizeHttpRequests().anyRequest().permitAll()
-            if(!corsEnabled){
+            if (!corsEnabled) {
                 http.cors().disable()
             }
             http.authenticationProvider(authenticationProvider())
             http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            http.addFilterBefore(jwtRequestFilter,UsernamePasswordAuthenticationFilter::class.java)
-//            http {
-//                csrf { disable() }
-//                oauth2Login {
-//                    userInfoEndpoint {
-//                        oidcUserService = customOidcUserService
-//                        userService = customOAuth2UserService
-//                    }
-//                    authenticationSuccessHandler = customOAuth2SuccessHandler
-//                    authenticationFailureHandler = customOAuth2FailureHandler
-//                }
-//                authorizeRequests { authorize(HttpMethod.OPTIONS, "/**", permitAll) }
-//                authenticationProvider()
-//                cors { if (!corsEnabled) disable() }
-//                sessionManagement { sessionCreationPolicy = SessionCreationPolicy.STATELESS }
-//                addFilterBefore<UsernamePasswordAuthenticationFilter>(jwtRequestFilter)
-//            }
+            http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter::class.java)
+            //            http {
+            //                csrf { disable() }
+            //                oauth2Login {
+            //                    userInfoEndpoint {
+            //                        oidcUserService = customOidcUserService
+            //                        userService = customOAuth2UserService
+            //                    }
+            //                    authenticationSuccessHandler = customOAuth2SuccessHandler
+            //                    authenticationFailureHandler = customOAuth2FailureHandler
+            //                }
+            //                authorizeRequests { authorize(HttpMethod.OPTIONS, "/**", permitAll) }
+            //                authenticationProvider()
+            //                cors { if (!corsEnabled) disable() }
+            //                sessionManagement { sessionCreationPolicy = SessionCreationPolicy.STATELESS
+            // }
+            //                addFilterBefore<UsernamePasswordAuthenticationFilter>(jwtRequestFilter)
+            //            }
             return http.build()
         }
         return null
