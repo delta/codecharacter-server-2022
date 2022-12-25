@@ -2,6 +2,7 @@ src/main/kotlin/delta/codecharacter/SpringDocConfiguration.kt
 src/main/kotlin/delta/codecharacter/core/AuthApi.kt
 src/main/kotlin/delta/codecharacter/core/CodeApi.kt
 src/main/kotlin/delta/codecharacter/core/CurrentUserApi.kt
+src/main/kotlin/delta/codecharacter/core/DailyChallengesApi.kt
 src/main/kotlin/delta/codecharacter/core/GameApi.kt
 src/main/kotlin/delta/codecharacter/core/LeaderboardApi.kt
 src/main/kotlin/delta/codecharacter/core/MapApi.kt
@@ -10,6 +11,7 @@ src/main/kotlin/delta/codecharacter/core/NotificationApi.kt
 src/main/kotlin/delta/codecharacter/core/UserApi.kt
 src/main/kotlin/delta/codecharacter/dtos/ActivateUserRequestDto.kt
 src/main/kotlin/delta/codecharacter/dtos/AuthStatusResponseDto.kt
+src/main/kotlin/delta/codecharacter/dtos/ChallengeTypeDto.kt
 src/main/kotlin/delta/codecharacter/dtos/CodeDto.kt
 src/main/kotlin/delta/codecharacter/dtos/CodeRevisionDto.kt
 src/main/kotlin/delta/codecharacter/dtos/CompleteProfileRequestDto.kt
@@ -17,6 +19,8 @@ src/main/kotlin/delta/codecharacter/dtos/CreateCodeRevisionRequestDto.kt
 src/main/kotlin/delta/codecharacter/dtos/CreateMapRevisionRequestDto.kt
 src/main/kotlin/delta/codecharacter/dtos/CreateMatchRequestDto.kt
 src/main/kotlin/delta/codecharacter/dtos/CurrentUserProfileDto.kt
+src/main/kotlin/delta/codecharacter/dtos/DailyChallengeGetRequestDto.kt
+src/main/kotlin/delta/codecharacter/dtos/DailyChallengeLeaderBoardResponseDto.kt
 src/main/kotlin/delta/codecharacter/dtos/ForgotPasswordRequestDto.kt
 src/main/kotlin/delta/codecharacter/dtos/GameDto.kt
 src/main/kotlin/delta/codecharacter/dtos/GameMapDto.kt
@@ -34,6 +38,7 @@ src/main/kotlin/delta/codecharacter/dtos/PublicUserDto.kt
 src/main/kotlin/delta/codecharacter/dtos/RatingHistoryDto.kt
 src/main/kotlin/delta/codecharacter/dtos/RegisterUserRequestDto.kt
 src/main/kotlin/delta/codecharacter/dtos/ResetPasswordRequestDto.kt
+src/main/kotlin/delta/codecharacter/dtos/TutorialLevelResponseDto.kt
 src/main/kotlin/delta/codecharacter/dtos/UpdateCurrentUserProfileDto.kt
 src/main/kotlin/delta/codecharacter/dtos/UpdateLatestCodeRequestDto.kt
 src/main/kotlin/delta/codecharacter/dtos/UpdateLatestMapRequestDto.kt

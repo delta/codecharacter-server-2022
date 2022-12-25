@@ -15,8 +15,8 @@ import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
+import org.springframework.security.config.annotation.web.invoke
 import org.springframework.security.config.http.SessionCreationPolicy
-import org.springframework.security.config.web.server.invoke
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
@@ -39,42 +39,21 @@ class WebSecurityConfiguration {
     fun filterChain(http: HttpSecurity?): SecurityFilterChain? {
 
         if (http != null) {
-            http.csrf()?.disable()
-            http.oauth2Login()?.userInfoEndpoint()?.oidcUserService(customOidcUserService)
-            http.oauth2Login()?.userInfoEndpoint()?.userService(customOAuth2UserService)
-            http.oauth2Login { it ->
-                it.userInfoEndpoint {
-                    it.oidcUserService(customOidcUserService)
-                    it.userService(customOAuth2UserService)
+            http.invoke {
+                csrf { disable() }
+                oauth2Login {
+                    userInfoEndpoint {
+                        oidcUserService = customOidcUserService
+                        userService = customOAuth2UserService
+                    }
+                    authenticationSuccessHandler = customOAuth2SuccessHandler
+                    authenticationFailureHandler = customOAuth2FailureHandler
                 }
+                authorizeRequests { authorize(HttpMethod.OPTIONS, "/**", permitAll) }
+                cors { if (!corsEnabled) disable() }
+                sessionManagement { sessionCreationPolicy = SessionCreationPolicy.STATELESS }
+                addFilterBefore<UsernamePasswordAuthenticationFilter>(jwtRequestFilter)
             }
-            http.oauth2Login().successHandler(customOAuth2SuccessHandler)
-            http.oauth2Login().failureHandler(customOAuth2FailureHandler)
-            http.authorizeHttpRequests().requestMatchers(HttpMethod.POST, "/**").permitAll()
-            http.authorizeHttpRequests().anyRequest().permitAll()
-            if (!corsEnabled) {
-                http.cors().disable()
-            }
-            http.authenticationProvider(authenticationProvider())
-            http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter::class.java)
-            //            http {
-            //                csrf { disable() }
-            //                oauth2Login {
-            //                    userInfoEndpoint {
-            //                        oidcUserService = customOidcUserService
-            //                        userService = customOAuth2UserService
-            //                    }
-            //                    authenticationSuccessHandler = customOAuth2SuccessHandler
-            //                    authenticationFailureHandler = customOAuth2FailureHandler
-            //                }
-            //                authorizeRequests { authorize(HttpMethod.OPTIONS, "/**", permitAll) }
-            //                authenticationProvider()
-            //                cors { if (!corsEnabled) disable() }
-            //                sessionManagement { sessionCreationPolicy = SessionCreationPolicy.STATELESS
-            // }
-            //                addFilterBefore<UsernamePasswordAuthenticationFilter>(jwtRequestFilter)
-            //            }
             return http.build()
         }
         return null

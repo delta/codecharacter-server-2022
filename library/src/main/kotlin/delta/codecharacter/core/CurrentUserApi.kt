@@ -8,6 +8,7 @@ package delta.codecharacter.core
 import delta.codecharacter.dtos.CompleteProfileRequestDto
 import delta.codecharacter.dtos.CurrentUserProfileDto
 import delta.codecharacter.dtos.GenericErrorDto
+import delta.codecharacter.dtos.TutorialLevelResponseDto
 import delta.codecharacter.dtos.UpdateCurrentUserProfileDto
 import delta.codecharacter.dtos.UpdatePasswordRequestDto
 import io.swagger.v3.oas.annotations.*
@@ -76,6 +77,27 @@ interface CurrentUserApi {
             produces = ["application/json"]
     )
     fun getCurrentUser(): ResponseEntity<CurrentUserProfileDto> {
+        return ResponseEntity(HttpStatus.NOT_IMPLEMENTED)
+    }
+
+    @Operation(
+        summary = "Get Tutorial level of the user",
+        operationId = "getTutorialLevel",
+        description = "Get the tutorial level of the user",
+        responses = [
+            ApiResponse(responseCode = "200", description = "OK", content = [Content(schema = Schema(implementation = TutorialLevelResponseDto::class))]),
+            ApiResponse(responseCode = "403", description = "Forbidden"),
+            ApiResponse(responseCode = "401", description = "Unauthorized"),
+            ApiResponse(responseCode = "404", description = "Not Found")
+        ],
+        security = [ SecurityRequirement(name = "http-bearer") ]
+    )
+    @RequestMapping(
+            method = [RequestMethod.GET],
+            value = ["/user/tutorial/level"],
+            produces = ["application/json"]
+    )
+    fun getTutorialLevel(): ResponseEntity<TutorialLevelResponseDto> {
         return ResponseEntity(HttpStatus.NOT_IMPLEMENTED)
     }
 

@@ -23,6 +23,7 @@ import io.swagger.v3.oas.annotations.media.Schema
  * @param college 
  * @param avatarId 
  * @param isProfileComplete 
+ * @param isTutorialComplete 
  */
 data class CurrentUserProfileDto(
 
@@ -50,7 +51,10 @@ data class CurrentUserProfileDto(
     @field:JsonProperty("avatarId", required = true) val avatarId: kotlin.Int,
 
     @Schema(example = "null", required = true, description = "")
-    @field:JsonProperty("isProfileComplete", required = true) val isProfileComplete: kotlin.Boolean = false
+    @field:JsonProperty("isProfileComplete", required = true) val isProfileComplete: kotlin.Boolean = false,
+
+    @Schema(example = "null", required = true, description = "")
+    @field:JsonProperty("isTutorialComplete", required = true) val isTutorialComplete: kotlin.Boolean = false
 ) {
 
 }

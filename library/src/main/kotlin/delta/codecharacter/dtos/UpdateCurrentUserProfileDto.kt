@@ -19,6 +19,7 @@ import io.swagger.v3.oas.annotations.media.Schema
  * @param country 
  * @param college 
  * @param avatarId 
+ * @param tutorialLevel 
  */
 data class UpdateCurrentUserProfileDto(
 
@@ -32,7 +33,10 @@ data class UpdateCurrentUserProfileDto(
     @field:JsonProperty("college") val college: kotlin.String? = null,
 
     @Schema(example = "1", description = "")
-    @field:JsonProperty("avatarId") val avatarId: kotlin.Int? = null
+    @field:JsonProperty("avatarId") val avatarId: kotlin.Int? = null,
+
+    @Schema(example = "2", description = "")
+    @field:JsonProperty("tutorialLevel") val tutorialLevel: kotlin.Int? = null
 ) {
 
 }
