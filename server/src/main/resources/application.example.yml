@@ -3,9 +3,6 @@ spring:
     mongodb:
       host: localhost
       auto-index-creation: true
-  mongodb:
-    embedded:
-      version: 5.0.5
   mvc:
     pathmatch:
       matching-strategy: ant_path_matcher

@@ -12,6 +12,10 @@ jobs:
         image: rabbitmq:3-management
         ports:
           - 5672:5672
+      mongodb:
+        image: mongo:latest
+        ports:
+          - 27017:27017
     steps:
       - uses: actions/checkout@v2
       - name: Set up JDK 17

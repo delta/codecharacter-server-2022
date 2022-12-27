@@ -53,7 +53,6 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-test:3.0.0") {
         exclude(module = "mockito-core")
     }
-    testRuntimeOnly("de.flapdoodle.embed:de.flapdoodle.embed.mongo:4.3.3")
     testImplementation("org.springframework.amqp:spring-rabbit-test:2.4.7")
     testImplementation("org.springframework.restdocs:spring-restdocs-mockmvc:2.0.6.RELEASE")
     testImplementation("org.springframework.security:spring-security-test:6.0.0")

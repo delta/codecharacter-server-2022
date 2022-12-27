@@ -48,6 +48,10 @@ jobs:
         image: rabbitmq:3-management
         ports:
           - 5672:5672
+      mongodb:
+        image: mongo:latest
+        ports:
+          - 27017:27017
     steps:
       - uses: actions/checkout@v2
       - name: Set up JDK 17
@@ -62,7 +66,7 @@ jobs:
         with:
           arguments: test
       - name: Upload coverage
-        uses: codecov/codecov-action@v2
+        uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./server/build/reports/jacoco/test/jacocoTestReport.xml
