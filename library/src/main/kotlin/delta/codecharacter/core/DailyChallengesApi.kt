@@ -5,8 +5,8 @@
 */
 package delta.codecharacter.core
 
-import delta.codecharacter.dtos.GenericErrorDto
-import delta.codecharacter.dtos.NotificationDto
+import delta.codecharacter.dtos.DailyChallengeGetRequestDto
+import delta.codecharacter.dtos.DailyChallengeLeaderBoardResponseDto
 import io.swagger.v3.oas.annotations.*
 import io.swagger.v3.oas.annotations.enums.*
 import io.swagger.v3.oas.annotations.media.*
@@ -36,44 +36,47 @@ import kotlin.collections.Map
 
 @Validated
 @RequestMapping("\${api.base-path:}")
-interface NotificationApi {
+interface DailyChallengesApi {
 
     @Operation(
-        summary = "Get all notifications",
-        operationId = "getAllNotifications",
-        description = "Get all notifications",
+        summary = "Get Daily Challenge for the day",
+        operationId = "getDailyChallenge",
+        description = "Get current user challenge for that day",
         responses = [
-            ApiResponse(responseCode = "200", description = "OK", content = [Content(schema = Schema(implementation = NotificationDto::class))])
+            ApiResponse(responseCode = "200", description = "OK", content = [Content(schema = Schema(implementation = DailyChallengeGetRequestDto::class))]),
+            ApiResponse(responseCode = "401", description = "Unauthorized"),
+            ApiResponse(responseCode = "403", description = "Forbidden"),
+            ApiResponse(responseCode = "404", description = "Not found")
         ],
         security = [ SecurityRequirement(name = "http-bearer") ]
     )
     @RequestMapping(
             method = [RequestMethod.GET],
-            value = ["/user/notifications"],
+            value = ["/dc/get"],
             produces = ["application/json"]
     )
-    fun getAllNotifications(): ResponseEntity<List<NotificationDto>> {
+    fun getDailyChallenge(): ResponseEntity<DailyChallengeGetRequestDto> {
         return ResponseEntity(HttpStatus.NOT_IMPLEMENTED)
     }
 
     @Operation(
-        summary = "Save notification read status",
-        operationId = "saveNotificationReadStatus",
-        description = "Save notification read status",
+        summary = "Get Daily Challenges Leaderboard",
+        operationId = "getDailyChallengeLeaderBoard",
+        description = "Get Leaderboard for daily challenges",
         responses = [
-            ApiResponse(responseCode = "204", description = "No Content"),
-            ApiResponse(responseCode = "400", description = "Bad Request", content = [Content(schema = Schema(implementation = GenericErrorDto::class))]),
-            ApiResponse(responseCode = "401", description = "Unauthorized")
+            ApiResponse(responseCode = "200", description = "OK", content = [Content(schema = Schema(implementation = DailyChallengeLeaderBoardResponseDto::class))]),
+            ApiResponse(responseCode = "401", description = "Unauthorized"),
+            ApiResponse(responseCode = "403", description = "Forbidden"),
+            ApiResponse(responseCode = "404", description = "Not Found")
         ],
         security = [ SecurityRequirement(name = "http-bearer") ]
     )
     @RequestMapping(
-            method = [RequestMethod.PUT],
-            value = ["/user/notifications/{notificationId}/read"],
-            produces = ["application/json"],
-            consumes = ["application/json"]
+            method = [RequestMethod.GET],
+            value = ["/dc/leaderboard"],
+            produces = ["application/json"]
     )
-    fun saveNotificationReadStatus(@Parameter(description = "ID of the notification", required = true) @PathVariable("notificationId") notificationId: java.util.UUID,@Parameter(description = "", required = true) @Valid @RequestBody body: kotlin.Boolean): ResponseEntity<Unit> {
+    fun getDailyChallengeLeaderBoard(): ResponseEntity<List<DailyChallengeLeaderBoardResponseDto>> {
         return ResponseEntity(HttpStatus.NOT_IMPLEMENTED)
     }
 }

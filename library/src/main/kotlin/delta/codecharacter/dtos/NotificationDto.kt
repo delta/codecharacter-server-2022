@@ -1,7 +1,17 @@
 package delta.codecharacter.dtos
 
+import java.util.Objects
 import com.fasterxml.jackson.annotation.JsonProperty
-import io.swagger.annotations.ApiModelProperty
+import jakarta.validation.constraints.DecimalMax
+import jakarta.validation.constraints.DecimalMin
+import jakarta.validation.constraints.Email
+import jakarta.validation.constraints.Max
+import jakarta.validation.constraints.Min
+import jakarta.validation.constraints.NotNull
+import jakarta.validation.constraints.Pattern
+import jakarta.validation.constraints.Size
+import jakarta.validation.Valid
+import io.swagger.v3.oas.annotations.media.Schema
 
 /**
  * Notification model
@@ -13,35 +23,21 @@ import io.swagger.annotations.ApiModelProperty
  */
 data class NotificationDto(
 
-    @ApiModelProperty(
-        example = "123e4567-e89b-12d3-a456-426614174000",
-        required = true,
-        value = ""
-    )
+    @Schema(example = "123e4567-e89b-12d3-a456-426614174000", required = true, description = "")
     @field:JsonProperty("id", required = true) val id: java.util.UUID,
 
-    @ApiModelProperty(
-        example = "Test notification",
-        required = true,
-        value = ""
-    )
-    @field:JsonProperty("title", required = true) val title: String,
+    @Schema(example = "Test notification", required = true, description = "")
+    @field:JsonProperty("title", required = true) val title: kotlin.String,
 
-    @ApiModelProperty(example = "Test", required = true, value = "")
-    @field:JsonProperty("content", required = true) val content: String,
+    @Schema(example = "Test", required = true, description = "")
+    @field:JsonProperty("content", required = true) val content: kotlin.String,
 
-    @ApiModelProperty(
-        required = true,
-        value = ""
-    )
-    @field:JsonProperty(
-        "createdAt",
-        required = true
-    ) val createdAt: java.time.Instant,
+    @Schema(example = "2021-01-01T00:00Z", required = true, description = "")
+    @field:JsonProperty("createdAt", required = true) val createdAt: java.time.Instant,
 
-    @ApiModelProperty(example = "null", required = true, value = "")
-    @field:JsonProperty(
-        "read",
-        required = true
-    ) val read: Boolean = false
-)
+    @Schema(example = "null", required = true, description = "")
+    @field:JsonProperty("read", required = true) val read: kotlin.Boolean = false
+) {
+
+}
+

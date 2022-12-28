@@ -3,9 +3,6 @@ spring:
     mongodb:
       host: db
       auto-index-creation: true
-  mongodb:
-    embedded:
-      version: 5.0.5
   mvc:
     pathmatch:
       matching-strategy: ant_path_matcher
@@ -29,6 +26,11 @@ spring:
             client-id: your-github-client-id
             client-secret: your-github-client-secret
             scope: user:email
+de:
+  flapdoodle:
+    mongodb:
+      embedded:
+        version: 5.0.5
 
 debug: false
 

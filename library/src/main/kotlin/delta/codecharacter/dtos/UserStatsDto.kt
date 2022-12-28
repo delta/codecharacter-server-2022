@@ -1,7 +1,17 @@
 package delta.codecharacter.dtos
 
+import java.util.Objects
 import com.fasterxml.jackson.annotation.JsonProperty
-import io.swagger.annotations.ApiModelProperty
+import jakarta.validation.constraints.DecimalMax
+import jakarta.validation.constraints.DecimalMin
+import jakarta.validation.constraints.Email
+import jakarta.validation.constraints.Max
+import jakarta.validation.constraints.Min
+import jakarta.validation.constraints.NotNull
+import jakarta.validation.constraints.Pattern
+import jakarta.validation.constraints.Size
+import jakarta.validation.Valid
+import io.swagger.v3.oas.annotations.media.Schema
 
 /**
  * User stats model
@@ -12,18 +22,18 @@ import io.swagger.annotations.ApiModelProperty
  */
 data class UserStatsDto(
 
-    @ApiModelProperty(example = "1000", required = true, value = "")
-    @field:JsonProperty(
-        "rating",
-        required = true
-    ) val rating: java.math.BigDecimal,
+    @Schema(example = "1000", required = true, description = "")
+    @field:JsonProperty("rating", required = true) val rating: java.math.BigDecimal,
 
-    @ApiModelProperty(example = "1", required = true, value = "")
-    @field:JsonProperty("wins", required = true) val wins: Int = 0,
+    @Schema(example = "1", required = true, description = "")
+    @field:JsonProperty("wins", required = true) val wins: kotlin.Int = 0,
 
-    @ApiModelProperty(example = "1", required = true, value = "")
-    @field:JsonProperty("losses", required = true) val losses: Int,
+    @Schema(example = "1", required = true, description = "")
+    @field:JsonProperty("losses", required = true) val losses: kotlin.Int,
 
-    @ApiModelProperty(example = "1", required = true, value = "")
-    @field:JsonProperty("ties", required = true) val ties: Int
-)
+    @Schema(example = "1", required = true, description = "")
+    @field:JsonProperty("ties", required = true) val ties: kotlin.Int
+) {
+
+}
+

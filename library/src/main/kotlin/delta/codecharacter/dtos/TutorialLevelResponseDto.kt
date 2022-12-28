@@ -1,7 +1,6 @@
 package delta.codecharacter.dtos
 
 import java.util.Objects
-import com.fasterxml.jackson.annotation.JsonValue
 import com.fasterxml.jackson.annotation.JsonProperty
 import jakarta.validation.constraints.DecimalMax
 import jakarta.validation.constraints.DecimalMin
@@ -15,13 +14,14 @@ import jakarta.validation.Valid
 import io.swagger.v3.oas.annotations.media.Schema
 
 /**
-* Match Mode
-* Values: SELF,MANUAL,AUTO
-*/
-enum class MatchModeDto(val value: kotlin.String) {
+ * Get the tutorial level of the current user
+ * @param level
+ */
+data class TutorialLevelResponseDto(
 
-    @JsonProperty("SELF") SELF("SELF"),
-    @JsonProperty("MANUAL") MANUAL("MANUAL"),
-    @JsonProperty("AUTO") AUTO("AUTO")
+    @Schema(example = "2", description = "")
+    @field:JsonProperty("level") val level: kotlin.Int? = null
+) {
+
 }
 

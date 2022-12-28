@@ -1,7 +1,6 @@
 package delta.codecharacter.dtos
 
 import java.util.Objects
-import com.fasterxml.jackson.annotation.JsonValue
 import com.fasterxml.jackson.annotation.JsonProperty
 import jakarta.validation.constraints.DecimalMax
 import jakarta.validation.constraints.DecimalMin
@@ -15,13 +14,18 @@ import jakarta.validation.Valid
 import io.swagger.v3.oas.annotations.media.Schema
 
 /**
-* Match Mode
-* Values: SELF,MANUAL,AUTO
-*/
-enum class MatchModeDto(val value: kotlin.String) {
+ * Response model for daily challenge leaderboard
+ * @param userName
+ * @param score
+ */
+data class DailyChallengeLeaderBoardResponseDto(
 
-    @JsonProperty("SELF") SELF("SELF"),
-    @JsonProperty("MANUAL") MANUAL("MANUAL"),
-    @JsonProperty("AUTO") AUTO("AUTO")
+    @Schema(example = "TestUser", description = "")
+    @field:JsonProperty("userName") val userName: kotlin.String? = null,
+
+    @Schema(example = "1500.0", description = "")
+    @field:JsonProperty("score") val score: kotlin.String? = null
+) {
+
 }
 

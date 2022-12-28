@@ -3,6 +3,8 @@ package delta.codecharacter.server.auth.oauth2
 import delta.codecharacter.server.auth.AuthService
 import delta.codecharacter.server.exception.CustomException
 import delta.codecharacter.server.user.LoginType
+import jakarta.servlet.http.HttpServletRequest
+import jakarta.servlet.http.HttpServletResponse
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -16,8 +18,6 @@ import java.time.Instant
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
-import javax.servlet.http.HttpServletRequest
-import javax.servlet.http.HttpServletResponse
 
 @Component
 class CustomOAuth2SuccessHandler(@Lazy @Autowired private val authService: AuthService) :

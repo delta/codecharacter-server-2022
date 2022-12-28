@@ -1,7 +1,17 @@
 package delta.codecharacter.dtos
 
+import java.util.Objects
 import com.fasterxml.jackson.annotation.JsonProperty
-import io.swagger.annotations.ApiModelProperty
+import jakarta.validation.constraints.DecimalMax
+import jakarta.validation.constraints.DecimalMin
+import jakarta.validation.constraints.Email
+import jakarta.validation.constraints.Max
+import jakarta.validation.constraints.Min
+import jakarta.validation.constraints.NotNull
+import jakarta.validation.constraints.Pattern
+import jakarta.validation.constraints.Size
+import jakarta.validation.Valid
+import io.swagger.v3.oas.annotations.media.Schema
 
 /**
  * Login response with user token
@@ -9,10 +19,9 @@ import io.swagger.annotations.ApiModelProperty
  */
 data class PasswordLoginResponseDto(
 
-    @ApiModelProperty(
-        example = "test-token",
-        required = true,
-        value = "Bearer token"
-    )
-    @field:JsonProperty("token", required = true) val token: String
-)
+    @Schema(example = "test-token", required = true, description = "Bearer token")
+    @field:JsonProperty("token", required = true) val token: kotlin.String
+) {
+
+}
+

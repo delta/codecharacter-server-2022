@@ -15,13 +15,12 @@ import jakarta.validation.Valid
 import io.swagger.v3.oas.annotations.media.Schema
 
 /**
-* Match Mode
-* Values: SELF,MANUAL,AUTO
+*
+* Values: CODE,MAP
 */
-enum class MatchModeDto(val value: kotlin.String) {
+enum class ChallengeTypeDto(val value: kotlin.String) {
 
-    @JsonProperty("SELF") SELF("SELF"),
-    @JsonProperty("MANUAL") MANUAL("MANUAL"),
-    @JsonProperty("AUTO") AUTO("AUTO")
+    @JsonProperty("CODE") CODE("CODE"),
+    @JsonProperty("MAP") MAP("MAP")
 }
 

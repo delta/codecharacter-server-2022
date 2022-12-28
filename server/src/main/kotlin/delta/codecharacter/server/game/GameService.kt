@@ -56,7 +56,6 @@ class GameService(
     fun updateGameStatus(gameStatusUpdateJson: String): GameEntity {
         val gameStatusUpdateEntity =
             mapper.readValue(gameStatusUpdateJson, GameStatusUpdateEntity::class.java)
-
         val oldGameEntity =
             gameRepository.findById(gameStatusUpdateEntity.gameId).orElseThrow {
                 throw CustomException(HttpStatus.NOT_FOUND, "Game not found")

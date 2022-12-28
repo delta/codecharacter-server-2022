@@ -529,6 +529,7 @@ paths:
                     college: NITT
                     avatarId: 1
                     isProfileComplete: true
+                    isTutorialComplete: true
         '401':
           description: Unauthorized
       operationId: getCurrentUser
@@ -564,6 +565,7 @@ paths:
                   name: Test User Mofified
                   country: IN
                   college: NIT Trichy
+                  tutorialLevel: 1
       tags:
         - current-user
   /user/complete-profile:
@@ -629,6 +631,30 @@ paths:
                   oldPassword: Pa$$w0rd
                   password: Pa$$w0rd1
                   passwordConfirmation: Pa$$w0rd1
+  /user/tutorial/level:
+    get:
+      summary: Get Tutorial level of the user
+      description: Get the tutorial level of the user
+      operationId: getTutorialLevel
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TutorialLevelResponse'
+              examples:
+                 Example:
+                   value:
+                     level: 2
+        403:
+          description: Forbidden
+        401:
+          description: Unauthorized
+        404:
+          description: Not Found
+      tags:
+        - current-user
   /user/code/latest:
     get:
       summary: Get latest code
@@ -1064,6 +1090,7 @@ paths:
                   country: IN
                   college: NITT
                   avatarId: 0
+                  recaptchaCode: 03AD1IbLAGl_UdwYP3-AeibnfJgXy_g3cNr_rhkBBh4zalD9GEXAR2xCcUGi7WlxFgOjYlpbRpZFTJJDVugJF-H4pBl32DU619cYHplp_ReGiOokgvz8DwiRLIZBvg1eu2e77jihWQPndoWU_WOTKrYVq1mzBcdPUfJ3PEMCo-eGvoyRaNvRWE0JYBSBgDfwFBaw8RmxaqiS84or-_G7-TDiifFYpcNFiIolIjGi9DkbMXivkjiIoEomAz6NUHg0alrk0C5_p1maoErBmpwLGwlAgKL_sa-ZAzHb89OprdVI8BXtN0CATBgwYO6u_zqrK5N9wDQyh-OmtFh5RXkEzmkASls33UYcJrtMfeFU-b9N-u-Je6NXVfkX49gAGan3k-GqkgcFKHowc5Cwym9tlGLrfiBtqKLIADw1UX4BCbIx9BbHlesoKEubr7MoVZCDv3VfctSTMXG-oH5IbDRQhez4E6JHR4Uv0lWyHKROv7wdxqXauz5PBlUlE11BdffXU5NEssJkM4Tk3zg5k6ddkju8DU2keqXodnzXVTBIXC6zxriA8IHaS_KFBtazAYZ6oac3-5Y2VMwli3XaADBCCVJzXC0GTa1jeuZQ
         description: ''
       security: []
   '/users/{userId}/activate':
@@ -1128,6 +1155,49 @@ paths:
           description: Not Found
       operationId: getRatingHistory
       description: Get user rating history
+
+  '/dc/get':
+    get:
+      summary: Get Daily Challenge for the day
+      description: Get current user challenge for that day
+      operationId: getDailyChallenge
+      tags:
+        - Daily Challenges
+      responses:
+        200:
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DailyChallengeGetRequest'
+        401:
+          description: Unauthorized
+        403:
+          description: Forbidden
+        404:
+          description: Not found
+  '/dc/leaderboard':
+    get:
+      summary: Get Daily Challenges Leaderboard
+      description: Get Leaderboard for daily challenges
+      operationId: getDailyChallengeLeaderBoard
+      tags:
+        - Daily Challenges
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/DailyChallengeLeaderBoardResponse'
+        '401':
+          description: Unauthorized
+        '403':
+          description: Forbidden
+        '404':
+          description: Not Found
 components:
   schemas:
     PasswordLoginRequest:
@@ -1516,6 +1586,9 @@ components:
         isProfileComplete:
           type: boolean
           default: false
+        isTutorialComplete:
+          type: boolean
+          default: false
       required:
         - id
         - username
@@ -1525,6 +1598,7 @@ components:
         - college
         - avatarId
         - isProfileComplete
+        - isTutorialComplete
     UpdateCurrentUserProfile:
       title: UpdateCurrentUserProfile
       type: object
@@ -1545,6 +1619,10 @@ components:
         avatarId:
           type: integer
           example: 1
+          nullable: true
+        tutorialLevel:
+          type: integer
+          example: 2
           nullable: true
     CompleteProfileRequest:
       title: CompleteProfileRequest
@@ -1609,6 +1687,9 @@ components:
         avatarId:
           type: integer
           example: 1
+        recaptchaCode:
+          type: string
+          example: 03AD1IbLAGl_UdwYP3-AeibnfJgXy_g3cNr_rhkBBh4zalD9GEXAR2xCcUGi7WlxFgOjYlpbRpZFTJJDVugJF-H4pBl32DU619cYHplp_ReGiOokgvz8DwiRLIZBvg1eu2e77jihWQPndoWU_WOTKrYVq1mzBcdPUfJ3PEMCo-eGvoyRaNvRWE0JYBSBgDfwFBaw8RmxaqiS84or-_G7-TDiifFYpcNFiIolIjGi9DkbMXivkjiIoEomAz6NUHg0alrk0C5_p1maoErBmpwLGwlAgKL_sa-ZAzHb89OprdVI8BXtN0CATBgwYO6u_zqrK5N9wDQyh-OmtFh5RXkEzmkASls33UYcJrtMfeFU-b9N-u-Je6NXVfkX49gAGan3k-GqkgcFKHowc5Cwym9tlGLrfiBtqKLIADw1UX4BCbIx9BbHlesoKEubr7MoVZCDv3VfctSTMXG-oH5IbDRQhez4E6JHR4Uv0lWyHKROv7wdxqXauz5PBlUlE11BdffXU5NEssJkM4Tk3zg5k6ddkju8DU2keqXodnzXVTBIXC6zxriA8IHaS_KFBtazAYZ6oac3-5Y2VMwli3XaADBCCVJzXC0GTa1jeuZQ
       required:
         - username
         - name
@@ -1618,6 +1699,7 @@ components:
         - country
         - college
         - avatarId
+        - recaptchaCode
     Match:
       description: Match model
       type: object
@@ -1718,6 +1800,42 @@ components:
         - user
         - stats
       description: Leaderboard entry model
+    DailyChallengeGetRequest:
+      title: Get daily challenge
+      description: Get current-user daily challenge
+      type: object
+      properties:
+        challName:
+          type: string
+          example: Daily Challenge 1
+        chall:
+          type: string
+          example: 'print("hello world");'
+        challType:
+          $ref: '#/components/schemas/ChallengeType'
+      required:
+        - challName
+        - chall
+        - challType
+    DailyChallengeLeaderBoardResponse:
+      title: DailyChallengeLeaderboardResponse
+      description: Response model for daily challenge leaderboard
+      type: object
+      properties:
+        userName:
+          type: string
+          example: TestUser
+        score:
+          type: string
+          example: 1500.0
+    TutorialLevelResponse:
+      title: TutorialLevelResponse
+      description: Get the tutorial level of the current user
+      type: object
+      properties:
+        level:
+          type: integer
+          example: 2
     GenericError:
       title: GenericError
       type: object
@@ -1771,6 +1889,12 @@ components:
             - AUTHENTICATED
             - PROFILE_INCOMPLETE
             - ACTIVATION_PENDING
+    ChallengeType:
+      title: DailyChallengeTypes
+      type: string
+      enum:
+        - CODE
+        - MAP
   securitySchemes:
     oauth2-google:
       type: oauth2
