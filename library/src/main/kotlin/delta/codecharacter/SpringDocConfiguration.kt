@@ -31,7 +31,7 @@ class SpringDocConfiguration {
                         License()
                             .name("MIT")
                                                 )
-                    .version("2022.0.1")
+                    .version("2023.0.1")
             )
             .components(
                 Components()
