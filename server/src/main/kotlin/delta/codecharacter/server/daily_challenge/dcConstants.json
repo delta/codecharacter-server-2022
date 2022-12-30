@@ -1,122 +1,62 @@
 [
   {
-    "UUID": "45fbb467-25f3-4fc4-9e1c-0473245af7ef",
-    "name": "Esse labore occaecat labore anim adipisicing aliqua non enim commodo cillum ipsum reprehenderit ipsum.",
-    "type": "CODE",
-    "description": "Laboris ea enim dolor et sint officia pariatur deserunt culpa cillum.",
-    "challenge": {
-      "code": "Dolor nisi nisi amet ex nostrud id.",
-      "maxAirDefenses": 2,
-      "maxLandDefenses": 9,
-      "destruction": "30%"
-    }
+    "UUID": "97bc49a1-857e-403f-9290-12e70b90e56d",
+    "challName": "Ex eiusmod voluptate eu laborum do.",
+    "challType": "MAP",
+    "chall": "Do cupidatat ea officia non ullamco cupidatat velit laboris."
   },
   {
-    "UUID": "3a735c9b-ea16-4341-9fdd-5b3e7feed9aa",
-    "name": "Nulla pariatur proident et officia do consequat tempor.",
-    "type": "CODE",
-    "description": "Fugiat velit in sint sint Lorem.",
-    "challenge": {
-      "code": "Magna quis est excepteur consectetur anim laboris in proident ullamco consequat.",
-      "maxAirDefenses": 3,
-      "maxLandDefenses": 9,
-      "destruction": "26%"
-    }
+    "UUID": "29963c40-7557-4033-9ed5-25e5a4337f3b",
+    "challName": "Eu commodo nisi id mollit ea in laboris.",
+    "challType": "MAP",
+    "chall": "Amet aliqua cillum id incididunt reprehenderit laboris sit sunt quis eu id duis commodo."
   },
   {
-    "UUID": "27227eff-6bda-48ea-a447-69b565faecd0",
-    "name": "Sint qui nulla reprehenderit adipisicing.",
-    "type": "CODE",
-    "description": "Est cupidatat dolor est minim et.",
-    "challenge": {
-      "code": "Eiusmod esse labore ut ut duis culpa dolor cupidatat ut magna duis incididunt consequat ipsum.",
-      "maxAirDefenses": 3,
-      "maxLandDefenses": 9,
-      "destruction": "11%"
-    }
+    "UUID": "121242cf-f7f8-4bb3-83e3-f7253aa8352c",
+    "challName": "Eiusmod tempor Lorem ullamco cupidatat incididunt.",
+    "challType": "CODE",
+    "chall": "Ad sunt labore amet ad veniam anim."
   },
   {
-    "UUID": "daf80f9e-0cdb-45a3-9ce1-e1ffa7d9e712",
-    "name": "Consequat incididunt anim sit sit.",
-    "type": "MAP",
-    "description": "Aute non in ad occaecat nulla pariatur aliquip consectetur.",
-    "challenge": {
-      "map": "Cillum commodo tempor culpa nostrud magna reprehenderit do esse eu excepteur velit laboris et dolore.",
-      "maxCoinsToUse": 273,
-      "defensesToBeDestroyed": 5,
-      "destruction": "61%"
-    }
+    "UUID": "85fd5a72-bc39-47c6-aa45-64d1b13c1352",
+    "challName": "Enim laborum id proident ipsum reprehenderit dolore sint enim commodo nulla cupidatat.",
+    "challType": "MAP",
+    "chall": "Sunt eu nisi occaecat enim quis in irure ex pariatur."
   },
   {
-    "UUID": "55644105-bc3c-492e-9780-b80342257631",
-    "name": "Aute magna culpa cupidatat sit pariatur culpa tempor sunt laborum aute laboris.",
-    "type": "CODE",
-    "description": "Cupidatat duis tempor ullamco qui minim.",
-    "challenge": {
-      "code": "Culpa commodo in cillum aute irure anim elit incididunt proident minim ipsum irure veniam irure.",
-      "maxAirDefenses": 2,
-      "maxLandDefenses": 10,
-      "destruction": "16%"
-    }
+    "UUID": "922b16b9-80ac-437f-864d-28ca1a277a94",
+    "challName": "Qui sit Lorem cupidatat id qui velit culpa.",
+    "challType": "MAP",
+    "chall": "Pariatur amet velit culpa elit sint consequat nostrud."
   },
   {
-    "UUID": "659baee8-4669-449b-a087-3611ddefbc95",
-    "name": "Ut reprehenderit do esse mollit mollit ipsum magna eu eu mollit esse.",
-    "type": "MAP",
-    "description": "Mollit quis elit quis duis exercitation incididunt aliqua et dolor occaecat.",
-    "challenge": {
-      "map": "Non deserunt tempor velit veniam ullamco consectetur officia velit in velit do voluptate aliquip.",
-      "maxCoinsToUse": 289,
-      "defensesToBeDestroyed": 5,
-      "destruction": "63%"
-    }
+    "UUID": "4a04c5f6-8ef9-4327-9a3f-3575bc41333c",
+    "challName": "Laboris cillum consectetur esse in cupidatat laboris ut.",
+    "challType": "CODE",
+    "chall": "Irure adipisicing excepteur do irure dolore exercitation."
   },
   {
-    "UUID": "1d442707-84ab-4fc8-8d5e-b0c5598fefec",
-    "name": "In dolore quis veniam commodo dolor laborum.",
-    "type": "MAP",
-    "description": "Aliqua ea eiusmod aliquip enim anim exercitation excepteur.",
-    "challenge": {
-      "map": "Id sint reprehenderit commodo eu reprehenderit aute culpa.",
-      "maxCoinsToUse": 239,
-      "defensesToBeDestroyed": 4,
-      "destruction": "65%"
-    }
+    "UUID": "01f6ac94-8312-43f6-8b49-095cf660bc9c",
+    "challName": "Aliqua duis aute ullamco aute adipisicing elit dolor anim ex incididunt et sunt ex id.",
+    "challType": "CODE",
+    "chall": "Sint cupidatat do cupidatat deserunt cupidatat elit esse eu."
   },
   {
-    "UUID": "a37c6d10-2595-464b-88cd-aad5c953ecc5",
-    "name": "Amet ea aliquip officia sit elit anim id esse do ad sit in.",
-    "type": "MAP",
-    "description": "Ut deserunt esse sunt dolore dolor ea veniam Lorem.",
-    "challenge": {
-      "map": "Cupidatat amet deserunt in ipsum reprehenderit officia adipisicing consequat sint dolore duis.",
-      "maxCoinsToUse": 260,
-      "defensesToBeDestroyed": 3,
-      "destruction": "33%"
-    }
+    "UUID": "6bb56099-22ae-44e3-b060-5e9513db469b",
+    "challName": "Officia aliqua culpa reprehenderit eiusmod elit commodo ipsum est magna nisi magna voluptate.",
+    "challType": "CODE",
+    "chall": "Qui labore enim ipsum tempor sunt."
   },
   {
-    "UUID": "5b17aa90-927b-4cdf-bc4e-f240af920eec",
-    "name": "Deserunt ad voluptate labore Lorem excepteur excepteur ullamco cupidatat minim adipisicing consequat qui eu commodo.",
-    "type": "CODE",
-    "description": "Nostrud excepteur amet minim amet est duis ad reprehenderit velit ullamco.",
-    "challenge": {
-      "code": "Elit quis Lorem ut sit consectetur enim consectetur laborum ex elit reprehenderit ipsum.",
-      "maxAirDefenses": 2,
-      "maxLandDefenses": 9,
-      "destruction": "15%"
-    }
+    "UUID": "a06fc971-ee92-4091-af75-c96d0a88721c",
+    "challName": "Nulla magna officia non esse adipisicing consequat dolor minim nulla laboris qui non minim.",
+    "challType": "CODE",
+    "chall": "Nulla officia non nulla adipisicing laboris ut ut elit minim officia pariatur anim laborum."
   },
   {
-    "UUID": "c3c49a34-ae22-49a5-b71d-bcec3f6a1e3a",
-    "name": "Culpa eu adipisicing proident anim nulla nulla ex occaecat officia.",
-    "type": "CODE",
-    "description": "Irure laboris do esse occaecat ad enim aute culpa ut sit amet et.",
-    "challenge": {
-      "code": "Quis commodo commodo esse in enim aliquip quis fugiat officia pariatur aliqua laboris.",
-      "maxAirDefenses": 2,
-      "maxLandDefenses": 9,
-      "destruction": "18%"
-    }
+    "UUID": "1dd47ff9-e766-4678-a403-48967ac76c5b",
+    "challName": "Dolor cupidatat sit Lorem exercitation sit cillum dolor eiusmod in.",
+    "challType": "MAP",
+    "chall": "Aute sunt et est reprehenderit incididunt aute id Lorem."
   }
 ]

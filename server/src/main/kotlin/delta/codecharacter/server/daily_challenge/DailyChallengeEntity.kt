@@ -1,18 +1,14 @@
-package delta.codecharacter.server.game
+package delta.codecharacter.server.daily_challenge
 
-import delta.codecharacter.server.daily_challenge.DailyChallenge
-import delta.codecharacter.server.daily_challenge.DailyChallengeType
+import delta.codecharacter.dtos.ChallengeTypeDto
+import delta.codecharacter.dtos.DailyChallengeGetRequestDto
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
-import java.util.Date
 import java.util.UUID
 
-@Document(collection = "daily_challenges") // change it later
+@Document(collection = "daily_challenges")
 data class DailyChallengeEntity(
-        @Id val id: UUID,
-        val name: String,
-        val type: DailyChallengeType,
-        val description: String,
-        val date: Date,
-        val challenge: DailyChallenge
+        val challName: String,
+        val challType: ChallengeTypeDto,
+        val chall: String,
 )
