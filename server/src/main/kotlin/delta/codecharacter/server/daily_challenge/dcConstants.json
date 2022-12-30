@@ -1,0 +1,122 @@
+[
+  {
+    "UUID": "45fbb467-25f3-4fc4-9e1c-0473245af7ef",
+    "name": "Esse labore occaecat labore anim adipisicing aliqua non enim commodo cillum ipsum reprehenderit ipsum.",
+    "type": "CODE",
+    "description": "Laboris ea enim dolor et sint officia pariatur deserunt culpa cillum.",
+    "challenge": {
+      "code": "Dolor nisi nisi amet ex nostrud id.",
+      "maxAirDefenses": 2,
+      "maxLandDefenses": 9,
+      "destruction": "30%"
+    }
+  },
+  {
+    "UUID": "3a735c9b-ea16-4341-9fdd-5b3e7feed9aa",
+    "name": "Nulla pariatur proident et officia do consequat tempor.",
+    "type": "CODE",
+    "description": "Fugiat velit in sint sint Lorem.",
+    "challenge": {
+      "code": "Magna quis est excepteur consectetur anim laboris in proident ullamco consequat.",
+      "maxAirDefenses": 3,
+      "maxLandDefenses": 9,
+      "destruction": "26%"
+    }
+  },
+  {
+    "UUID": "27227eff-6bda-48ea-a447-69b565faecd0",
+    "name": "Sint qui nulla reprehenderit adipisicing.",
+    "type": "CODE",
+    "description": "Est cupidatat dolor est minim et.",
+    "challenge": {
+      "code": "Eiusmod esse labore ut ut duis culpa dolor cupidatat ut magna duis incididunt consequat ipsum.",
+      "maxAirDefenses": 3,
+      "maxLandDefenses": 9,
+      "destruction": "11%"
+    }
+  },
+  {
+    "UUID": "daf80f9e-0cdb-45a3-9ce1-e1ffa7d9e712",
+    "name": "Consequat incididunt anim sit sit.",
+    "type": "MAP",
+    "description": "Aute non in ad occaecat nulla pariatur aliquip consectetur.",
+    "challenge": {
+      "map": "Cillum commodo tempor culpa nostrud magna reprehenderit do esse eu excepteur velit laboris et dolore.",
+      "maxCoinsToUse": 273,
+      "defensesToBeDestroyed": 5,
+      "destruction": "61%"
+    }
+  },
+  {
+    "UUID": "55644105-bc3c-492e-9780-b80342257631",
+    "name": "Aute magna culpa cupidatat sit pariatur culpa tempor sunt laborum aute laboris.",
+    "type": "CODE",
+    "description": "Cupidatat duis tempor ullamco qui minim.",
+    "challenge": {
+      "code": "Culpa commodo in cillum aute irure anim elit incididunt proident minim ipsum irure veniam irure.",
+      "maxAirDefenses": 2,
+      "maxLandDefenses": 10,
+      "destruction": "16%"
+    }
+  },
+  {
+    "UUID": "659baee8-4669-449b-a087-3611ddefbc95",
+    "name": "Ut reprehenderit do esse mollit mollit ipsum magna eu eu mollit esse.",
+    "type": "MAP",
+    "description": "Mollit quis elit quis duis exercitation incididunt aliqua et dolor occaecat.",
+    "challenge": {
+      "map": "Non deserunt tempor velit veniam ullamco consectetur officia velit in velit do voluptate aliquip.",
+      "maxCoinsToUse": 289,
+      "defensesToBeDestroyed": 5,
+      "destruction": "63%"
+    }
+  },
+  {
+    "UUID": "1d442707-84ab-4fc8-8d5e-b0c5598fefec",
+    "name": "In dolore quis veniam commodo dolor laborum.",
+    "type": "MAP",
+    "description": "Aliqua ea eiusmod aliquip enim anim exercitation excepteur.",
+    "challenge": {
+      "map": "Id sint reprehenderit commodo eu reprehenderit aute culpa.",
+      "maxCoinsToUse": 239,
+      "defensesToBeDestroyed": 4,
+      "destruction": "65%"
+    }
+  },
+  {
+    "UUID": "a37c6d10-2595-464b-88cd-aad5c953ecc5",
+    "name": "Amet ea aliquip officia sit elit anim id esse do ad sit in.",
+    "type": "MAP",
+    "description": "Ut deserunt esse sunt dolore dolor ea veniam Lorem.",
+    "challenge": {
+      "map": "Cupidatat amet deserunt in ipsum reprehenderit officia adipisicing consequat sint dolore duis.",
+      "maxCoinsToUse": 260,
+      "defensesToBeDestroyed": 3,
+      "destruction": "33%"
+    }
+  },
+  {
+    "UUID": "5b17aa90-927b-4cdf-bc4e-f240af920eec",
+    "name": "Deserunt ad voluptate labore Lorem excepteur excepteur ullamco cupidatat minim adipisicing consequat qui eu commodo.",
+    "type": "CODE",
+    "description": "Nostrud excepteur amet minim amet est duis ad reprehenderit velit ullamco.",
+    "challenge": {
+      "code": "Elit quis Lorem ut sit consectetur enim consectetur laborum ex elit reprehenderit ipsum.",
+      "maxAirDefenses": 2,
+      "maxLandDefenses": 9,
+      "destruction": "15%"
+    }
+  },
+  {
+    "UUID": "c3c49a34-ae22-49a5-b71d-bcec3f6a1e3a",
+    "name": "Culpa eu adipisicing proident anim nulla nulla ex occaecat officia.",
+    "type": "CODE",
+    "description": "Irure laboris do esse occaecat ad enim aute culpa ut sit amet et.",
+    "challenge": {
+      "code": "Quis commodo commodo esse in enim aliquip quis fugiat officia pariatur aliqua laboris.",
+      "maxAirDefenses": 2,
+      "maxLandDefenses": 9,
+      "destruction": "18%"
+    }
+  }
+]
