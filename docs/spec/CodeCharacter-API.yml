@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: CodeCharacter API
-  version: 2022.0.1
+  version: 2023.0.1
   contact:
     name: CodeCharacter Authors
     url: 'https://delta.nitt.edu'
@@ -1808,11 +1808,18 @@ components:
         challName:
           type: string
           example: Daily Challenge 1
+        description:
+          type: string
+          example: Daily Challenge description
         chall:
           type: string
           example: 'print("hello world");'
         challType:
           $ref: '#/components/schemas/ChallengeType'
+        completionStatus:
+          type: boolean
+          example: true
+
       required:
         - challName
         - chall
