@@ -15,6 +15,7 @@ data class UserEntity(
     val loginType: LoginType,
     private val password: String,
     val isProfileComplete: Boolean,
+    val tutorialLevel: Int?,
     private val isEnabled: Boolean = false,
     private val isCredentialsNonExpired: Boolean = true,
     private val isAccountNonExpired: Boolean = true,

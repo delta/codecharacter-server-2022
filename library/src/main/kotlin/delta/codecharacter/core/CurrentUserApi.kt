@@ -97,7 +97,7 @@ interface CurrentUserApi {
             value = ["/user/tutorial/level"],
             produces = ["application/json"]
     )
-    fun getTutorialLevel(): ResponseEntity<TutorialLevelResponseDto> {
+    fun getTutorialLevel(@Parameter(description = "", required = true) @Valid @RequestBody tutorialLevelResponseDto: TutorialLevelResponseDto): ResponseEntity<Unit> {
         return ResponseEntity(HttpStatus.NOT_IMPLEMENTED)
     }
 

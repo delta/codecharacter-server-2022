@@ -3,6 +3,7 @@ package delta.codecharacter.server.user
 import delta.codecharacter.core.CurrentUserApi
 import delta.codecharacter.dtos.CompleteProfileRequestDto
 import delta.codecharacter.dtos.CurrentUserProfileDto
+import delta.codecharacter.dtos.TutorialLevelResponseDto
 import delta.codecharacter.dtos.UpdateCurrentUserProfileDto
 import delta.codecharacter.dtos.UpdatePasswordRequestDto
 import delta.codecharacter.server.user.public_user.PublicUserService
@@ -47,6 +48,15 @@ class CurrentUserController(
     ): ResponseEntity<Unit> {
         val user = SecurityContextHolder.getContext().authentication.principal as UserEntity
         userService.updatePassword(user.id, updatePasswordRequestDto)
+        return ResponseEntity.ok().build()
+    }
+
+    @Secured(value = ["ROLE_USER"])
+    override fun getTutorialLevel(
+        tutorialLevelResponseDto: TutorialLevelResponseDto
+    ): ResponseEntity<Unit> {
+        val user = SecurityContextHolder.getContext().authentication.principal as UserEntity
+        userService.updateTutorialLevel(user.id, tutorialLevelResponseDto)
         return ResponseEntity.ok().build()
     }
 }

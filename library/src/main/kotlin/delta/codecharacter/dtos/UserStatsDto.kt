@@ -26,6 +26,9 @@ data class UserStatsDto(
     @field:JsonProperty("rating", required = true) val rating: java.math.BigDecimal,
 
     @Schema(example = "1", required = true, description = "")
+    @field:JsonProperty("tier", required = true) val tier: Int,
+
+    @Schema(example = "1", required = true, description = "")
     @field:JsonProperty("wins", required = true) val wins: kotlin.Int = 0,
 
     @Schema(example = "1", required = true, description = "")

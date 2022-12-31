@@ -132,6 +132,46 @@ class MatchService(
         gameService.sendGameRequest(game2, opponentCode, opponentLanguage, userMap)
     }
 
+    fun createTierMatch(userId: UUID) {
+        val publicUser = publicUserService.getPublicUser(userId)
+        val userTier = publicUser.tier
+        val opponentList = publicUserService.getLeaderboardByTier(userTier)
+        val opponentUser = opponentList[(0..opponentList.size).random()].user.username
+        val publicOpponent = publicUserService.getPublicUserByUsername(opponentUser)
+        val opponentId = publicOpponent.userId
+
+        if (userId == opponentId) {
+            throw CustomException(HttpStatus.BAD_REQUEST, "You cannot play against yourself")
+        }
+
+        val (userLanguage, userCode) = lockedCodeService.getLockedCode(userId)
+        val userMap = lockedMapService.getLockedMap(userId)
+
+        val (opponentLanguage, opponentCode) = lockedCodeService.getLockedCode(opponentId)
+        val opponentMap = lockedMapService.getLockedMap(opponentId)
+
+        val matchId = UUID.randomUUID()
+
+        val game1 = gameService.createGame(matchId)
+        val game2 = gameService.createGame(matchId)
+
+        val match =
+            MatchEntity(
+                id = matchId,
+                games = listOf(game1, game2),
+                mode = MatchModeEnum.MANUAL,
+                verdict = MatchVerdictEnum.TIE,
+                createdAt = Instant.now(),
+                totalPoints = 0,
+                player1 = publicUser,
+                player2 = publicOpponent,
+            )
+        matchRepository.save(match)
+
+        gameService.sendGameRequest(game1, userCode, userLanguage, opponentMap)
+        gameService.sendGameRequest(game2, opponentCode, opponentLanguage, userMap)
+    }
+
     fun createMatch(userId: UUID, createMatchRequestDto: CreateMatchRequestDto) {
         when (createMatchRequestDto.mode) {
             MatchModeDto.SELF -> {

@@ -13,6 +13,7 @@ data class PublicUserEntity(
     val country: String,
     val college: String,
     val avatarId: Int,
+    val tier: Int,
     val rating: Double,
     val wins: Int,
     val losses: Int,

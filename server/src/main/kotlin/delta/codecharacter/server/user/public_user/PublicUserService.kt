@@ -38,6 +38,7 @@ class PublicUserService(@Autowired private val publicUserRepository: PublicUserR
                 wins = 0,
                 losses = 0,
                 ties = 0,
+                tier = 1
             )
         publicUserRepository.save(publicUser)
     }
@@ -57,11 +58,63 @@ class PublicUserService(@Autowired private val publicUserRepository: PublicUserR
                 stats =
                 UserStatsDto(
                     rating = BigDecimal(it.rating),
+                    tier = it.tier,
                     wins = it.wins,
                     losses = it.losses,
                     ties = it.ties,
                 )
             )
+        }
+    }
+
+    fun getLeaderboardByTier(tier: Int): List<LeaderboardEntryDto> {
+        val leaderboardEntry =
+            publicUserRepository.findAll().map {
+                LeaderboardEntryDto(
+                    user =
+                    PublicUserDto(
+                        username = it.username,
+                        name = it.name,
+                        country = it.country,
+                        college = it.college,
+                        avatarId = it.avatarId,
+                    ),
+                    stats =
+                    UserStatsDto(
+                        rating = BigDecimal(it.rating),
+                        tier = it.tier,
+                        wins = it.wins,
+                        losses = it.losses,
+                        ties = it.ties,
+                    )
+                )
+            }
+        updateTiers(leaderboardEntry)
+        return when (tier) {
+            4 -> leaderboardEntry.subList(0, (0.1 * leaderboardEntry.size).toInt())
+            3 ->
+                leaderboardEntry.subList(
+                    (0.1 * leaderboardEntry.size).toInt(), (0.15 * leaderboardEntry.size).toInt()
+                )
+            2 ->
+                leaderboardEntry.subList(
+                    (0.15 * leaderboardEntry.size).toInt(), (0.25 * leaderboardEntry.size).toInt()
+                )
+            else ->
+                leaderboardEntry.subList((0.25 * leaderboardEntry.size).toInt(), leaderboardEntry.size)
+        }
+    }
+
+    fun updateTiers(leaderboardEntry: List<LeaderboardEntryDto>) {
+        val totalCount = leaderboardEntry.size
+        for (i in leaderboardEntry.indices) {
+            val user = publicUserRepository.findByUsername(leaderboardEntry[i].user.username).get()
+            if (i <= totalCount * 0.1) publicUserRepository.save(user.copy(tier = 4))
+            else if (i > totalCount * 0.1 && i <= totalCount * 0.15)
+                publicUserRepository.save(user.copy(tier = 3))
+            else if (i > totalCount * 0.15 && i <= totalCount * 0.25)
+                publicUserRepository.save(user.copy(tier = 2))
+            else publicUserRepository.save(user.copy(tier = 1))
         }
     }
 

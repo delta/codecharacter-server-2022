@@ -2,6 +2,7 @@ package delta.codecharacter.server.user
 
 import delta.codecharacter.dtos.CompleteProfileRequestDto
 import delta.codecharacter.dtos.RegisterUserRequestDto
+import delta.codecharacter.dtos.TutorialLevelResponseDto
 import delta.codecharacter.dtos.UpdatePasswordRequestDto
 import delta.codecharacter.server.exception.CustomException
 import delta.codecharacter.server.user.activate_user.ActivateUserService
@@ -53,6 +54,7 @@ class UserService(
                 email = email,
                 loginType = LoginType.PASSWORD,
                 isProfileComplete = true,
+                tutorialLevel = 0,
                 isEnabled = false,
                 isAccountNonExpired = true,
                 isAccountNonLocked = true,
@@ -71,6 +73,7 @@ class UserService(
                 email = email,
                 loginType = oauthProvider,
                 isProfileComplete = false,
+                tutorialLevel = 0,
                 isEnabled = true,
                 isAccountNonExpired = true,
                 isAccountNonLocked = true,
@@ -109,7 +112,17 @@ class UserService(
     }
 
     fun registerUser(registerUserRequestDto: RegisterUserRequestDto) {
-        val (username, name, email, password, passwordConfirmation, country, college, avatarId) =
+        val (
+            username,
+            name,
+            email,
+            password,
+            passwordConfirmation,
+            country,
+            college,
+            avatarId,
+            recaptchaCode
+        ) =
             registerUserRequestDto
 
         if (password != passwordConfirmation) {
@@ -150,5 +163,11 @@ class UserService(
                 userAuthorities = mutableListOf(SimpleGrantedAuthority("ROLE_USER"))
             )
         )
+    }
+
+    fun updateTutorialLevel(userId: UUID, tutorialLevelResponseDto: TutorialLevelResponseDto) {
+        val (level) = tutorialLevelResponseDto
+        val user = userRepository.findById(userId).get()
+        userRepository.save(user.copy(tutorialLevel = level))
     }
 }
