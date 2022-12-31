@@ -1,6 +1,6 @@
 package delta.codecharacter.server.daily_challenge
 
-import delta.codecharacter.dtos.*
+import delta.codecharacter.dtos.DailyChallengeGetRequestDto
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 
