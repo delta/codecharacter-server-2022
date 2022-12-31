@@ -30,6 +30,7 @@ import jakarta.validation.constraints.Min
 import jakarta.validation.constraints.NotNull
 import jakarta.validation.constraints.Pattern
 import jakarta.validation.constraints.Size
+import java.util.Date
 
 import kotlin.collections.List
 import kotlin.collections.Map
@@ -76,7 +77,7 @@ interface DailyChallengesApi {
             value = ["/dc/leaderboard"],
             produces = ["application/json"]
     )
-    fun getDailyChallengeLeaderBoard(): ResponseEntity<List<DailyChallengeLeaderBoardResponseDto>> {
+    fun getDailyChallengeLeaderBoard(@Parameter(description = "Index of the page") @Valid @RequestParam(value = "page", required = false) page: kotlin.Int?,@Parameter(description = "Size of the page") @Valid @RequestParam(value = "size", required = false) size: kotlin.Int?): ResponseEntity<List<DailyChallengeLeaderBoardResponseDto>> {
         return ResponseEntity(HttpStatus.NOT_IMPLEMENTED)
     }
 }
