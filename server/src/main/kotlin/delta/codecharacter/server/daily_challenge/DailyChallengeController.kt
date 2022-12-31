@@ -7,7 +7,9 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
-class DailyChallengeController(@Autowired private val dailyChallengeService: DailyChallengeService) : DailyChallengesApi {
+class DailyChallengeController(
+    @Autowired private val dailyChallengeService: DailyChallengeService
+) : DailyChallengesApi {
     override fun getDailyChallenge(): ResponseEntity<DailyChallengeGetRequestDto> {
         return ResponseEntity.ok(dailyChallengeService.getDailyChallengeByDate())
     }
