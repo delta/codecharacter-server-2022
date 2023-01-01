@@ -41,7 +41,6 @@ class TestAttributes {
                 wins = 4,
                 losses = 2,
                 ties = 1,
-                tier = 1
             )
     }
 }
