@@ -8,6 +8,7 @@ import delta.codecharacter.server.exception.CustomException
 import delta.codecharacter.server.user.activate_user.ActivateUserService
 import delta.codecharacter.server.user.public_user.PublicUserService
 import delta.codecharacter.server.user.rating_history.RatingHistoryService
+import org.bson.json.JsonObject
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Lazy
 import org.springframework.dao.DuplicateKeyException
@@ -17,6 +18,9 @@ import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
+import java.io.OutputStream
+import java.net.HttpURLConnection
+import java.net.URL
 import java.util.Optional
 import java.util.UUID
 
@@ -135,6 +139,9 @@ class UserService(
             throw CustomException(HttpStatus.BAD_REQUEST, "Username already taken")
         }
 
+        if (!verifyReCaptcha(recaptchaCode))
+            throw CustomException(HttpStatus.BAD_REQUEST, "Invalid ReCaptcha")
+
         val userId = UUID.randomUUID()
         try {
             createUserWithPassword(userId, password, email)
@@ -143,6 +150,33 @@ class UserService(
             activateUserService.sendActivationToken(userId, name, email)
         } catch (duplicateError: DuplicateKeyException) {
             throw CustomException(HttpStatus.BAD_REQUEST, "Username/Email already exists")
+        }
+    }
+
+    fun verifyReCaptcha(reCaptchaResponse: String): Boolean {
+        val secretKey = "6LdaMMEjAAAAAMKn5h1gPoQSNrhXutr5Gk8LhBye"
+        val url =
+            "https://www.google.com/recaptcha/api/siteverifysecret=$secretKey&response=$reCaptchaResponse"
+        try {
+            val con: HttpURLConnection = URL(url).openConnection() as HttpURLConnection
+            con.requestMethod = "POST"
+            val dataOutputStream: OutputStream? = con.outputStream
+            dataOutputStream?.flush()
+            dataOutputStream?.close()
+            val bufferedReader = con.inputStream.bufferedReader()
+            val response = StringBuffer()
+            var inputLine = bufferedReader.readLine()
+            while ((inputLine) != null) {
+                response.append(inputLine)
+                inputLine = bufferedReader.readLine()
+            }
+            bufferedReader.close()
+            val jsonObject = JsonObject(response.toString())
+            val result = jsonObject.toBsonDocument().getBoolean("success")
+            return result.value
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return false
         }
     }
 
