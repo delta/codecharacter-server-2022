@@ -41,9 +41,6 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.14.0")
     implementation("io.swagger.core.v3:swagger-annotations:2.2.7")
     implementation("io.swagger.core.v3:swagger-core:2.2.7")
-    implementation("org.hibernate:hibernate-core:6.1.6.Final")
-    implementation("mysql:mysql-connector-java:8.0.30")
-    implementation("org.apache.commons:commons-dbcp2:2.9.0")
 
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5:1.6.0")
     testImplementation("org.springframework.boot:spring-boot-starter-test:3.0.0") {

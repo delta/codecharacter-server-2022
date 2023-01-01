@@ -77,7 +77,7 @@ interface DailyChallengesApi {
             value = ["/dc/leaderboard"],
             produces = ["application/json"]
     )
-    fun getDailyChallengeLeaderBoard(@Parameter(description = "Index of the page") @Valid @RequestParam(value = "page", required = false) page: kotlin.Int?,@Parameter(description = "Size of the page") @Valid @RequestParam(value = "size", required = false) size: kotlin.Int?): ResponseEntity<List<DailyChallengeLeaderBoardResponseDto>> {
+    fun getDailyChallengeLeaderBoard(): ResponseEntity<List<DailyChallengeLeaderBoardResponseDto>> {
         return ResponseEntity(HttpStatus.NOT_IMPLEMENTED)
     }
 }

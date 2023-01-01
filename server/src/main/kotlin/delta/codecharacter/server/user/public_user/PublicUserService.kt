@@ -63,8 +63,8 @@ class PublicUserService(@Autowired private val publicUserRepository: PublicUserR
         }
     }
 
-    fun getDailyChallengeLeaderboard(page: Int?, size: Int?): List<DailyChallengeLeaderBoardResponseDto> {
-        val pageRequest = PageRequest.of(page ?: 0, size ?: 10, Sort.by(Sort.Direction.DESC, "score"))
+    fun getDailyChallengeLeaderboard(): List<DailyChallengeLeaderBoardResponseDto> {
+        val pageRequest = PageRequest.of(0, Integer.MAX_VALUE, Sort.by(Sort.Direction.DESC, "score"))
         return publicUserRepository.findAll(pageRequest).content.map {
             DailyChallengeLeaderBoardResponseDto(
                 userName = it.username,
