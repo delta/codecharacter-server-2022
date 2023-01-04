@@ -8,11 +8,10 @@ services:
       - "27017:27017"
     volumes:
       - ./data/mongo_dev:/data/db
-      - ./server/src/main/kotlin/delta/codecharacter/server/daily_challenge/seed.js:/docker-entrypoint-initdb.d/mongo-init.js
     networks:
       - common
     environment:
-      MONGO_INITDB_DATABASE: test # change it to codecharacter_2022 later
+      MONGO_INITDB_DATABASE: codecharacter_2022
     restart: always
 
 
@@ -44,6 +43,8 @@ services:
       - ./:/server
     networks:
       - common
+    environment:
+     EVENT_START_DATE: 2023 0 1
 
 networks:
   common:

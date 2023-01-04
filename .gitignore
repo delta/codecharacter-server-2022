@@ -39,8 +39,8 @@ out/
 
 ### Data ###
 data
-/server/src/main/kotlin/delta/codecharacter/server/daily_challenge/dcConstants.json
-/server/src/main/kotlin/delta/codecharacter/server/daily_challenge/seed.js
+dcConstants.json
+seed.js
 
 ### OpenAPI ###
 openapitools.json
