@@ -1198,6 +1198,18 @@ paths:
           description: Forbidden
         '404':
           description: Not Found
+      parameters:
+        - schema:
+            type: integer
+          in: query
+          name: page
+          description: Index of the page
+        - schema:
+            type: integer
+          in: query
+          name: size
+          description: Size of the page
+    parameters: []
 components:
   schemas:
     PasswordLoginRequest:
@@ -1833,8 +1845,15 @@ components:
           type: string
           example: TestUser
         score:
-          type: string
-          example: 1500.0
+          type: number
+          example: 1500.00
+        avatarId:
+          type: integer
+          example: 1
+      required:
+        - userName
+        - score
+        - avatarId
     TutorialLevelResponse:
       title: TutorialLevelResponse
       description: Get the tutorial level of the current user

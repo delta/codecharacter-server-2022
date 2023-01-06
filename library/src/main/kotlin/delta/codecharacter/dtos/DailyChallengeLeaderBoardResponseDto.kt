@@ -17,14 +17,18 @@ import io.swagger.v3.oas.annotations.media.Schema
  * Response model for daily challenge leaderboard
  * @param userName
  * @param score
+ * @param avatarId
  */
 data class DailyChallengeLeaderBoardResponseDto(
 
-    @Schema(example = "TestUser", description = "")
-    @field:JsonProperty("userName") val userName: kotlin.String? = null,
+    @Schema(example = "TestUser", required = true, description = "")
+    @field:JsonProperty("userName", required = true) val userName: kotlin.String,
 
-    @Schema(example = "1500.0", description = "")
-    @field:JsonProperty("score") val score: kotlin.String? = null
+    @Schema(example = "1500.0", required = true, description = "")
+    @field:JsonProperty("score", required = true) val score: java.math.BigDecimal,
+
+    @Schema(example = "1", required = true, description = "")
+    @field:JsonProperty("avatarId", required = true) val avatarId: kotlin.Int
 ) {
 
 }

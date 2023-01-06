@@ -1,6 +1,7 @@
 package delta.codecharacter.server.user.public_user
 
 import delta.codecharacter.dtos.CurrentUserProfileDto
+import delta.codecharacter.dtos.DailyChallengeLeaderBoardResponseDto
 import delta.codecharacter.dtos.LeaderboardEntryDto
 import delta.codecharacter.dtos.PublicUserDto
 import delta.codecharacter.dtos.UpdateCurrentUserProfileDto
@@ -38,6 +39,8 @@ class PublicUserService(@Autowired private val publicUserRepository: PublicUserR
                 wins = 0,
                 losses = 0,
                 ties = 0,
+                score = 0.0,
+                challengesCompleted = null,
             )
         publicUserRepository.save(publicUser)
     }
@@ -61,6 +64,18 @@ class PublicUserService(@Autowired private val publicUserRepository: PublicUserR
                     losses = it.losses,
                     ties = it.ties,
                 )
+            )
+        }
+    }
+
+    fun getDailyChallengeLeaderboard(
+        page: Int?,
+        size: Int?
+    ): List<DailyChallengeLeaderBoardResponseDto> {
+        val pageRequest = PageRequest.of(page ?: 0, size ?: 10, Sort.by(Sort.Direction.DESC, "score"))
+        return publicUserRepository.findAll(pageRequest).content.map {
+            DailyChallengeLeaderBoardResponseDto(
+                userName = it.username, score = BigDecimal(it.score), avatarId = it.avatarId
             )
         }
     }
