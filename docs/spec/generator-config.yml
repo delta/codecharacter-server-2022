@@ -1,6 +1,6 @@
 apiPackage: delta.codecharacter.core
 artifactId: codecharacter-core
-artifactVersion: 2022.0.1
+artifactVersion: 2023.0.1
 basePackage: delta.codecharacter
 delegatePattern: false
 enumPropertyNaming: UPPERCASE

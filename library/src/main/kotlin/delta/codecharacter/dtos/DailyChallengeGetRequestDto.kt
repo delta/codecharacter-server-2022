@@ -19,6 +19,8 @@ import io.swagger.v3.oas.annotations.media.Schema
  * @param challName
  * @param chall
  * @param challType
+ * @param description
+ * @param completionStatus
  */
 data class DailyChallengeGetRequestDto(
 
@@ -30,7 +32,13 @@ data class DailyChallengeGetRequestDto(
 
     @field:Valid
     @Schema(example = "null", required = true, description = "")
-    @field:JsonProperty("challType", required = true) val challType: ChallengeTypeDto
+    @field:JsonProperty("challType", required = true) val challType: ChallengeTypeDto,
+
+    @Schema(example = "Daily Challenge description", description = "")
+    @field:JsonProperty("description") val description: kotlin.String? = null,
+
+    @Schema(example = "true", description = "")
+    @field:JsonProperty("completionStatus") val completionStatus: kotlin.Boolean? = null
 ) {
 
 }

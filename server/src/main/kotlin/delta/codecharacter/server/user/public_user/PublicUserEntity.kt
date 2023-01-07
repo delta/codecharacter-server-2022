@@ -18,4 +18,6 @@ data class PublicUserEntity(
     val losses: Int,
     val ties: Int,
     val isActivated: Boolean = true,
+    val score: Double,
+    val challengesCompleted: Array<String>?
 )
