@@ -43,8 +43,7 @@ services:
       - ./:/server
     networks:
       - common
-    environment:
-     EVENT_START_DATE: 2023 0 1
+
 
 networks:
   common:

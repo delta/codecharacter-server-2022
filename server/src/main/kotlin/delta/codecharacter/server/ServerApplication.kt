@@ -1,6 +1,5 @@
 package delta.codecharacter.server
 
-// import delta.codecharacter.server.daily_challenge.DailyChallengeSeeder
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.runApplication

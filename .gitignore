@@ -40,7 +40,6 @@ out/
 ### Data ###
 data
 dcConstants.json
-seed.js
 
 ### OpenAPI ###
 openapitools.json
