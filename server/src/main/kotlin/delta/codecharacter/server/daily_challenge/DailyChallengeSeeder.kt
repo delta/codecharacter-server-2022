@@ -9,35 +9,28 @@ import org.springframework.boot.context.event.ApplicationReadyEvent
 import org.springframework.context.event.EventListener
 import org.springframework.stereotype.Component
 
-
-
 @Component
 class DailyChallengeSeeder {
 
     @Autowired private lateinit var dailyChallengeRepository: DailyChallengeRepository
 
-    private val logger : Logger = LoggerFactory.getLogger(DailyChallengeSeeder::class.java)
+    private val logger: Logger = LoggerFactory.getLogger(DailyChallengeSeeder::class.java)
     @EventListener(ApplicationReadyEvent::class)
     fun doSomethingAfterStartup() {
 
-        if(dailyChallengeRepository.findAll().isEmpty()){
+        if (dailyChallengeRepository.findAll().isEmpty()) {
             logger.info("Seeding daily_challenges")
 
-            //      Delete everything initially
             dailyChallengeRepository.deleteAll()
 
-            //      Seed the database
             val jsonString = this::class.java.classLoader.getResource("dcConstants.json").readText()
-            if(jsonString != null){
+            if (jsonString.isNotEmpty()) {
                 val objectMapper = jacksonObjectMapper()
                 val dcs: List<DailyChallengeEntity> = objectMapper.readValue(jsonString)
                 dailyChallengeRepository.saveAll(dcs)
-            }
-            else{
+            } else {
                 logger.error("dcConstants.json not found or doesn't exist")
             }
-
         }
-
     }
 }

@@ -1,62 +1,82 @@
 [
   {
     "day": 0,
-    "challName": "Aliqua cillum proident nulla elit dolore id quis eu.",
+    "challName": "Nulla aliquip do ut deserunt culpa duis laboris velit in ea et elit dolore incididunt.",
     "challType": "CODE",
-    "chall": "Eu id velit incididunt commodo sint aute reprehenderit do aliquip commodo enim qui excepteur."
+    "chall": "Anim excepteur duis exercitation sint magna.",
+    "description": "Amet ad cupidatat anim mollit ex quis cupidatat non nisi consequat anim nostrud consectetur.",
+    "completionStatus": false
   },
   {
     "day": 1,
-    "challName": "Consectetur elit sint excepteur quis enim.",
+    "challName": "Culpa duis ullamco eu consectetur ipsum in occaecat labore consequat ad commodo deserunt fugiat eu.",
     "challType": "CODE",
-    "chall": "Consectetur irure aute laborum esse excepteur commodo proident."
+    "chall": "Veniam fugiat est veniam minim minim sunt cillum voluptate.",
+    "description": "Et aliqua dolor est reprehenderit magna consectetur laboris incididunt deserunt voluptate.",
+    "completionStatus": false
   },
   {
     "day": 2,
-    "challName": "Tempor do commodo occaecat nulla.",
-    "challType": "CODE",
-    "chall": "Deserunt proident aliquip cillum ipsum voluptate duis elit commodo qui elit aliquip dolor."
+    "challName": "Mollit aliquip et Lorem eiusmod ea in ad consequat culpa eu.",
+    "challType": "MAP",
+    "chall": "Minim laborum cillum qui dolor incididunt sit fugiat.",
+    "description": "Non enim cillum officia adipisicing quis voluptate.",
+    "completionStatus": true
   },
   {
     "day": 3,
-    "challName": "In quis minim id voluptate sunt aliquip elit elit laborum dolor excepteur ea.",
+    "challName": "Officia labore laboris nostrud tempor Lorem proident officia deserunt tempor exercitation adipisicing nostrud.",
     "challType": "MAP",
-    "chall": "Sunt officia deserunt sunt voluptate."
+    "chall": "Amet nostrud ullamco cupidatat ex et officia eu.",
+    "description": "Et occaecat labore laboris aliquip laboris ut non.",
+    "completionStatus": true
   },
   {
     "day": 4,
-    "challName": "Reprehenderit amet ad voluptate esse aliquip.",
+    "challName": "Ullamco labore anim consequat ad aute mollit incididunt incididunt.",
     "challType": "MAP",
-    "chall": "Sit est nostrud occaecat sit qui aliqua nisi dolor eu non consectetur."
+    "chall": "Proident adipisicing voluptate non aute aliquip reprehenderit sit Lorem.",
+    "description": "Commodo reprehenderit laborum culpa incididunt irure consectetur veniam laborum irure adipisicing magna voluptate aute.",
+    "completionStatus": false
   },
   {
     "day": 5,
-    "challName": "Nisi in laborum et pariatur.",
+    "challName": "Mollit ullamco ipsum veniam adipisicing cupidatat veniam commodo minim nostrud consequat aliquip veniam.",
     "challType": "CODE",
-    "chall": "Commodo ea esse minim dolor ipsum nostrud anim."
+    "chall": "Esse magna commodo id magna qui.",
+    "description": "Laboris duis nulla mollit proident laboris aute minim ullamco aute ullamco Lorem magna consectetur quis.",
+    "completionStatus": false
   },
   {
     "day": 6,
-    "challName": "Lorem cupidatat labore ut dolor esse exercitation consequat quis qui do.",
-    "challType": "MAP",
-    "chall": "Culpa irure nulla cillum anim laboris ipsum est ullamco aute eiusmod veniam magna qui Lorem."
+    "challName": "Nostrud deserunt et tempor dolor consequat dolor sunt.",
+    "challType": "CODE",
+    "chall": "Id labore deserunt fugiat nisi aute minim ipsum esse nostrud sint.",
+    "description": "Qui consectetur esse enim sint elit sunt magna est.",
+    "completionStatus": true
   },
   {
     "day": 7,
-    "challName": "Consequat anim nisi sit incididunt minim exercitation.",
+    "challName": "Qui amet irure nisi officia.",
     "challType": "CODE",
-    "chall": "Qui Lorem dolor dolor do mollit labore proident cillum."
+    "chall": "Esse consequat Lorem esse nostrud ullamco ut consequat tempor nulla deserunt esse magna ipsum veniam.",
+    "description": "Elit laborum elit est ut do.",
+    "completionStatus": false
   },
   {
     "day": 8,
-    "challName": "Excepteur tempor voluptate fugiat et irure occaecat nisi culpa laboris.",
-    "challType": "CODE",
-    "chall": "Incididunt labore pariatur sit esse mollit."
+    "challName": "Pariatur laboris ullamco pariatur incididunt ullamco.",
+    "challType": "MAP",
+    "chall": "Irure ullamco exercitation nulla ut ea amet adipisicing proident tempor veniam.",
+    "description": "Ut elit anim reprehenderit quis sunt laborum.",
+    "completionStatus": false
   },
   {
     "day": 9,
-    "challName": "Ea fugiat elit laboris culpa et.",
+    "challName": "Sunt culpa ad eiusmod proident anim adipisicing mollit tempor labore esse fugiat voluptate elit.",
     "challType": "CODE",
-    "chall": "Lorem sunt duis pariatur et exercitation ea tempor amet minim culpa mollit in id."
+    "chall": "Ipsum consectetur labore irure ea amet ullamco cupidatat nisi irure sit duis aliquip aliquip.",
+    "description": "Reprehenderit cillum cillum velit sit elit amet esse cillum anim ut.",
+    "completionStatus": false
   }
 ]
