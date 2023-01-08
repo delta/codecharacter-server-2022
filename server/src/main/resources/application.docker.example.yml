@@ -27,7 +27,7 @@ spring:
             client-secret: your-github-client-secret
             scope: user:email
 environment:
-  event-start-date: YYYY/MM/dd/HH/mm/ss
+  event-start-date: YYYY-MM-DDTHH:MM:SSZ
 
 de:
   flapdoodle:

@@ -21,10 +21,8 @@ class DailyChallengeSeeder {
         if (dailyChallengeRepository.findAll().isEmpty()) {
             logger.info("Seeding daily_challenges")
 
-            dailyChallengeRepository.deleteAll()
-
-            val jsonString = this::class.java.classLoader.getResource("dcConstants.json").readText()
-            if (jsonString.isNotEmpty()) {
+            val jsonString = this::class.java.classLoader.getResource("dcConstants.json")?.readText()
+            if (!jsonString.isNullOrEmpty()) {
                 val objectMapper = jacksonObjectMapper()
                 val dcs: List<DailyChallengeEntity> = objectMapper.readValue(jsonString)
                 dailyChallengeRepository.saveAll(dcs)

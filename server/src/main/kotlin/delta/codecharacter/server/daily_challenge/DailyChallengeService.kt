@@ -1,17 +1,13 @@
 package delta.codecharacter.server.daily_challenge
 
 import delta.codecharacter.dtos.DailyChallengeGetRequestDto
+import delta.codecharacter.server.exception.CustomException
+import org.apache.http.HttpStatus
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.LocalTime
-import java.time.Period
-import java.time.ZoneId
-import java.time.ZonedDateTime
-import java.time.format.DateTimeFormatter
-import java.util.Locale
+import java.time.Duration
+import java.time.Instant
 
 @Service
 class DailyChallengeService(
@@ -21,25 +17,24 @@ class DailyChallengeService(
     @Value("\${environment.event-start-date}") val tempDate: String = ""
 
     fun findNumberOfDays(): Int {
-        val formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd/HH/mm/ss", Locale.ENGLISH)
-
-        val givenDateTime =
-            LocalDateTime.of(LocalDate.parse(tempDate, formatter), LocalTime.of(0, 0))
-                .atZone(ZoneId.of("Asia/Kolkata"))
-        val zdtNow = ZonedDateTime.now(ZoneId.of("Asia/Kolkata"))
-        val period: Period = Period.between(givenDateTime.toLocalDate(), zdtNow.toLocalDate())
-        return period.days
+        val givenDateTime = Instant.parse(tempDate)
+        val nowDateTime = Instant.now()
+        val period: Duration = Duration.between(givenDateTime, nowDateTime)
+        return period.toDays().toInt()
     }
 
     fun getDailyChallengeByDate(): DailyChallengeGetRequestDto {
 
-        val dc = dailyChallengeRepository.findByDay(findNumberOfDays())
+        val dc =
+            dailyChallengeRepository.findByDay(findNumberOfDays()).orElseThrow {
+                throw CustomException(org.springframework.http.HttpStatus.BAD_REQUEST, "Invalid Request")
+            }
         return DailyChallengeGetRequestDto(
             challName = dc.challName,
             chall = dc.chall,
             challType = dc.challType,
             description = dc.description,
-            completionStatus = dc.completionStatus
+            completionStatus = true
         )
     }
 }

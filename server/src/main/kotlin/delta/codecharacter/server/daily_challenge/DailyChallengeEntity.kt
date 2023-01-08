@@ -10,5 +10,4 @@ data class DailyChallengeEntity(
     val challType: ChallengeTypeDto,
     val chall: String,
     val description: String?,
-    val completionStatus: Boolean?
 )

@@ -5,7 +5,6 @@
     "challType": "CODE",
     "chall": "Anim excepteur duis exercitation sint magna.",
     "description": "Amet ad cupidatat anim mollit ex quis cupidatat non nisi consequat anim nostrud consectetur.",
-    "completionStatus": false
   },
   {
     "day": 1,
@@ -13,7 +12,6 @@
     "challType": "CODE",
     "chall": "Veniam fugiat est veniam minim minim sunt cillum voluptate.",
     "description": "Et aliqua dolor est reprehenderit magna consectetur laboris incididunt deserunt voluptate.",
-    "completionStatus": false
   },
   {
     "day": 2,
@@ -21,7 +19,6 @@
     "challType": "MAP",
     "chall": "Minim laborum cillum qui dolor incididunt sit fugiat.",
     "description": "Non enim cillum officia adipisicing quis voluptate.",
-    "completionStatus": true
   },
   {
     "day": 3,
@@ -29,7 +26,6 @@
     "challType": "MAP",
     "chall": "Amet nostrud ullamco cupidatat ex et officia eu.",
     "description": "Et occaecat labore laboris aliquip laboris ut non.",
-    "completionStatus": true
   },
   {
     "day": 4,
@@ -37,7 +33,6 @@
     "challType": "MAP",
     "chall": "Proident adipisicing voluptate non aute aliquip reprehenderit sit Lorem.",
     "description": "Commodo reprehenderit laborum culpa incididunt irure consectetur veniam laborum irure adipisicing magna voluptate aute.",
-    "completionStatus": false
   },
   {
     "day": 5,
@@ -45,7 +40,6 @@
     "challType": "CODE",
     "chall": "Esse magna commodo id magna qui.",
     "description": "Laboris duis nulla mollit proident laboris aute minim ullamco aute ullamco Lorem magna consectetur quis.",
-    "completionStatus": false
   },
   {
     "day": 6,
@@ -53,7 +47,6 @@
     "challType": "CODE",
     "chall": "Id labore deserunt fugiat nisi aute minim ipsum esse nostrud sint.",
     "description": "Qui consectetur esse enim sint elit sunt magna est.",
-    "completionStatus": true
   },
   {
     "day": 7,
@@ -61,7 +54,6 @@
     "challType": "CODE",
     "chall": "Esse consequat Lorem esse nostrud ullamco ut consequat tempor nulla deserunt esse magna ipsum veniam.",
     "description": "Elit laborum elit est ut do.",
-    "completionStatus": false
   },
   {
     "day": 8,
@@ -69,7 +61,6 @@
     "challType": "MAP",
     "chall": "Irure ullamco exercitation nulla ut ea amet adipisicing proident tempor veniam.",
     "description": "Ut elit anim reprehenderit quis sunt laborum.",
-    "completionStatus": false
   },
   {
     "day": 9,
@@ -77,6 +68,5 @@
     "challType": "CODE",
     "chall": "Ipsum consectetur labore irure ea amet ullamco cupidatat nisi irure sit duis aliquip aliquip.",
     "description": "Reprehenderit cillum cillum velit sit elit amet esse cillum anim ut.",
-    "completionStatus": false
   }
 ]
