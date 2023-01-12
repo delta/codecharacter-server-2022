@@ -49,7 +49,7 @@ class DailyChallengeSeeder {
             }
         }
         else {
-            logger.info("Seeded already")
+            logger.info("Daily Challenges seeded already")
         }
     }
 }
