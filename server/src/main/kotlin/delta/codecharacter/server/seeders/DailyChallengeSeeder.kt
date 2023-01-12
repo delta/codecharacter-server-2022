@@ -47,8 +47,7 @@ class DailyChallengeSeeder {
             } else {
                 logger.error("dcConstants.json is empty or doesn't exist")
             }
-        }
-        else {
+        } else {
             logger.info("Daily Challenges seeded already")
         }
     }
