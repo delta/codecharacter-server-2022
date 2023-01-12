@@ -3,7 +3,6 @@ package delta.codecharacter.server.seeders
 import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import delta.codecharacter.server.daily_challenge.DailyChallengeEntity
-import delta.codecharacter.server.daily_challenge.DailyChallengeObject
 import delta.codecharacter.server.daily_challenge.DailyChallengeRepository
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -46,7 +45,7 @@ class DailyChallengeSeeder {
                 }
                 dailyChallengeRepository.saveAll(dcEntities)
             } else {
-                logger.error("dcConstants.json not found or doesn't exist")
+                logger.error("dcConstants.json is empty or doesn't exist")
             }
         }
     }
