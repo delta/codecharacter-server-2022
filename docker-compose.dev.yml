@@ -44,6 +44,7 @@ services:
     networks:
       - common
 
+
 networks:
   common:
     name: codecharacter_common
