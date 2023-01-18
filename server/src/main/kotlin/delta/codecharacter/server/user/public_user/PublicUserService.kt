@@ -95,6 +95,9 @@ class PublicUserService(@Autowired private val publicUserRepository: PublicUserR
 
     fun updateUserProfile(userId: UUID, updateCurrentUserProfileDto: UpdateCurrentUserProfileDto) {
         val user = publicUserRepository.findById(userId).get()
+        if (updateCurrentUserProfileDto.name?.length!! <= 5) {
+            throw CustomException(HttpStatus.BAD_REQUEST, "Username must be minimum 5 characters long")
+        }
         val updatedUser =
             user.copy(
                 name = updateCurrentUserProfileDto.name ?: user.name,
