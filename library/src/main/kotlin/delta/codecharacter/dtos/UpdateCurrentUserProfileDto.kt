@@ -2,6 +2,7 @@ package delta.codecharacter.dtos
 
 import java.util.Objects
 import com.fasterxml.jackson.annotation.JsonProperty
+import delta.codecharacter.dtos.TutorialUpdateTypeDto
 import jakarta.validation.constraints.DecimalMax
 import jakarta.validation.constraints.DecimalMin
 import jakarta.validation.constraints.Email
@@ -19,7 +20,7 @@ import io.swagger.v3.oas.annotations.media.Schema
  * @param country
  * @param college
  * @param avatarId
- * @param tutorialLevel
+ * @param updateTutorialLevel
  */
 data class UpdateCurrentUserProfileDto(
 
@@ -35,8 +36,9 @@ data class UpdateCurrentUserProfileDto(
     @Schema(example = "1", description = "")
     @field:JsonProperty("avatarId") val avatarId: kotlin.Int? = null,
 
-    @Schema(example = "2", description = "")
-    @field:JsonProperty("tutorialLevel") val tutorialLevel: kotlin.Int? = null
+    @field:Valid
+    @Schema(example = "null", description = "")
+    @field:JsonProperty("updateTutorialLevel") val updateTutorialLevel: TutorialUpdateTypeDto? = null
 ) {
 
 }

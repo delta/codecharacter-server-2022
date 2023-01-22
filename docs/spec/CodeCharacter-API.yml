@@ -528,6 +528,7 @@ paths:
                     country: IN
                     college: NITT
                     avatarId: 1
+                    tutorialLevel: 2
                     isProfileComplete: true
                     isTutorialComplete: true
         '401':
@@ -565,7 +566,7 @@ paths:
                   name: Test User Mofified
                   country: IN
                   college: NIT Trichy
-                  tutorialLevel: 1
+                  updateTutorialLevel: NEXT
       tags:
         - current-user
   /user/complete-profile:
@@ -631,30 +632,6 @@ paths:
                   oldPassword: Pa$$w0rd
                   password: Pa$$w0rd1
                   passwordConfirmation: Pa$$w0rd1
-  /user/tutorial/level:
-    get:
-      summary: Get Tutorial level of the user
-      description: Get the tutorial level of the user
-      operationId: getTutorialLevel
-      responses:
-        200:
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/TutorialLevelResponse'
-              examples:
-                 Example:
-                   value:
-                     level: 2
-        403:
-          description: Forbidden
-        401:
-          description: Unauthorized
-        404:
-          description: Not Found
-      tags:
-        - current-user
   /user/code/latest:
     get:
       summary: Get latest code
@@ -1595,6 +1572,9 @@ components:
         avatarId:
           type: integer
           example: 1
+        tutorialLevel:
+          type: integer
+          example: 1
         isProfileComplete:
           type: boolean
           default: false
@@ -1609,6 +1589,7 @@ components:
         - country
         - college
         - avatarId
+        - tutorialLevel
         - isProfileComplete
         - isTutorialComplete
     UpdateCurrentUserProfile:
@@ -1632,10 +1613,8 @@ components:
           type: integer
           example: 1
           nullable: true
-        tutorialLevel:
-          type: integer
-          example: 2
-          nullable: true
+        updateTutorialLevel:
+          $ref: '#/components/schemas/TutorialUpdateType'
     CompleteProfileRequest:
       title: CompleteProfileRequest
       type: object
@@ -1854,14 +1833,6 @@ components:
         - userName
         - score
         - avatarId
-    TutorialLevelResponse:
-      title: TutorialLevelResponse
-      description: Get the tutorial level of the current user
-      type: object
-      properties:
-        level:
-          type: integer
-          example: 2
     GenericError:
       title: GenericError
       type: object
@@ -1921,6 +1892,13 @@ components:
       enum:
         - CODE
         - MAP
+    TutorialUpdateType:
+      title: TutorialUpdateType
+      type: string
+      enum:
+        - NEXT
+        - PREVIOUS
+        - SKIP
   securitySchemes:
     oauth2-google:
       type: oauth2

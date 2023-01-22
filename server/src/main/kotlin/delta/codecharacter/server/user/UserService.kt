@@ -7,7 +7,9 @@ import delta.codecharacter.server.exception.CustomException
 import delta.codecharacter.server.user.activate_user.ActivateUserService
 import delta.codecharacter.server.user.public_user.PublicUserService
 import delta.codecharacter.server.user.rating_history.RatingHistoryService
+import org.bson.json.JsonObject
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Lazy
 import org.springframework.dao.DuplicateKeyException
 import org.springframework.http.HttpStatus
@@ -16,6 +18,10 @@ import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
+import java.net.URI
+import java.net.http.HttpClient
+import java.net.http.HttpRequest
+import java.net.http.HttpResponse
 import java.util.Optional
 import java.util.UUID
 
@@ -28,6 +34,7 @@ class UserService(
 ) : UserDetailsService {
 
     @Lazy @Autowired private lateinit var passwordEncoder: BCryptPasswordEncoder
+    @Value("\${environment.reCaptcha-key}") private lateinit var secretKey: String
 
     override fun loadUserByUsername(email: String?): UserEntity {
         if (email == null) {
@@ -109,7 +116,17 @@ class UserService(
     }
 
     fun registerUser(registerUserRequestDto: RegisterUserRequestDto) {
-        val (username, name, email, password, passwordConfirmation, country, college, avatarId) =
+        val (
+            username,
+            name,
+            email,
+            password,
+            passwordConfirmation,
+            country,
+            college,
+            avatarId,
+            recaptchaCode
+        ) =
             registerUserRequestDto
 
         if (password != passwordConfirmation) {
@@ -122,6 +139,9 @@ class UserService(
             throw CustomException(HttpStatus.BAD_REQUEST, "Username already taken")
         }
 
+        if (!verifyReCaptcha(recaptchaCode))
+            throw CustomException(HttpStatus.BAD_REQUEST, "Invalid ReCaptcha")
+
         val userId = UUID.randomUUID()
         try {
             createUserWithPassword(userId, password, email)
@@ -130,6 +150,25 @@ class UserService(
             activateUserService.sendActivationToken(userId, name, email)
         } catch (duplicateError: DuplicateKeyException) {
             throw CustomException(HttpStatus.BAD_REQUEST, "Username/Email already exists")
+        }
+    }
+
+    fun verifyReCaptcha(reCaptchaResponse: String): Boolean {
+        val url =
+            "https://www.google.com/recaptcha/api/siteverify?secret=$secretKey&response=$reCaptchaResponse"
+        try {
+            val client = HttpClient.newBuilder().build()
+            val request =
+                HttpRequest.newBuilder()
+                    .uri(URI.create(url))
+                    .POST(HttpRequest.BodyPublishers.noBody())
+                    .build()
+            val response = client.send(request, HttpResponse.BodyHandlers.ofString())
+            val json = JsonObject(response.body())
+            return json.toBsonDocument().getBoolean("success").value
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return false
         }
     }
 

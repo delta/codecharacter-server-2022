@@ -22,6 +22,7 @@ import io.swagger.v3.oas.annotations.media.Schema
  * @param country
  * @param college
  * @param avatarId
+ * @param tutorialLevel
  * @param isProfileComplete
  * @param isTutorialComplete
  */
@@ -49,6 +50,9 @@ data class CurrentUserProfileDto(
 
     @Schema(example = "1", required = true, description = "")
     @field:JsonProperty("avatarId", required = true) val avatarId: kotlin.Int,
+
+    @Schema(example = "1", required = true, description = "")
+    @field:JsonProperty("tutorialLevel", required = true) val tutorialLevel: kotlin.Int,
 
     @Schema(example = "null", required = true, description = "")
     @field:JsonProperty("isProfileComplete", required = true) val isProfileComplete: kotlin.Boolean = false,

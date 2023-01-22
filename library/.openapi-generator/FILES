@@ -38,7 +38,7 @@ src/main/kotlin/delta/codecharacter/dtos/PublicUserDto.kt
 src/main/kotlin/delta/codecharacter/dtos/RatingHistoryDto.kt
 src/main/kotlin/delta/codecharacter/dtos/RegisterUserRequestDto.kt
 src/main/kotlin/delta/codecharacter/dtos/ResetPasswordRequestDto.kt
-src/main/kotlin/delta/codecharacter/dtos/TutorialLevelResponseDto.kt
+src/main/kotlin/delta/codecharacter/dtos/TutorialUpdateTypeDto.kt
 src/main/kotlin/delta/codecharacter/dtos/UpdateCurrentUserProfileDto.kt
 src/main/kotlin/delta/codecharacter/dtos/UpdateLatestCodeRequestDto.kt
 src/main/kotlin/delta/codecharacter/dtos/UpdateLatestMapRequestDto.kt

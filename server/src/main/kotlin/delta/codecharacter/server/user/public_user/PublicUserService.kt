@@ -4,11 +4,13 @@ import delta.codecharacter.dtos.CurrentUserProfileDto
 import delta.codecharacter.dtos.DailyChallengeLeaderBoardResponseDto
 import delta.codecharacter.dtos.LeaderboardEntryDto
 import delta.codecharacter.dtos.PublicUserDto
+import delta.codecharacter.dtos.TutorialUpdateTypeDto
 import delta.codecharacter.dtos.UpdateCurrentUserProfileDto
 import delta.codecharacter.dtos.UserStatsDto
 import delta.codecharacter.server.exception.CustomException
 import delta.codecharacter.server.match.MatchVerdictEnum
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.http.HttpStatus
@@ -19,6 +21,7 @@ import java.util.UUID
 @Service
 class PublicUserService(@Autowired private val publicUserRepository: PublicUserRepository) {
 
+    @Value("\${environment.no-of-tutorial-level}") private lateinit var totalTutorialLevels: Number
     fun create(
         userId: UUID,
         username: String,
@@ -41,6 +44,7 @@ class PublicUserService(@Autowired private val publicUserRepository: PublicUserR
                 ties = 0,
                 score = 0.0,
                 challengesCompleted = null,
+                tutorialLevel = 1,
             )
         publicUserRepository.save(publicUser)
     }
@@ -62,7 +66,7 @@ class PublicUserService(@Autowired private val publicUserRepository: PublicUserR
                     rating = BigDecimal(it.rating),
                     wins = it.wins,
                     losses = it.losses,
-                    ties = it.ties,
+                    ties = it.ties
                 )
             )
         }
@@ -89,7 +93,9 @@ class PublicUserService(@Autowired private val publicUserRepository: PublicUserR
             name = user.name,
             country = user.country,
             college = user.college,
+            tutorialLevel = user.tutorialLevel,
             avatarId = user.avatarId,
+            isTutorialComplete = user.tutorialLevel == totalTutorialLevels.toInt()
         )
     }
 
@@ -100,9 +106,37 @@ class PublicUserService(@Autowired private val publicUserRepository: PublicUserR
                 name = updateCurrentUserProfileDto.name ?: user.name,
                 country = updateCurrentUserProfileDto.country ?: user.country,
                 college = updateCurrentUserProfileDto.college ?: user.college,
-                avatarId = updateCurrentUserProfileDto.avatarId ?: user.avatarId
+                tutorialLevel =
+                updateTutorialLevel(
+                    updateCurrentUserProfileDto.updateTutorialLevel, user.tutorialLevel
+                )
             )
         publicUserRepository.save(updatedUser)
+    }
+
+    fun updateTutorialLevel(updateTutorialType: TutorialUpdateTypeDto?, tutorialLevel: Int): Int {
+        var updatedTutorialLevel = tutorialLevel
+        when (updateTutorialType) {
+            TutorialUpdateTypeDto.NEXT -> {
+                if (tutorialLevel >= totalTutorialLevels.toInt()) {
+                    return tutorialLevel
+                }
+                updatedTutorialLevel += 1
+            }
+            TutorialUpdateTypeDto.PREVIOUS -> {
+                if (tutorialLevel <= 1) {
+                    return 1
+                }
+                updatedTutorialLevel -= 1
+            }
+            TutorialUpdateTypeDto.SKIP -> {
+                updatedTutorialLevel = totalTutorialLevels.toInt()
+            }
+            else -> {
+                return tutorialLevel
+            }
+        }
+        return updatedTutorialLevel
     }
 
     fun updatePublicRating(

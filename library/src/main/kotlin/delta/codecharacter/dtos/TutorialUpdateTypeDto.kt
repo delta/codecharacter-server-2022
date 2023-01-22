@@ -1,6 +1,7 @@
 package delta.codecharacter.dtos
 
 import java.util.Objects
+import com.fasterxml.jackson.annotation.JsonValue
 import com.fasterxml.jackson.annotation.JsonProperty
 import jakarta.validation.constraints.DecimalMax
 import jakarta.validation.constraints.DecimalMin
@@ -14,14 +15,13 @@ import jakarta.validation.Valid
 import io.swagger.v3.oas.annotations.media.Schema
 
 /**
- * Get the tutorial level of the current user
- * @param level
- */
-data class TutorialLevelResponseDto(
+*
+* Values: NEXT,PREVIOUS,SKIP
+*/
+enum class TutorialUpdateTypeDto(val value: kotlin.String) {
 
-    @Schema(example = "2", description = "")
-    @field:JsonProperty("level") val level: kotlin.Int? = null
-) {
-
+    @JsonProperty("NEXT") NEXT("NEXT"),
+    @JsonProperty("PREVIOUS") PREVIOUS("PREVIOUS"),
+    @JsonProperty("SKIP") SKIP("SKIP")
 }
 

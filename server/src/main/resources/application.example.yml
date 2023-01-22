@@ -26,6 +26,9 @@ spring:
             scope: user:email
 environment:
   event-start-date: YYYY-MM-DDTHH:MM:SSZ
+  reCaptcha-key: your-recaptcha-key
+  no-of-tutorial-level: 0
+
 
 de:
   flapdoodle:
