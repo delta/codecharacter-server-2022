@@ -9,4 +9,5 @@ data class Attacker(
     @field:JsonProperty("attack_power", required = true) val attackPower: Int,
     @field:JsonProperty("speed", required = true) val speed: Int,
     @field:JsonProperty("price", required = true) val price: Int,
+    @field:JsonProperty("is_aerial", required = true) val type: Boolean,
 )
