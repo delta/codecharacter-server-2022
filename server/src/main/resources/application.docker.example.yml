@@ -31,6 +31,11 @@ environment:
   reCaptcha-key: your-recaptcha-key
   no-of-tutorial-level: 0
 
+server:
+  compression:
+    enabled: true
+  http2:
+    enabled: true
 
 de:
   flapdoodle:
