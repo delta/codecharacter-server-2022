@@ -2,6 +2,7 @@ package delta.codecharacter.dtos
 
 import java.util.Objects
 import com.fasterxml.jackson.annotation.JsonProperty
+import delta.codecharacter.dtos.CodeTypeDto
 import delta.codecharacter.dtos.LanguageDto
 import jakarta.validation.constraints.DecimalMax
 import jakarta.validation.constraints.DecimalMin
@@ -19,6 +20,7 @@ import io.swagger.v3.oas.annotations.media.Schema
  * @param code
  * @param message
  * @param language
+ * @param codeType
  */
 data class CreateCodeRevisionRequestDto(
 
@@ -30,7 +32,11 @@ data class CreateCodeRevisionRequestDto(
 
     @field:Valid
     @Schema(example = "null", required = true, description = "")
-    @field:JsonProperty("language", required = true) val language: LanguageDto
+    @field:JsonProperty("language", required = true) val language: LanguageDto,
+
+    @field:Valid
+    @Schema(example = "null", description = "")
+    @field:JsonProperty("codeType") val codeType: CodeTypeDto? = CodeTypeDto.NORMAL
 ) {
 
 }

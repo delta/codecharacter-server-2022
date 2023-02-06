@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import delta.codecharacter.dtos.CreateMapRevisionRequestDto
 import delta.codecharacter.dtos.GameMapDto
 import delta.codecharacter.dtos.GameMapRevisionDto
+import delta.codecharacter.dtos.GameMapTypeDto
 import delta.codecharacter.dtos.UpdateLatestMapRequestDto
 import delta.codecharacter.server.TestAttributes
 import delta.codecharacter.server.WithMockCustomUser
@@ -49,7 +50,10 @@ internal class GameMapControllerIntegrationTest(@Autowired val mockMvc: MockMvc)
     fun `should create map revision`() {
 
         val validMap = mapper.writeValueAsString(List(64) { List(64) { 0 } })
-        val dto = CreateMapRevisionRequestDto(map = validMap, message = "message")
+        val dto =
+            CreateMapRevisionRequestDto(
+                map = validMap, message = "message", mapImage = "", mapType = GameMapTypeDto.NORMAL
+            )
 
         mockMvc
             .post("/user/map/revisions") {
@@ -74,6 +78,8 @@ internal class GameMapControllerIntegrationTest(@Autowired val mockMvc: MockMvc)
                 id = UUID.randomUUID(),
                 map = "map",
                 message = "message",
+                mapImage = "",
+                mapType = GameMapTypeDto.NORMAL,
                 userId = TestAttributes.user.id,
                 parentRevision = null,
                 createdAt = Instant.now().truncatedTo(ChronoUnit.MILLIS)
@@ -99,16 +105,23 @@ internal class GameMapControllerIntegrationTest(@Autowired val mockMvc: MockMvc)
     @Test
     @WithMockCustomUser
     fun `should get latest map`() {
-        val latestMapEntity =
-            LatestMapEntity(
-                userId = TestAttributes.user.id,
+        val latestMap = HashMap<GameMapTypeDto, GameMap>()
+        latestMap[GameMapTypeDto.NORMAL] =
+            GameMap(
                 map = "map",
+                mapImage = "base64",
                 lastSavedAt = Instant.now().truncatedTo(ChronoUnit.MILLIS)
             )
+        val latestMapEntity = LatestMapEntity(userId = TestAttributes.user.id, latestMap = latestMap)
         mongoTemplate.insert<LatestMapEntity>(latestMapEntity)
 
         val expectedDto =
-            GameMapDto(map = latestMapEntity.map, lastSavedAt = latestMapEntity.lastSavedAt)
+            GameMapDto(
+                map = latestMapEntity.latestMap[GameMapTypeDto.NORMAL]?.map.toString(),
+                lastSavedAt = latestMapEntity.latestMap[GameMapTypeDto.NORMAL]?.lastSavedAt
+                    ?: Instant.MIN,
+                mapImage = "base64"
+            )
 
         mockMvc.get("/user/map/latest") { contentType = MediaType.APPLICATION_JSON }.andExpect {
             status { is2xxSuccessful() }
@@ -119,17 +132,20 @@ internal class GameMapControllerIntegrationTest(@Autowired val mockMvc: MockMvc)
     @Test
     @WithMockCustomUser
     fun `should update latest map`() {
-        val validMap = mapper.writeValueAsString(List(64) { List(64) { 0 } })
-        val oldMapEntity =
-            LatestMapEntity(
-                userId = TestAttributes.user.id,
-                map = validMap,
+        val oldMap = HashMap<GameMapTypeDto, GameMap>()
+        oldMap[GameMapTypeDto.NORMAL] =
+            GameMap(
+                map = "map",
+                mapImage = "base64",
                 lastSavedAt = Instant.now().truncatedTo(ChronoUnit.MILLIS)
             )
+        val validMap = mapper.writeValueAsString(List(64) { List(64) { 0 } })
+        val oldMapEntity = LatestMapEntity(userId = TestAttributes.user.id, latestMap = oldMap)
 
         mongoTemplate.insert<LatestMapEntity>(oldMapEntity)
 
-        val dto = UpdateLatestMapRequestDto(map = validMap)
+        val dto =
+            UpdateLatestMapRequestDto(map = validMap, mapImage = "", mapType = GameMapTypeDto.NORMAL)
 
         mockMvc
             .post("/user/map/latest") {
@@ -139,23 +155,29 @@ internal class GameMapControllerIntegrationTest(@Autowired val mockMvc: MockMvc)
             .andExpect { status { is2xxSuccessful() } }
 
         val latestMap = mongoTemplate.findAll<LatestMapEntity>().first()
-        assertThat(latestMap.map).isEqualTo(dto.map)
-        assertThat(latestMap.lastSavedAt).isNotEqualTo(oldMapEntity.lastSavedAt)
+        assertThat(latestMap.latestMap[GameMapTypeDto.NORMAL]?.map).isEqualTo(dto.map)
+        assertThat(latestMap.latestMap[GameMapTypeDto.NORMAL]?.lastSavedAt)
+            .isNotEqualTo(oldMapEntity.latestMap[GameMapTypeDto.NORMAL]?.lastSavedAt)
     }
 
     @Test
     @WithMockCustomUser
     fun `should update latest map with lock`() {
         val validMap = mapper.writeValueAsString(List(64) { List(64) { 0 } })
-        val oldMapEntity =
-            LatestMapEntity(
-                userId = TestAttributes.user.id,
-                map = validMap,
+        val oldMap = HashMap<GameMapTypeDto, GameMap>()
+        oldMap[GameMapTypeDto.NORMAL] =
+            GameMap(
+                map = "map",
+                mapImage = "base64",
                 lastSavedAt = Instant.now().truncatedTo(ChronoUnit.MILLIS)
             )
+        val oldMapEntity = LatestMapEntity(userId = TestAttributes.user.id, latestMap = oldMap)
         mongoTemplate.insert<LatestMapEntity>(oldMapEntity)
 
-        val dto = UpdateLatestMapRequestDto(map = validMap, lock = true)
+        val dto =
+            UpdateLatestMapRequestDto(
+                map = validMap, lock = true, mapImage = "", mapType = GameMapTypeDto.NORMAL
+            )
 
         mockMvc
             .post("/user/map/latest") {
@@ -165,11 +187,12 @@ internal class GameMapControllerIntegrationTest(@Autowired val mockMvc: MockMvc)
             .andExpect { status { is2xxSuccessful() } }
 
         val latestMap = mongoTemplate.findAll<LatestMapEntity>().first()
-        assertThat(latestMap.map).isEqualTo(dto.map)
-        assertThat(latestMap.lastSavedAt).isNotEqualTo(oldMapEntity.lastSavedAt)
+        assertThat(latestMap.latestMap[GameMapTypeDto.NORMAL]?.map).isEqualTo(dto.map)
+        assertThat(latestMap.latestMap[GameMapTypeDto.NORMAL]?.map)
+            .isNotEqualTo(oldMapEntity.latestMap[GameMapTypeDto.NORMAL]?.map)
 
         val lockedMap = mongoTemplate.findAll<LockedMapEntity>().first()
-        assertThat(lockedMap.map).isEqualTo(dto.map)
+        assertThat(lockedMap.lockedMap[GameMapTypeDto.NORMAL]?.map).isEqualTo(dto.map)
     }
 
     @AfterEach

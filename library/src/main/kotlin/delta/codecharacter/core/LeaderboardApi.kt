@@ -6,6 +6,7 @@
 package delta.codecharacter.core
 
 import delta.codecharacter.dtos.LeaderboardEntryDto
+import delta.codecharacter.dtos.TierTypeDto
 import io.swagger.v3.oas.annotations.*
 import io.swagger.v3.oas.annotations.enums.*
 import io.swagger.v3.oas.annotations.media.*
@@ -52,7 +53,7 @@ interface LeaderboardApi {
             value = ["/leaderboard"],
             produces = ["application/json"]
     )
-    fun getLeaderboard(@Parameter(description = "Index of the page") @Valid @RequestParam(value = "page", required = false) page: kotlin.Int?,@Parameter(description = "Size of the page") @Valid @RequestParam(value = "size", required = false) size: kotlin.Int?): ResponseEntity<List<LeaderboardEntryDto>> {
+    fun getLeaderboard(@Parameter(description = "Index of the page") @Valid @RequestParam(value = "page", required = false) page: kotlin.Int?,@Parameter(description = "Size of the page") @Valid @RequestParam(value = "size", required = false) size: kotlin.Int?,@Parameter(description = "Leaderboard Tier", schema = Schema(allowableValues = ["TIER_PRACTICE", "TIER1", "TIER2", "TIER3", "TIER4"])) @Valid @RequestParam(value = "tier", required = false) tier: TierTypeDto?): ResponseEntity<List<LeaderboardEntryDto>> {
         return ResponseEntity(HttpStatus.NOT_IMPLEMENTED)
     }
 }

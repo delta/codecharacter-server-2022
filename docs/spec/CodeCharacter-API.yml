@@ -296,6 +296,11 @@ paths:
           in: query
           name: size
           description: Size of the page
+        - schema:
+            $ref: '#/components/schemas/TierType'
+          in: query
+          name: tier
+          description: Leaderboard Tier
       description: Get leaderboard
     parameters: []
   /top-matches:
@@ -529,6 +534,7 @@ paths:
                     college: NITT
                     avatarId: 1
                     tutorialLevel: 2
+                    tier: TIER1
                     isProfileComplete: true
                     isTutorialComplete: true
         '401':
@@ -654,6 +660,12 @@ paths:
         '401':
           description: Unauthorized
       operationId: getLatestCode
+      parameters:
+        - schema:
+            $ref: '#/components/schemas/CodeType'
+          in: query
+          name: type
+          description: code type
       description: Get latest code
     post:
       summary: Update latest code
@@ -669,6 +681,7 @@ paths:
               Example:
                 value:
                   code: '#include<iostream.h>'
+                  codeType: NORMAL
                   language: C
                   lock: false
       responses:
@@ -733,6 +746,12 @@ paths:
         '401':
           description: Unauthorized
       operationId: getCodeRevisions
+      parameters:
+        - schema:
+            $ref: '#/components/schemas/CodeType'
+          in: query
+          name: type
+          description: code type
       description: Get list of all code revision IDs
     post:
       summary: Create code revision
@@ -763,6 +782,7 @@ paths:
               Example:
                 value:
                   code: '#include<iostream>'
+                  codeType: NORMAL
                   message: revision1
                   language: C
       tags:
@@ -785,11 +805,18 @@ paths:
                 Example:
                   value:
                     map: 0000\n0010\n0100\n1000\n
+                    mapImage: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAIAQMAAAD+wSzIAAAABlBMVEX///+/v7+jQ3Y5AAAADklEQVQI12P4AIX8EAgALgAD/aNpbtEAAAAASUVORK5CYII'
                     lastSavedAt: '2019-08-24T14:15:22Z'
         '401':
           description: Unauthorized
       operationId: getLatestMap
       description: Get latest map
+      parameters:
+        - schema:
+            $ref: '#/components/schemas/GameMapType'
+          in: query
+          name: type
+          description: map type
     post:
       summary: Update latest map
       operationId: updateLatestMap
@@ -804,6 +831,8 @@ paths:
               Example:
                 value:
                   map: 0000\n0010\n0100\n1000\n
+                  mapType: NORMAL
+                  mapImage: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAIAQMAAAD+wSzIAAAABlBMVEX///+/v7+jQ3Y5AAAADklEQVQI12P4AIX8EAgALgAD/aNpbtEAAAAASUVORK5CYII'
                   lock: false
       responses:
         '204':
@@ -855,6 +884,12 @@ paths:
         '401':
           description: Unauthorized
       operationId: getMapRevisions
+      parameters:
+        - schema:
+            $ref: '#/components/schemas/GameMapType'
+          in: query
+          name: type
+          description: map type
       description: Get list of all map revision IDs
     post:
       summary: Create map revision
@@ -885,10 +920,41 @@ paths:
               Example:
                 value:
                   map: 0000\n0010\n0100\n1000\n
+                  mapImage: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAIAQMAAAD+wSzIAAAABlBMVEX///+/v7+jQ3Y5AAAADklEQVQI12P4AIX8EAgALgAD/aNpbtEAAAAASUVORK5CYII'
+                  mapType: NORMAL
                   message: revision1
       tags:
         - map
     parameters: []
+  /user/map/revision/{commitId}:
+    get:
+      summary: Get the Map and image of the commit ID
+      tags:
+        - map
+      responses:
+        200:
+          description: OK
+          headers: { }
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MapCommitByCommitIdResponse'
+              examples:
+                Example:
+                  value:
+                    mapImage: 'base-64-string'
+                    map: 0000\n0000\0001\n0000
+        401:
+          description: Unauthorized
+      operationId: getMapByCommitID
+      parameters:
+        - schema:
+            type: string
+            format: uuid
+            example: 123e456-e445b-12d3-a4565-212324
+          in: path
+          required: true
+          name: commitId
   /user/matches:
     get:
       summary: Get user matches
@@ -1156,10 +1222,6 @@ paths:
   '/dc/leaderboard':
     get:
       summary: Get Daily Challenges Leaderboard
-      description: Get Leaderboard for daily challenges
-      operationId: getDailyChallengeLeaderBoard
-      tags:
-        - Daily Challenges
       responses:
         '200':
           description: OK
@@ -1175,6 +1237,10 @@ paths:
           description: Forbidden
         '404':
           description: Not Found
+      description: Get Leaderboard for daily challenges
+      operationId: getDailyChallengeLeaderBoard
+      tags:
+        - Daily Challenges
       parameters:
         - schema:
             type: integer
@@ -1187,6 +1253,45 @@ paths:
           name: size
           description: Size of the page
     parameters: []
+  /dc/submit:
+    post:
+      summary: Match Execution for Daily Challenges
+      description: Match making for Daily Challenges
+      operationId: createDailyChallengeMatch
+      responses:
+        '201':
+          description: Created
+        '400':
+          description: Bad Request
+          headers: { }
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GenericError'
+              examples:
+                Example:
+                  value:
+                    message: Some field missing
+        '401':
+          description: Unauthorized
+      requestBody:
+        required: true
+        content:
+           application/json:
+              schema:
+                $ref: '#/components/schemas/DailyChallengeMatchRequest'
+              examples:
+                CodeExample:
+                  value:
+                    value : "#include<iostream>"
+                    language: CPP
+                MapExample:
+                  value:
+                    value: "[[0,0,0]]"
+      tags:
+        - Daily Challenges
+
+
 components:
   schemas:
     PasswordLoginRequest:
@@ -1288,6 +1393,8 @@ components:
         country:
           type: string
           example: IN
+        tier:
+          $ref: '#/components/schemas/TierType'
         college:
           type: string
           example: Test
@@ -1297,6 +1404,7 @@ components:
       required:
         - username
         - name
+        - tier
         - country
         - college
         - avatarId
@@ -1354,6 +1462,8 @@ components:
         code:
           type: string
           example: '#include <iostream>'
+        codeType:
+          $ref: '#/components/schemas/CodeType'
         lock:
           type: boolean
           default: false
@@ -1400,6 +1510,8 @@ components:
         code:
           type: string
           example: '#include <iostream>'
+        codeType:
+          $ref: '#/components/schemas/CodeType'
         message:
           type: string
           example: message
@@ -1417,12 +1529,16 @@ components:
         map:
           type: string
           example: 0000\n0010\n0100\n1000\n
+        mapImage:
+          type: string
+          example: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAIAQMAAAD+wSzIAAAABlBMVEX///+/v7+jQ3Y5AAAADklEQVQI12P4AIX8EAgALgAD/aNpbtEAAAAASUVORK5CYII'
         lastSavedAt:
           type: string
           format: date-time
           example: '2021-01-01T00:00:00Z'
       required:
         - map
+        - mapImage
         - lastSavedAt
     UpdateLatestMapRequest:
       title: UpdateLatestMapRequest
@@ -1432,11 +1548,17 @@ components:
         map:
           type: string
           example: 0000\n0010\n0100\n1000\n
+        mapType:
+          $ref: '#/components/schemas/GameMapType'
+        mapImage:
+          type: string
+          example: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAIAQMAAAD+wSzIAAAABlBMVEX///+/v7+jQ3Y5AAAADklEQVQI12P4AIX8EAgALgAD/aNpbtEAAAAASUVORK5CYII'
         lock:
           type: boolean
           default: false
       required:
         - map
+        - mapImage
     GameMapRevision:
       title: GameMapRevision
       type: object
@@ -1472,12 +1594,32 @@ components:
         map:
           type: string
           example: 0000\n0010\n0100\n1000\n
+        mapType:
+          $ref: '#/components/schemas/GameMapType'
+        mapImage:
+          type: string
+          example: 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAIAQMAAAD+wSzIAAAABlBMVEX///+/v7+jQ3Y5AAAADklEQVQI12P4AIX8EAgALgAD/aNpbtEAAAAASUVORK5CYII'
         message:
           type: string
           example: message
       required:
         - map
+        - mapImage
         - message
+    MapCommitByCommitIdResponse:
+      title: MapCommitByCommitIdResponse
+      type: object
+      description: Get map image and map by commitId
+      properties:
+        mapImage:
+          type: string
+          example: 'base-64-string'
+        map:
+          type: string
+          example: 0000\n0000\n0001\n0000
+      required:
+        - mapImage
+        - map
     ActivateUserRequest:
       title: ActivateUserRequest
       type: object
@@ -1575,6 +1717,8 @@ components:
         tutorialLevel:
           type: integer
           example: 1
+        tier:
+          $ref: '#/components/schemas/TierType'
         isProfileComplete:
           type: boolean
           default: false
@@ -1810,7 +1954,6 @@ components:
         completionStatus:
           type: boolean
           example: true
-
       required:
         - challName
         - chall
@@ -1833,6 +1976,18 @@ components:
         - userName
         - score
         - avatarId
+    DailyChallengeMatchRequest:
+      title: DailyChallengeMatchRequest
+      description: Request Model for the daily challenge
+      type: object
+      properties:
+        value:
+          type: string
+          example: "#include<iostream>"
+        language:
+          $ref: '#/components/schemas/Language'
+      required:
+        - value
     GenericError:
       title: GenericError
       type: object
@@ -1899,6 +2054,29 @@ components:
         - NEXT
         - PREVIOUS
         - SKIP
+    CodeType:
+      title: CodeType
+      type: string
+      enum:
+        - NORMAL
+        - DAILY_CHALLENGE
+      default: NORMAL
+    GameMapType:
+      title: GameMapType
+      type: string
+      enum:
+        - NORMAL
+        - DAILY_CHALLENGE
+      default: NORMAL
+    TierType:
+      title: TierType
+      type: string
+      enum:
+        - TIER_PRACTICE
+        - TIER1
+        - TIER2
+        - TIER3
+        - TIER4
   securitySchemes:
     oauth2-google:
       type: oauth2

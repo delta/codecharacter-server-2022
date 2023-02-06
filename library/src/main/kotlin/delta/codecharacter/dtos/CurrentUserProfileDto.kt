@@ -2,6 +2,7 @@ package delta.codecharacter.dtos
 
 import java.util.Objects
 import com.fasterxml.jackson.annotation.JsonProperty
+import delta.codecharacter.dtos.TierTypeDto
 import jakarta.validation.constraints.DecimalMax
 import jakarta.validation.constraints.DecimalMin
 import jakarta.validation.constraints.Email
@@ -25,6 +26,7 @@ import io.swagger.v3.oas.annotations.media.Schema
  * @param tutorialLevel
  * @param isProfileComplete
  * @param isTutorialComplete
+ * @param tier
  */
 data class CurrentUserProfileDto(
 
@@ -58,7 +60,11 @@ data class CurrentUserProfileDto(
     @field:JsonProperty("isProfileComplete", required = true) val isProfileComplete: kotlin.Boolean = false,
 
     @Schema(example = "null", required = true, description = "")
-    @field:JsonProperty("isTutorialComplete", required = true) val isTutorialComplete: kotlin.Boolean = false
+    @field:JsonProperty("isTutorialComplete", required = true) val isTutorialComplete: kotlin.Boolean = false,
+
+    @field:Valid
+    @Schema(example = "null", description = "")
+    @field:JsonProperty("tier") val tier: TierTypeDto? = null
 ) {
 
 }

@@ -10,6 +10,8 @@ import delta.codecharacter.server.code.LanguageEnum
 import delta.codecharacter.server.code.code_revision.CodeRevisionService
 import delta.codecharacter.server.code.latest_code.LatestCodeService
 import delta.codecharacter.server.code.locked_code.LockedCodeService
+import delta.codecharacter.server.daily_challenge.DailyChallengeService
+import delta.codecharacter.server.daily_challenge.match.DailyChallengeMatchRepository
 import delta.codecharacter.server.exception.CustomException
 import delta.codecharacter.server.game.GameEntity
 import delta.codecharacter.server.game.GameService
@@ -48,6 +50,8 @@ internal class MatchServiceTest {
     private lateinit var verdictAlgorithm: VerdictAlgorithm
     private lateinit var ratingHistoryService: RatingHistoryService
     private lateinit var notificationService: NotificationService
+    private lateinit var dailyChallengeService: DailyChallengeService
+    private lateinit var dailyChallengeMatchRepository: DailyChallengeMatchRepository
     private lateinit var jackson2ObjectMapperBuilder: Jackson2ObjectMapperBuilder
     private lateinit var simpMessagingTemplate: SimpMessagingTemplate
 
@@ -67,6 +71,8 @@ internal class MatchServiceTest {
         verdictAlgorithm = mockk(relaxed = true)
         ratingHistoryService = mockk(relaxed = true)
         notificationService = mockk(relaxed = true)
+        dailyChallengeService = mockk(relaxed = true)
+        dailyChallengeMatchRepository = mockk(relaxed = true)
         jackson2ObjectMapperBuilder = Jackson2ObjectMapperBuilder()
         simpMessagingTemplate = mockk(relaxed = true)
 
@@ -84,6 +90,8 @@ internal class MatchServiceTest {
                 verdictAlgorithm,
                 ratingHistoryService,
                 notificationService,
+                dailyChallengeService,
+                dailyChallengeMatchRepository,
                 jackson2ObjectMapperBuilder,
                 simpMessagingTemplate
             )

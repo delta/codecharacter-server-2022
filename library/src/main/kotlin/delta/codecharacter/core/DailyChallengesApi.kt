@@ -7,6 +7,8 @@ package delta.codecharacter.core
 
 import delta.codecharacter.dtos.DailyChallengeGetRequestDto
 import delta.codecharacter.dtos.DailyChallengeLeaderBoardResponseDto
+import delta.codecharacter.dtos.DailyChallengeMatchRequestDto
+import delta.codecharacter.dtos.GenericErrorDto
 import io.swagger.v3.oas.annotations.*
 import io.swagger.v3.oas.annotations.enums.*
 import io.swagger.v3.oas.annotations.media.*
@@ -37,6 +39,27 @@ import kotlin.collections.Map
 @Validated
 @RequestMapping("\${api.base-path:}")
 interface DailyChallengesApi {
+
+    @Operation(
+        summary = "Match Execution for Daily Challenges",
+        operationId = "createDailyChallengeMatch",
+        description = "Match making for Daily Challenges",
+        responses = [
+            ApiResponse(responseCode = "201", description = "Created"),
+            ApiResponse(responseCode = "400", description = "Bad Request", content = [Content(schema = Schema(implementation = GenericErrorDto::class))]),
+            ApiResponse(responseCode = "401", description = "Unauthorized")
+        ],
+        security = [ SecurityRequirement(name = "http-bearer") ]
+    )
+    @RequestMapping(
+            method = [RequestMethod.POST],
+            value = ["/dc/submit"],
+            produces = ["application/json"],
+            consumes = ["application/json"]
+    )
+    fun createDailyChallengeMatch(@Parameter(description = "", required = true) @Valid @RequestBody dailyChallengeMatchRequestDto: DailyChallengeMatchRequestDto): ResponseEntity<Unit> {
+        return ResponseEntity(HttpStatus.NOT_IMPLEMENTED)
+    }
 
     @Operation(
         summary = "Get Daily Challenge for the day",

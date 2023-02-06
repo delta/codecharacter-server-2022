@@ -4,10 +4,12 @@ import delta.codecharacter.dtos.CurrentUserProfileDto
 import delta.codecharacter.dtos.DailyChallengeLeaderBoardResponseDto
 import delta.codecharacter.dtos.LeaderboardEntryDto
 import delta.codecharacter.dtos.PublicUserDto
+import delta.codecharacter.dtos.TierTypeDto
 import delta.codecharacter.dtos.TutorialUpdateTypeDto
 import delta.codecharacter.dtos.UpdateCurrentUserProfileDto
 import delta.codecharacter.dtos.UserStatsDto
 import delta.codecharacter.server.exception.CustomException
+import delta.codecharacter.server.leaderboard.LeaderBoardEnum
 import delta.codecharacter.server.match.MatchVerdictEnum
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
@@ -43,13 +45,14 @@ class PublicUserService(@Autowired private val publicUserRepository: PublicUserR
                 losses = 0,
                 ties = 0,
                 score = 0.0,
-                challengesCompleted = null,
+                tier = LeaderBoardEnum.TIER_PRACTICE,
+                isDailyChallengeCompleted = false,
                 tutorialLevel = 1,
             )
         publicUserRepository.save(publicUser)
     }
 
-    fun getLeaderboard(page: Int?, size: Int?): List<LeaderboardEntryDto> {
+    fun getLeaderboard(page: Int?, size: Int?, tier: TierTypeDto?): List<LeaderboardEntryDto> {
         val pageRequest = PageRequest.of(page ?: 0, size ?: 10, Sort.by(Sort.Direction.DESC, "rating"))
         return publicUserRepository.findAll(pageRequest).content.map {
             LeaderboardEntryDto(
@@ -57,6 +60,7 @@ class PublicUserService(@Autowired private val publicUserRepository: PublicUserR
                 PublicUserDto(
                     username = it.username,
                     name = it.name,
+                    tier = TierTypeDto.valueOf(it.tier.name),
                     country = it.country,
                     college = it.college,
                     avatarId = it.avatarId,
@@ -203,5 +207,13 @@ class PublicUserService(@Autowired private val publicUserRepository: PublicUserR
 
     fun isUsernameUnique(username: String): Boolean {
         return publicUserRepository.findByUsername(username).isEmpty
+    }
+
+    fun updateIsDailyChallengeComplete() {
+        val users = publicUserRepository.findAll()
+        users.forEach { user ->
+            val updatedUser = user.copy(isDailyChallengeCompleted = false)
+            publicUserRepository.save(updatedUser)
+        }
     }
 }

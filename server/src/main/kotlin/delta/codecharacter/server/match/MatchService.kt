@@ -1,17 +1,24 @@
 package delta.codecharacter.server.match
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import delta.codecharacter.dtos.ChallengeTypeDto
 import delta.codecharacter.dtos.CreateMatchRequestDto
+import delta.codecharacter.dtos.DailyChallengeMatchRequestDto
 import delta.codecharacter.dtos.GameDto
 import delta.codecharacter.dtos.GameStatusDto
 import delta.codecharacter.dtos.MatchDto
 import delta.codecharacter.dtos.MatchModeDto
 import delta.codecharacter.dtos.PublicUserDto
+import delta.codecharacter.dtos.TierTypeDto
 import delta.codecharacter.dtos.VerdictDto
 import delta.codecharacter.server.code.LanguageEnum
 import delta.codecharacter.server.code.code_revision.CodeRevisionService
 import delta.codecharacter.server.code.latest_code.LatestCodeService
 import delta.codecharacter.server.code.locked_code.LockedCodeService
+import delta.codecharacter.server.daily_challenge.DailyChallengeService
+import delta.codecharacter.server.daily_challenge.match.DailyChallengeMatchEntity
+import delta.codecharacter.server.daily_challenge.match.DailyChallengeMatchRepository
+import delta.codecharacter.server.daily_challenge.match.DailyChallengeMatchVerdictEnum
 import delta.codecharacter.server.exception.CustomException
 import delta.codecharacter.server.game.GameService
 import delta.codecharacter.server.game.GameStatusEnum
@@ -46,6 +53,8 @@ class MatchService(
     @Autowired private val verdictAlgorithm: VerdictAlgorithm,
     @Autowired private val ratingHistoryService: RatingHistoryService,
     @Autowired private val notificationService: NotificationService,
+    @Autowired private val dailyChallengeService: DailyChallengeService,
+    @Autowired private val dailyChallengeMatchRepository: DailyChallengeMatchRepository,
     @Autowired private val jackson2ObjectMapperBuilder: Jackson2ObjectMapperBuilder,
     @Autowired private val simpMessagingTemplate: SimpMessagingTemplate,
 ) {
@@ -132,6 +141,41 @@ class MatchService(
         gameService.sendGameRequest(game2, opponentCode, opponentLanguage, userMap)
     }
 
+    fun createDCMatch(userId: UUID, dailyChallengeMatchRequestDto: DailyChallengeMatchRequestDto) {
+        val (_, chall, challType, _, completionStatus) = dailyChallengeService.getDailyChallengeByDate()
+        val (value, _) = dailyChallengeMatchRequestDto
+        if (completionStatus != null && completionStatus) {
+            throw CustomException(HttpStatus.ACCEPTED, "You have already completed your daily Challenge")
+        }
+        val language: LanguageEnum
+        val map: String
+        val code: String
+        when (challType) {
+            ChallengeTypeDto.CODE -> { // code as question and map as answer
+                code = chall
+                language = LanguageEnum.CPP
+                map = value
+            }
+            ChallengeTypeDto.MAP -> {
+                map = chall
+                language = LanguageEnum.valueOf(dailyChallengeMatchRequestDto.language.toString())
+                code = value
+            }
+        }
+        val matchId = UUID.randomUUID()
+        val game = gameService.createGame(matchId)
+        val user = publicUserService.getPublicUser(userId)
+        val match =
+            DailyChallengeMatchEntity(
+                id = matchId,
+                verdict = DailyChallengeMatchVerdictEnum.STARTED,
+                createdAt = Instant.now(),
+                user = user,
+                game = game
+            )
+        dailyChallengeMatchRepository.save(match)
+        gameService.sendGameRequest(game, code, language, map)
+    }
     fun createMatch(userId: UUID, createMatchRequestDto: CreateMatchRequestDto) {
         when (createMatchRequestDto.mode) {
             MatchModeDto.SELF -> {
@@ -170,6 +214,7 @@ class MatchService(
                 PublicUserDto(
                     username = matchEntity.player1.username,
                     name = matchEntity.player1.name,
+                    tier = TierTypeDto.valueOf(matchEntity.player1.tier.name),
                     country = matchEntity.player1.country,
                     college = matchEntity.player1.college,
                     avatarId = matchEntity.player1.avatarId,
@@ -178,6 +223,7 @@ class MatchService(
                 PublicUserDto(
                     username = matchEntity.player2.username,
                     name = matchEntity.player2.name,
+                    tier = TierTypeDto.valueOf(matchEntity.player2.tier.name),
                     country = matchEntity.player2.country,
                     college = matchEntity.player2.college,
                     avatarId = matchEntity.player2.avatarId,
@@ -200,67 +246,83 @@ class MatchService(
     @RabbitListener(queues = ["gameStatusUpdateQueue"], ackMode = "AUTO")
     fun receiveGameResult(gameStatusUpdateJson: String) {
         val updatedGame = gameService.updateGameStatus(gameStatusUpdateJson)
-
-        val match = matchRepository.findById(updatedGame.matchId).get()
-        if (match.mode != MatchModeEnum.AUTO && match.games.first().id == updatedGame.id) {
-            simpMessagingTemplate.convertAndSend(
-                "/updates/${match.player1.userId}",
-                mapper.writeValueAsString(
-                    GameDto(
-                        id = updatedGame.id,
-                        destruction = BigDecimal(updatedGame.destruction),
-                        coinsUsed = updatedGame.coinsUsed,
-                        status = GameStatusDto.valueOf(updatedGame.status.name),
+        val matchId = updatedGame.matchId
+        if (matchRepository.findById(matchId).isPresent) {
+            val match = matchRepository.findById(updatedGame.matchId).get()
+            if (match.mode != MatchModeEnum.AUTO && match.games.first().id == updatedGame.id) {
+                simpMessagingTemplate.convertAndSend(
+                    "/updates/${match.player1.userId}",
+                    mapper.writeValueAsString(
+                        GameDto(
+                            id = updatedGame.id,
+                            destruction = BigDecimal(updatedGame.destruction),
+                            coinsUsed = updatedGame.coinsUsed,
+                            status = GameStatusDto.valueOf(updatedGame.status.name),
+                        )
                     )
                 )
-            )
-        }
-        if (match.mode != MatchModeEnum.SELF &&
-            match.games.all { game ->
-                game.status == GameStatusEnum.EXECUTED || game.status == GameStatusEnum.EXECUTE_ERROR
             }
-        ) {
-            val player1Game = match.games.first()
-            val player2Game = match.games.last()
-            val verdict =
-                verdictAlgorithm.getVerdict(
-                    player1Game.status == GameStatusEnum.EXECUTE_ERROR,
-                    player1Game.coinsUsed,
-                    player1Game.destruction,
-                    player2Game.status == GameStatusEnum.EXECUTE_ERROR,
-                    player2Game.coinsUsed,
-                    player2Game.destruction
-                )
-            val finishedMatch = match.copy(verdict = verdict)
-            val (newUserRating, newOpponentRating) =
-                ratingHistoryService.updateRating(match.player1.userId, match.player2.userId, verdict)
+            if (match.mode != MatchModeEnum.SELF &&
+                match.games.all { game ->
+                    game.status == GameStatusEnum.EXECUTED || game.status == GameStatusEnum.EXECUTE_ERROR
+                }
+            ) {
+                val player1Game = match.games.first()
+                val player2Game = match.games.last()
+                val verdict =
+                    verdictAlgorithm.getVerdict(
+                        player1Game.status == GameStatusEnum.EXECUTE_ERROR,
+                        player1Game.coinsUsed,
+                        player1Game.destruction,
+                        player2Game.status == GameStatusEnum.EXECUTE_ERROR,
+                        player2Game.coinsUsed,
+                        player2Game.destruction
+                    )
+                val finishedMatch = match.copy(verdict = verdict)
+                val (newUserRating, newOpponentRating) =
+                    ratingHistoryService.updateRating(match.player1.userId, match.player2.userId, verdict)
 
-            publicUserService.updatePublicRating(
-                userId = match.player1.userId,
-                isInitiator = true,
-                verdict = verdict,
-                newRating = newUserRating
-            )
-            publicUserService.updatePublicRating(
-                userId = match.player2.userId,
-                isInitiator = false,
-                verdict = verdict,
-                newRating = newOpponentRating
-            )
-
-            if (match.mode == MatchModeEnum.MANUAL) {
-                notificationService.sendNotification(
-                    match.player1.userId,
-                    "Match Result",
-                    "${when (verdict) {
-                        MatchVerdictEnum.PLAYER1 -> "Won"
-                        MatchVerdictEnum.PLAYER2 -> "Lost"
-                        MatchVerdictEnum.TIE -> "Tied"
-                    }} against ${match.player2.username}",
+                publicUserService.updatePublicRating(
+                    userId = match.player1.userId,
+                    isInitiator = true,
+                    verdict = verdict,
+                    newRating = newUserRating
                 )
+                publicUserService.updatePublicRating(
+                    userId = match.player2.userId,
+                    isInitiator = false,
+                    verdict = verdict,
+                    newRating = newOpponentRating
+                )
+
+                if (match.mode == MatchModeEnum.MANUAL) {
+                    notificationService.sendNotification(
+                        match.player1.userId,
+                        "Match Result",
+                        "${
+                        when (verdict) {
+                            MatchVerdictEnum.PLAYER1 -> "Won"
+                            MatchVerdictEnum.PLAYER2 -> "Lost"
+                            MatchVerdictEnum.TIE -> "Tied"
+                        }
+                        } against ${match.player2.username}",
+                    )
+                }
+
+                matchRepository.save(finishedMatch)
             }
-
-            matchRepository.save(finishedMatch)
+        } else if (dailyChallengeMatchRepository.findById(matchId).isPresent) {
+            println(updatedGame.destruction)
+            println(updatedGame.matchId)
+      /*
+       * Get the DCMatch with help of the matchId
+       * pass the game parameters into the daily-challenge-verdict-algorithm
+       * Game-Parameters :- GameStatus, destruction,coinsUsed
+       * Store the verdict back in verdict in daily-challenge entity
+       * websocket for sending game status /updates/{userId} -> userId from dcMatchEntity
+       * store the finsished DC Match
+       * If verdict-> success make isDailyChallengeComplete-true
+       */
         }
     }
 }

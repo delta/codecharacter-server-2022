@@ -1,6 +1,7 @@
 package delta.codecharacter.server.game_map.map_revision
 
 import delta.codecharacter.dtos.CreateMapRevisionRequestDto
+import delta.codecharacter.dtos.GameMapTypeDto
 import delta.codecharacter.server.logic.validation.MapValidator
 import io.mockk.confirmVerified
 import io.mockk.every
@@ -31,18 +32,27 @@ internal class MapRevisionServiceTest {
         val createMapRevisionRequestDto =
             CreateMapRevisionRequestDto(
                 map = "map",
+                mapType = GameMapTypeDto.NORMAL,
+                mapImage = "",
                 message = "message",
             )
         val mapRevisionEntity = mockk<MapRevisionEntity>()
 
-        every { mapRevisionRepository.findFirstByUserIdOrderByCreatedAtDesc(userId) } returns
-            Optional.of(mapRevisionEntity)
+        every {
+            mapRevisionRepository.findFirstByUserIdAndMapTypeOrderByCreatedAtDesc(
+                userId, GameMapTypeDto.NORMAL
+            )
+        } returns Optional.of(mapRevisionEntity)
         every { mapRevisionRepository.save(any()) } returns mapRevisionEntity
         every { mapValidator.validateMap(createMapRevisionRequestDto.map) } returns Unit
 
         mapRevisionService.createMapRevision(userId, createMapRevisionRequestDto)
 
-        verify { mapRevisionRepository.findFirstByUserIdOrderByCreatedAtDesc(userId) }
+        verify {
+            mapRevisionRepository.findFirstByUserIdAndMapTypeOrderByCreatedAtDesc(
+                userId, GameMapTypeDto.NORMAL
+            )
+        }
         verify { mapValidator.validateMap(createMapRevisionRequestDto.map) }
         verify { mapRevisionRepository.save(any()) }
 
@@ -57,18 +67,27 @@ internal class MapRevisionServiceTest {
                 id = UUID.randomUUID(),
                 userId = userId,
                 map = "map",
+                mapType = GameMapTypeDto.NORMAL,
+                mapImage = "",
                 message = "message",
                 parentRevision = null,
                 createdAt = Instant.now(),
             )
 
-        every { mapRevisionRepository.findAllByUserIdOrderByCreatedAtDesc(userId) } returns
-            listOf(mapRevisionEntity)
+        every {
+            mapRevisionRepository.findAllByUserIdAndMapTypeOrderByCreatedAtDesc(
+                userId, GameMapTypeDto.NORMAL
+            )
+        } returns listOf(mapRevisionEntity)
 
         val mapRevisionDtos = mapRevisionService.getMapRevisions(userId)
         val mapRevisionDto = mapRevisionDtos.first()
 
-        verify { mapRevisionRepository.findAllByUserIdOrderByCreatedAtDesc(userId) }
+        verify {
+            mapRevisionRepository.findAllByUserIdAndMapTypeOrderByCreatedAtDesc(
+                userId, GameMapTypeDto.NORMAL
+            )
+        }
 
         confirmVerified(mapRevisionRepository)
         assertThat(mapRevisionDtos.size).isEqualTo(1)

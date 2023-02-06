@@ -3,6 +3,7 @@ package delta.codecharacter.server.code
 import delta.codecharacter.core.CodeApi
 import delta.codecharacter.dtos.CodeDto
 import delta.codecharacter.dtos.CodeRevisionDto
+import delta.codecharacter.dtos.CodeTypeDto
 import delta.codecharacter.dtos.CreateCodeRevisionRequestDto
 import delta.codecharacter.dtos.UpdateLatestCodeRequestDto
 import delta.codecharacter.server.code.code_revision.CodeRevisionService
@@ -32,15 +33,15 @@ class CodeController(
     }
 
     @Secured(value = ["ROLE_USER"])
-    override fun getCodeRevisions(): ResponseEntity<List<CodeRevisionDto>> {
+    override fun getCodeRevisions(type: CodeTypeDto): ResponseEntity<List<CodeRevisionDto>> {
         val user = SecurityContextHolder.getContext().authentication.principal as UserEntity
-        return ResponseEntity.ok(codeRevisionService.getCodeRevisions(user.id))
+        return ResponseEntity.ok(codeRevisionService.getCodeRevisions(user.id, type))
     }
 
     @Secured(value = ["ROLE_USER"])
-    override fun getLatestCode(): ResponseEntity<CodeDto> {
+    override fun getLatestCode(type: CodeTypeDto): ResponseEntity<CodeDto> {
         val user = SecurityContextHolder.getContext().authentication.principal as UserEntity
-        return ResponseEntity.ok(latestCodeService.getLatestCode(user.id))
+        return ResponseEntity.ok(latestCodeService.getLatestCode(user.id, type))
     }
 
     @Secured(value = ["ROLE_USER"])

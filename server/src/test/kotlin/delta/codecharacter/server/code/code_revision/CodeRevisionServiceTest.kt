@@ -1,5 +1,6 @@
 package delta.codecharacter.server.code.code_revision
 
+import delta.codecharacter.dtos.CodeTypeDto
 import delta.codecharacter.dtos.CreateCodeRevisionRequestDto
 import delta.codecharacter.dtos.LanguageDto
 import delta.codecharacter.server.code.LanguageEnum
@@ -30,18 +31,26 @@ internal class CodeRevisionServiceTest {
         val createCodeRevisionRequestDto =
             CreateCodeRevisionRequestDto(
                 code = "code",
+                codeType = CodeTypeDto.NORMAL,
                 message = "message",
                 language = LanguageDto.C,
             )
         val codeRevisionEntity = mockk<CodeRevisionEntity>()
 
-        every { codeRevisionRepository.findFirstByUserIdOrderByCreatedAtDesc(userId) } returns
-            Optional.of(codeRevisionEntity)
+        every {
+            codeRevisionRepository.findFirstByUserIdAndCodeTypeOrderByCreatedAtDesc(
+                userId, CodeTypeDto.NORMAL
+            )
+        } returns Optional.of(codeRevisionEntity)
         every { codeRevisionRepository.save(any()) } returns codeRevisionEntity
 
         codeRevisionService.createCodeRevision(userId, createCodeRevisionRequestDto)
 
-        verify { codeRevisionRepository.findFirstByUserIdOrderByCreatedAtDesc(userId) }
+        verify {
+            codeRevisionRepository.findFirstByUserIdAndCodeTypeOrderByCreatedAtDesc(
+                userId, CodeTypeDto.NORMAL
+            )
+        }
         verify { codeRevisionRepository.save(any()) }
 
         confirmVerified(codeRevisionRepository)
@@ -55,19 +64,27 @@ internal class CodeRevisionServiceTest {
                 id = UUID.randomUUID(),
                 userId = userId,
                 code = "code",
+                codeType = CodeTypeDto.NORMAL,
                 message = "message",
                 language = LanguageEnum.C,
                 parentRevision = null,
                 createdAt = Instant.now(),
             )
 
-        every { codeRevisionRepository.findAllByUserIdOrderByCreatedAtDesc(userId) } returns
-            listOf(codeRevisionEntity)
+        every {
+            codeRevisionRepository.findAllByUserIdAndCodeTypeOrderByCreatedAtDesc(
+                userId, CodeTypeDto.NORMAL
+            )
+        } returns listOf(codeRevisionEntity)
 
         val codeRevisionDtos = codeRevisionService.getCodeRevisions(userId)
         val codeRevisionDto = codeRevisionDtos.first()
 
-        verify { codeRevisionRepository.findAllByUserIdOrderByCreatedAtDesc(userId) }
+        verify {
+            codeRevisionRepository.findAllByUserIdAndCodeTypeOrderByCreatedAtDesc(
+                userId, CodeTypeDto.NORMAL
+            )
+        }
 
         confirmVerified(codeRevisionRepository)
         assertThat(codeRevisionDtos.size).isEqualTo(1)

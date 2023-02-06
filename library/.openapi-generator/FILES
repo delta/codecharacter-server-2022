@@ -14,6 +14,7 @@ src/main/kotlin/delta/codecharacter/dtos/AuthStatusResponseDto.kt
 src/main/kotlin/delta/codecharacter/dtos/ChallengeTypeDto.kt
 src/main/kotlin/delta/codecharacter/dtos/CodeDto.kt
 src/main/kotlin/delta/codecharacter/dtos/CodeRevisionDto.kt
+src/main/kotlin/delta/codecharacter/dtos/CodeTypeDto.kt
 src/main/kotlin/delta/codecharacter/dtos/CompleteProfileRequestDto.kt
 src/main/kotlin/delta/codecharacter/dtos/CreateCodeRevisionRequestDto.kt
 src/main/kotlin/delta/codecharacter/dtos/CreateMapRevisionRequestDto.kt
@@ -21,14 +22,17 @@ src/main/kotlin/delta/codecharacter/dtos/CreateMatchRequestDto.kt
 src/main/kotlin/delta/codecharacter/dtos/CurrentUserProfileDto.kt
 src/main/kotlin/delta/codecharacter/dtos/DailyChallengeGetRequestDto.kt
 src/main/kotlin/delta/codecharacter/dtos/DailyChallengeLeaderBoardResponseDto.kt
+src/main/kotlin/delta/codecharacter/dtos/DailyChallengeMatchRequestDto.kt
 src/main/kotlin/delta/codecharacter/dtos/ForgotPasswordRequestDto.kt
 src/main/kotlin/delta/codecharacter/dtos/GameDto.kt
 src/main/kotlin/delta/codecharacter/dtos/GameMapDto.kt
 src/main/kotlin/delta/codecharacter/dtos/GameMapRevisionDto.kt
+src/main/kotlin/delta/codecharacter/dtos/GameMapTypeDto.kt
 src/main/kotlin/delta/codecharacter/dtos/GameStatusDto.kt
 src/main/kotlin/delta/codecharacter/dtos/GenericErrorDto.kt
 src/main/kotlin/delta/codecharacter/dtos/LanguageDto.kt
 src/main/kotlin/delta/codecharacter/dtos/LeaderboardEntryDto.kt
+src/main/kotlin/delta/codecharacter/dtos/MapCommitByCommitIdResponseDto.kt
 src/main/kotlin/delta/codecharacter/dtos/MatchDto.kt
 src/main/kotlin/delta/codecharacter/dtos/MatchModeDto.kt
 src/main/kotlin/delta/codecharacter/dtos/NotificationDto.kt
@@ -38,6 +42,7 @@ src/main/kotlin/delta/codecharacter/dtos/PublicUserDto.kt
 src/main/kotlin/delta/codecharacter/dtos/RatingHistoryDto.kt
 src/main/kotlin/delta/codecharacter/dtos/RegisterUserRequestDto.kt
 src/main/kotlin/delta/codecharacter/dtos/ResetPasswordRequestDto.kt
+src/main/kotlin/delta/codecharacter/dtos/TierTypeDto.kt
 src/main/kotlin/delta/codecharacter/dtos/TutorialUpdateTypeDto.kt
 src/main/kotlin/delta/codecharacter/dtos/UpdateCurrentUserProfileDto.kt
 src/main/kotlin/delta/codecharacter/dtos/UpdateLatestCodeRequestDto.kt

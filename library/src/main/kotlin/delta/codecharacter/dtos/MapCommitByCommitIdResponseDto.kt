@@ -14,21 +14,17 @@ import jakarta.validation.Valid
 import io.swagger.v3.oas.annotations.media.Schema
 
 /**
- * GameMap model
- * @param map
+ * Get map image and map by commitId
  * @param mapImage
- * @param lastSavedAt
+ * @param map
  */
-data class GameMapDto(
+data class MapCommitByCommitIdResponseDto(
 
-    @Schema(example = "0000\n0010\n0100\n1000\n", required = true, description = "")
-    @field:JsonProperty("map", required = true) val map: kotlin.String,
-
-    @Schema(example = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAgAAAAIAQMAAAD+wSzIAAAABlBMVEX///+/v7+jQ3Y5AAAADklEQVQI12P4AIX8EAgALgAD/aNpbtEAAAAASUVORK5CYII", required = true, description = "")
+    @Schema(example = "base-64-string", required = true, description = "")
     @field:JsonProperty("mapImage", required = true) val mapImage: kotlin.String,
 
-    @Schema(example = "2021-01-01T00:00Z", required = true, description = "")
-    @field:JsonProperty("lastSavedAt", required = true) val lastSavedAt: java.time.Instant
+    @Schema(example = "0000\n0000\n0001\n0000", required = true, description = "")
+    @field:JsonProperty("map", required = true) val map: kotlin.String
 ) {
 
 }

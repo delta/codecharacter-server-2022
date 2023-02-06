@@ -1,5 +1,6 @@
 package delta.codecharacter.server
 
+import delta.codecharacter.server.leaderboard.LeaderBoardEnum
 import delta.codecharacter.server.user.LoginType
 import delta.codecharacter.server.user.UserEntity
 import delta.codecharacter.server.user.public_user.PublicUserEntity
@@ -40,8 +41,9 @@ class TestAttributes {
                 wins = 4,
                 losses = 2,
                 ties = 1,
+                tier = LeaderBoardEnum.TIER_PRACTICE,
                 score = 0.0,
-                challengesCompleted = null,
+                isDailyChallengeCompleted = false,
                 tutorialLevel = 1
             )
     }

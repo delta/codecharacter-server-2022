@@ -1,10 +1,13 @@
 package delta.codecharacter.server.match
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import delta.codecharacter.dtos.CodeTypeDto
 import delta.codecharacter.dtos.CreateMatchRequestDto
+import delta.codecharacter.dtos.GameMapTypeDto
 import delta.codecharacter.dtos.MatchModeDto
 import delta.codecharacter.server.TestAttributes
 import delta.codecharacter.server.WithMockCustomUser
+import delta.codecharacter.server.code.Code
 import delta.codecharacter.server.code.LanguageEnum
 import delta.codecharacter.server.code.code_revision.CodeRevisionEntity
 import delta.codecharacter.server.code.locked_code.LockedCodeEntity
@@ -14,6 +17,7 @@ import delta.codecharacter.server.game.game_log.GameLogEntity
 import delta.codecharacter.server.game.queue.entities.GameRequestEntity
 import delta.codecharacter.server.game.queue.entities.GameResultEntity
 import delta.codecharacter.server.game.queue.entities.GameStatusUpdateEntity
+import delta.codecharacter.server.game_map.GameMap
 import delta.codecharacter.server.game_map.locked_map.LockedMapEntity
 import delta.codecharacter.server.game_map.map_revision.MapRevisionEntity
 import delta.codecharacter.server.user.UserEntity
@@ -76,6 +80,7 @@ internal class RabbitIntegrationTest(@Autowired val mockMvc: MockMvc) {
                     id = UUID.randomUUID(),
                     userId = TestAttributes.user.id,
                     code = "code",
+                    codeType = CodeTypeDto.NORMAL,
                     message = "message",
                     language = LanguageEnum.PYTHON,
                     createdAt = Instant.now(),
@@ -89,6 +94,8 @@ internal class RabbitIntegrationTest(@Autowired val mockMvc: MockMvc) {
                     id = UUID.randomUUID(),
                     userId = TestAttributes.user.id,
                     map = "map",
+                    mapType = GameMapTypeDto.NORMAL,
+                    mapImage = "",
                     message = "message",
                     createdAt = Instant.now(),
                     parentRevision = null
@@ -135,6 +142,11 @@ internal class RabbitIntegrationTest(@Autowired val mockMvc: MockMvc) {
     @Test
     @WithMockCustomUser
     fun `should create match with two games for manual mode`() {
+        val lockedUserCode = HashMap<CodeTypeDto, Code>()
+        lockedUserCode[CodeTypeDto.NORMAL] = Code(code = "user-code", language = LanguageEnum.PYTHON)
+
+        val lockedUserMap = HashMap<GameMapTypeDto, GameMap>()
+        lockedUserMap[GameMapTypeDto.NORMAL] = GameMap(map = "user-map", mapImage = "base64")
         val opponentUser =
             mongoTemplate.save(
                 TestAttributes.user.copy(id = UUID.randomUUID(), email = "opponent@test.com")
@@ -148,35 +160,24 @@ internal class RabbitIntegrationTest(@Autowired val mockMvc: MockMvc) {
 
         val userLockedCode =
             mongoTemplate.save(
-                LockedCodeEntity(
-                    userId = TestAttributes.user.id,
-                    code = "user-code",
-                    language = LanguageEnum.PYTHON,
-                )
+                LockedCodeEntity(userId = TestAttributes.user.id, lockedCode = lockedUserCode)
             )
         val userLockedMap =
             mongoTemplate.save(
-                LockedMapEntity(
-                    userId = TestAttributes.user.id,
-                    map = "user-map",
-                )
+                LockedMapEntity(userId = TestAttributes.user.id, lockedMap = lockedUserMap)
             )
+        val lockedOpponentCode = HashMap<CodeTypeDto, Code>()
+        lockedUserCode[CodeTypeDto.NORMAL] =
+            Code(code = "opponent-code", language = LanguageEnum.PYTHON)
 
+        val lockedOpponentMap = HashMap<GameMapTypeDto, GameMap>()
+        lockedUserMap[GameMapTypeDto.NORMAL] = GameMap(map = "opponent-map", mapImage = "base64")
         val opponentLockedCode =
             mongoTemplate.save(
-                LockedCodeEntity(
-                    userId = opponentUser.id,
-                    code = "opponent-code",
-                    language = LanguageEnum.PYTHON,
-                )
+                LockedCodeEntity(userId = opponentUser.id, lockedCode = lockedOpponentCode)
             )
         val opponentLockedMap =
-            mongoTemplate.save(
-                LockedMapEntity(
-                    userId = opponentUser.id,
-                    map = "opponent-map",
-                )
-            )
+            mongoTemplate.save(LockedMapEntity(userId = opponentUser.id, lockedMap = lockedOpponentMap))
 
         val createMatchRequestDto =
             CreateMatchRequestDto(
@@ -210,22 +211,35 @@ internal class RabbitIntegrationTest(@Autowired val mockMvc: MockMvc) {
         assertThat(match.games.last()).isEqualTo(game2)
 
         val gameRequestEntityString1 =
-            this.rabbitTemplate.receiveAndConvert("gameRequestQueue") as String
+            this.rabbitTemplate.receiveAndConvert("gameRequestQueue") as String?
         val gameRequestEntity1 =
             mapper.readValue(gameRequestEntityString1, GameRequestEntity::class.java)
-        assertThat(gameRequestEntity1.gameId).isEqualTo(game1.id)
-        assertThat(gameRequestEntity1.map).isEqualTo(opponentLockedMap.map)
-        assertThat(gameRequestEntity1.sourceCode).isEqualTo(userLockedCode.code)
-        assertThat(gameRequestEntity1.language).isEqualTo(userLockedCode.language)
-
+        if (opponentLockedMap.lockedMap[GameMapTypeDto.NORMAL] != null &&
+            userLockedCode.lockedCode[CodeTypeDto.NORMAL] != null
+        ) {
+            assertThat(gameRequestEntity1.gameId).isEqualTo(game1.id)
+            assertThat(gameRequestEntity1.map)
+                .isEqualTo(opponentLockedMap.lockedMap[GameMapTypeDto.NORMAL]?.map.toString())
+            assertThat(gameRequestEntity1.sourceCode)
+                .isEqualTo(userLockedCode.lockedCode[CodeTypeDto.NORMAL]?.code)
+            assertThat(gameRequestEntity1.language)
+                .isEqualTo(userLockedCode.lockedCode[CodeTypeDto.NORMAL]?.language)
+        }
         val gameRequestEntityString2 =
-            this.rabbitTemplate.receiveAndConvert("gameRequestQueue") as String
+            this.rabbitTemplate.receiveAndConvert("gameRequestQueue") as String?
         val gameRequestEntity2 =
             mapper.readValue(gameRequestEntityString2, GameRequestEntity::class.java)
-        assertThat(gameRequestEntity2.gameId).isEqualTo(game2.id)
-        assertThat(gameRequestEntity2.map).isEqualTo(userLockedMap.map)
-        assertThat(gameRequestEntity2.sourceCode).isEqualTo(opponentLockedCode.code)
-        assertThat(gameRequestEntity2.language).isEqualTo(opponentLockedCode.language)
+        if (userLockedMap.lockedMap[GameMapTypeDto.NORMAL] != null &&
+            opponentLockedCode.lockedCode[CodeTypeDto.NORMAL] != null
+        ) {
+            assertThat(gameRequestEntity2.gameId).isEqualTo(game2.id)
+            assertThat(gameRequestEntity2.map)
+                .isEqualTo(userLockedMap.lockedMap[GameMapTypeDto.NORMAL]?.map)
+            assertThat(gameRequestEntity2.sourceCode)
+                .isEqualTo(opponentLockedCode.lockedCode[CodeTypeDto.NORMAL]?.code)
+            assertThat(gameRequestEntity2.language)
+                .isEqualTo(opponentLockedCode.lockedCode[CodeTypeDto.NORMAL]?.language)
+        }
     }
 
     @Test

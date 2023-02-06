@@ -7,6 +7,7 @@ package delta.codecharacter.core
 
 import delta.codecharacter.dtos.CodeDto
 import delta.codecharacter.dtos.CodeRevisionDto
+import delta.codecharacter.dtos.CodeTypeDto
 import delta.codecharacter.dtos.CreateCodeRevisionRequestDto
 import delta.codecharacter.dtos.GenericErrorDto
 import delta.codecharacter.dtos.UpdateLatestCodeRequestDto
@@ -77,7 +78,7 @@ interface CodeApi {
             value = ["/user/code/revisions"],
             produces = ["application/json"]
     )
-    fun getCodeRevisions(): ResponseEntity<List<CodeRevisionDto>> {
+    fun getCodeRevisions(@Parameter(description = "code type", schema = Schema(allowableValues = ["NORMAL", "DAILY_CHALLENGE"], defaultValue = "NORMAL")) @Valid @RequestParam(value = "type", required = false, defaultValue = "NORMAL") type: CodeTypeDto): ResponseEntity<List<CodeRevisionDto>> {
         return ResponseEntity(HttpStatus.NOT_IMPLEMENTED)
     }
 
@@ -96,7 +97,7 @@ interface CodeApi {
             value = ["/user/code/latest"],
             produces = ["application/json"]
     )
-    fun getLatestCode(): ResponseEntity<CodeDto> {
+    fun getLatestCode(@Parameter(description = "code type", schema = Schema(allowableValues = ["NORMAL", "DAILY_CHALLENGE"], defaultValue = "NORMAL")) @Valid @RequestParam(value = "type", required = false, defaultValue = "NORMAL") type: CodeTypeDto): ResponseEntity<CodeDto> {
         return ResponseEntity(HttpStatus.NOT_IMPLEMENTED)
     }
 
