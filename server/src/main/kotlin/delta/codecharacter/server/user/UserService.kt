@@ -129,6 +129,21 @@ class UserService(
         ) =
             registerUserRequestDto
 
+        if (username.trim().length < 5) {
+            throw CustomException(HttpStatus.BAD_REQUEST, "Username must be minimum 5 characters long")
+        }
+        if (name.trim().length < 5) {
+            throw CustomException(HttpStatus.BAD_REQUEST, "Name must be minimum 5 characters long")
+        }
+        if (avatarId !in 0..19) {
+            throw CustomException(HttpStatus.BAD_REQUEST, "Selected Avatar is invalid")
+        }
+        if (college.trim().isEmpty()) {
+            throw CustomException(HttpStatus.BAD_REQUEST, "College can not be empty")
+        }
+        if (country.trim().isEmpty()) {
+            throw CustomException(HttpStatus.BAD_REQUEST, "Country can not be empty")
+        }
         if (password != passwordConfirmation) {
             throw CustomException(
                 HttpStatus.BAD_REQUEST, "Password and password confirmation don't match"

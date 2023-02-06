@@ -1,5 +1,6 @@
 package delta.codecharacter.server.exception
 
+import com.fasterxml.jackson.databind.exc.InvalidFormatException
 import com.fasterxml.jackson.module.kotlin.MissingKotlinParameterException
 import jakarta.validation.ConstraintViolationException
 import org.springframework.core.Ordered
@@ -25,12 +26,15 @@ class RestExceptionHandler : ResponseEntityExceptionHandler() {
         status: HttpStatusCode,
         request: WebRequest
     ): ResponseEntity<Any>? {
-        val cause = ex.cause
-        return if (cause is MissingKotlinParameterException) {
-            ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                .body(mapOf("message" to "${cause.parameter.name} is missing"))
-        } else {
-            ResponseEntity.status(HttpStatus.BAD_REQUEST).body(mapOf("message" to "Unknown error"))
+        return when (val cause = ex.cause) {
+            is MissingKotlinParameterException ->
+                ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(mapOf("message" to "${cause.parameter.name} is missing"))
+            is InvalidFormatException ->
+                ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(mapOf("message" to "${cause.value} is of Invalid Format"))
+            else ->
+                ResponseEntity.status(HttpStatus.BAD_REQUEST).body(mapOf("message" to "Unknown Error"))
         }
     }
 

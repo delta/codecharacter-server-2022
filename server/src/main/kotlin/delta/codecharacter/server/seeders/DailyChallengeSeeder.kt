@@ -19,7 +19,7 @@ class DailyChallengeSeeder {
 
     private val logger: Logger = LoggerFactory.getLogger(DailyChallengeSeeder::class.java)
     @EventListener(ApplicationReadyEvent::class)
-    fun doSomethingAfterStartup() {
+    fun seedDailyChallenges() {
 
         if (dailyChallengeRepository.findAll().isEmpty()) {
             logger.info("Seeding daily_challenges")
@@ -44,6 +44,7 @@ class DailyChallengeSeeder {
                         )
                 }
                 dailyChallengeRepository.saveAll(dcEntities)
+                logger.info("Seeding Daily-Challenges Completed")
             } else {
                 logger.error("dcConstants.json is empty or doesn't exist")
             }

@@ -101,11 +101,36 @@ class PublicUserService(@Autowired private val publicUserRepository: PublicUserR
 
     fun updateUserProfile(userId: UUID, updateCurrentUserProfileDto: UpdateCurrentUserProfileDto) {
         val user = publicUserRepository.findById(userId).get()
+
+        if (updateCurrentUserProfileDto.name != null &&
+            updateCurrentUserProfileDto.name!!.trim().length < 5
+        ) {
+            throw CustomException(HttpStatus.BAD_REQUEST, "Name must be minimum 5 characters")
+        }
+
+        if (updateCurrentUserProfileDto.country != null &&
+            updateCurrentUserProfileDto.country!!.trim().isEmpty()
+        ) {
+            throw CustomException(HttpStatus.BAD_REQUEST, "Country can not be an empty")
+        }
+
+        if (updateCurrentUserProfileDto.college != null &&
+            updateCurrentUserProfileDto.college!!.trim().isEmpty()
+        ) {
+            throw CustomException(HttpStatus.BAD_REQUEST, "College can not be an empty")
+        }
+        if (updateCurrentUserProfileDto.avatarId != null &&
+            updateCurrentUserProfileDto.avatarId!! !in 0..19
+        ) {
+            throw CustomException(HttpStatus.BAD_REQUEST, "Selected Avatar is invalid")
+        }
+
         val updatedUser =
             user.copy(
                 name = updateCurrentUserProfileDto.name ?: user.name,
                 country = updateCurrentUserProfileDto.country ?: user.country,
                 college = updateCurrentUserProfileDto.college ?: user.college,
+                avatarId = updateCurrentUserProfileDto.avatarId ?: user.avatarId,
                 tutorialLevel =
                 updateTutorialLevel(
                     updateCurrentUserProfileDto.updateTutorialLevel, user.tutorialLevel
