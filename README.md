@@ -24,7 +24,9 @@
 3. Press `Ctrl+Alt+Shift+S` and make sure the JDK version is 17.
 4. Press `Ctrl+Alt+S` and go to `Build, Execution, Deployment -> Docker` and make sure docker is configured correctly/
 5. Copy `server/src/main/resources/application.example.yml` to `server/src/main/resources/application.yml`. If you want to use docker instead, copy the `server/src/main/resources/application.docker.example.yml` to `server/src/main/resources/application.yml`.
-6. The run configurations will be available in the top bar:
+6. Run `git submodule update --init`
+7. Run `cp server/src/main/resources/dcConstans.example.json server/src/main/resources/dcConstans.json`
+8. The run configurations will be available in the top bar:
 
    ![Run Configurations](https://i.imgur.com/pO2SrPd.png)
 
