@@ -23,6 +23,7 @@ src/main/kotlin/delta/codecharacter/dtos/CurrentUserProfileDto.kt
 src/main/kotlin/delta/codecharacter/dtos/DailyChallengeGetRequestDto.kt
 src/main/kotlin/delta/codecharacter/dtos/DailyChallengeLeaderBoardResponseDto.kt
 src/main/kotlin/delta/codecharacter/dtos/DailyChallengeMatchRequestDto.kt
+src/main/kotlin/delta/codecharacter/dtos/DailyChallengeObjectDto.kt
 src/main/kotlin/delta/codecharacter/dtos/ForgotPasswordRequestDto.kt
 src/main/kotlin/delta/codecharacter/dtos/GameDto.kt
 src/main/kotlin/delta/codecharacter/dtos/GameMapDto.kt

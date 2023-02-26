@@ -22,5 +22,5 @@ data class PublicUserEntity(
     val ties: Int,
     val isActivated: Boolean = true,
     val score: Double,
-    val isDailyChallengeCompleted: Boolean = false,
+    val dailyChallengeHistory: HashMap<Int, DailyChallengeHistory>
 )

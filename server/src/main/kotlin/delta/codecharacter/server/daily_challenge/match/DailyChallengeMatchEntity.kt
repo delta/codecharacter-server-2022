@@ -8,7 +8,7 @@ import org.springframework.data.mongodb.core.mapping.DocumentReference
 import java.time.Instant
 import java.util.UUID
 
-@Document(collation = "daily_challenge_match")
+@Document(collection = "daily_challenge_match")
 data class DailyChallengeMatchEntity(
     @Id val id: UUID,
     @DocumentReference(lazy = true) val game: GameEntity,

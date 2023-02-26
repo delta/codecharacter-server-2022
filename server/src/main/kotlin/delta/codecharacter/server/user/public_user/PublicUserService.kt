@@ -8,6 +8,7 @@ import delta.codecharacter.dtos.TierTypeDto
 import delta.codecharacter.dtos.TutorialUpdateTypeDto
 import delta.codecharacter.dtos.UpdateCurrentUserProfileDto
 import delta.codecharacter.dtos.UserStatsDto
+import delta.codecharacter.server.daily_challenge.DailyChallengeEntity
 import delta.codecharacter.server.exception.CustomException
 import delta.codecharacter.server.leaderboard.LeaderBoardEnum
 import delta.codecharacter.server.match.MatchVerdictEnum
@@ -46,8 +47,8 @@ class PublicUserService(@Autowired private val publicUserRepository: PublicUserR
                 ties = 0,
                 score = 0.0,
                 tier = LeaderBoardEnum.TIER_PRACTICE,
-                isDailyChallengeCompleted = false,
                 tutorialLevel = 1,
+                dailyChallengeHistory = HashMap()
             )
         publicUserRepository.save(publicUser)
     }
@@ -209,11 +210,11 @@ class PublicUserService(@Autowired private val publicUserRepository: PublicUserR
         return publicUserRepository.findByUsername(username).isEmpty
     }
 
-    fun updateIsDailyChallengeComplete() {
-        val users = publicUserRepository.findAll()
-        users.forEach { user ->
-            val updatedUser = user.copy(isDailyChallengeCompleted = false)
-            publicUserRepository.save(updatedUser)
-        }
+    fun updateDailyChallengeScore(userId: UUID, score: Double, dailyChallenge: DailyChallengeEntity) {
+        val user = publicUserRepository.findById(userId).get()
+        val current = user.dailyChallengeHistory
+        current[dailyChallenge.day] = DailyChallengeHistory(score, dailyChallenge)
+        val updatedUser = user.copy(score = user.score + score, dailyChallengeHistory = current)
+        publicUserRepository.save(updatedUser)
     }
 }

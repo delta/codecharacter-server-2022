@@ -1,5 +1,6 @@
 package delta.codecharacter.server.config
 
+import delta.codecharacter.server.logic.daily_challenge_score.DailyChallengeScoreAlgorithm
 import delta.codecharacter.server.logic.rating.GlickoRatingAlgorithm
 import delta.codecharacter.server.logic.rating.RatingAlgorithm
 import delta.codecharacter.server.logic.validation.MapValidator
@@ -24,5 +25,10 @@ class LogicConfiguration {
     @Bean
     fun mapValidator(): MapValidator {
         return MapValidator()
+    }
+
+    @Bean
+    fun dailyChallengeScoreAlgorithm(): DailyChallengeScoreAlgorithm {
+        return DailyChallengeScoreAlgorithm(gameConfiguration = GameConfiguration())
     }
 }

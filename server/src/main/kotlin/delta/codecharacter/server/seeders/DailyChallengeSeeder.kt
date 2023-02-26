@@ -39,7 +39,11 @@ class DailyChallengeSeeder {
                                 chall = it.chall,
                                 challName = it.challName,
                                 challType = it.challType,
-                                description = it.description
+                                description = it.description,
+                                perfectScore = it.perfectScore,
+                                numberOfCompletions = it.numberOfCompletions,
+                                toleratedDestruction = it.toleratedDestruction,
+                                map = it.map,
                             )
                         )
                 }

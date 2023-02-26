@@ -3,70 +3,138 @@
     "day": 0,
     "challName": "Nisi sunt ea culpa est cillum cupidatat officia est.",
     "challType": "CODE",
-    "chall": "Commodo duis sunt est ad duis ea anim nisi pariatur ut.",
-    "description": "Sunt ut est ea et dolor minim veniam quis id occaecat adipisicing quis."
+    "chall": {
+      "cpp" : "This is cpp code",
+      "java" : "This is Java Code",
+      "python" : "This is python code"
+    },
+    "description": "Sunt ut est ea et dolor minim veniam quis id occaecat adipisicing quis.",
+    "perfectScore" : 500,
+    "numberOfCompletions" : 0,
+    "toleratedDestruction" : 50,
+    "map" : ""
   },
   {
     "day": 1,
     "challName": "Exercitation esse ullamco irure quis dolor ut.",
     "challType": "CODE",
-    "chall": "Aute nulla dolor consequat tempor commodo et aute occaecat est nulla esse reprehenderit anim tempor.",
-    "description": "Labore adipisicing culpa eiusmod labore mollit nisi ex fugiat nulla et voluptate laborum."
+    "chall": {
+      "cpp" : "This is cpp code",
+      "java" : "This is Java Code",
+      "python" : "This is python code"
+    },
+    "description": "Labore adipisicing culpa eiusmod labore mollit nisi ex fugiat nulla et voluptate laborum.",
+    "perfectScore" : 500,
+    "numberOfCompletions" : 0,
+    "toleratedDestruction" : 50,
+    "map": ""
   },
   {
     "day": 2,
     "challName": "Ex incididunt laboris ex pariatur irure aute qui occaecat ullamco consequat eu mollit fugiat culpa.",
     "challType": "CODE",
-    "chall": "Id aliqua sit fugiat exercitation Lorem elit sint nisi commodo magna do.",
-    "description": "Laborum labore in excepteur do."
+    "chall": {
+      "cpp" : "This is cpp code",
+      "java" : "This is Java Code",
+      "python" : "This is python code"
+    },
+    "description": "Laborum labore in excepteur do.",
+    "perfectScore" : 500,
+    "numberOfCompletions" : 0,
+    "toleratedDestruction" : 50,
+    "map": ""
   },
   {
     "day": 3,
     "challName": "Sint ut proident ipsum est nostrud nostrud pariatur anim id laboris velit officia est.",
     "challType": "MAP",
-    "chall": "Incididunt id aute ad velit commodo aute cupidatat voluptate qui mollit.",
-    "description": "Esse do sint non enim dolore."
+    "chall": {
+      "image" : "this is map image"
+    },
+    "description": "Esse do sint non enim dolore.",
+    "perfectScore" : 500,
+    "numberOfCompletions" : 0,
+    "toleratedDestruction" : 50,
+    "map": ""
   },
   {
     "day": 4,
     "challName": "Mollit qui in culpa nostrud veniam commodo fugiat tempor sit dolor duis id non.",
     "challType": "MAP",
-    "chall": "Aliqua mollit sint sunt id elit mollit ipsum incididunt sint qui officia quis elit cillum.",
-    "description": "Et et labore ad ad ex elit et laboris deserunt eiusmod eiusmod reprehenderit eu."
+    "chall": {
+      "image" : "this is map image"
+    },
+    "description": "Et et labore ad ad ex elit et laboris deserunt eiusmod eiusmod reprehenderit eu.",
+    "perfectScore" : 500,
+    "numberOfCompletions" : 0,
+    "toleratedDestruction" : 50,
+    "map": ""
   },
   {
     "day": 5,
     "challName": "Est qui aliquip esse mollit.",
     "challType": "MAP",
-    "chall": "Voluptate quis commodo mollit id deserunt.",
-    "description": "Aute voluptate amet aliquip irure."
+    "chall": {
+      "image" : "this is map image"
+    },
+    "description": "Aute voluptate amet aliquip irure.",
+    "perfectScore" : 500,
+    "numberOfCompletions" : 0,
+    "toleratedDestruction" : 50,
+    "map": ""
   },
   {
     "day": 6,
     "challName": "Duis anim tempor velit do fugiat tempor aute aliqua velit ut reprehenderit.",
     "challType": "MAP",
-    "chall": "Laborum sunt anim duis nulla reprehenderit aliqua sunt veniam elit.",
-    "description": "Duis do est Lorem ex veniam."
+    "chall": {
+      "image" : "this is map image"
+    },
+    "description": "Duis do est Lorem ex veniam.",
+    "perfectScore" : 500,
+    "numberOfCompletions" : 0,
+    "toleratedDestruction" : 50,
+    "map": ""
   },
   {
     "day": 7,
     "challName": "Labore velit consequat quis irure officia ad qui sint deserunt ea dolore nostrud consequat aute.",
     "challType": "CODE",
-    "chall": "Occaecat id magna ut incididunt consectetur sunt magna labore.",
-    "description": "Irure qui minim aliqua sunt esse consequat commodo nostrud consectetur."
+    "chall": {
+      "cpp" : "This is cpp code",
+      "java" : "This is Java Code",
+      "python" : "This is python code"
+    },
+    "description": "Irure qui minim aliqua sunt esse consequat commodo nostrud consectetur.",
+    "perfectScore" : 500,
+    "numberOfCompletions" : 0,
+    "toleratedDestruction" : 50,
+    "map": ""
   },
   {
     "day": 8,
     "challName": "Ullamco magna Lorem Lorem sit sunt.",
     "challType": "MAP",
-    "chall": "Eiusmod voluptate aliqua duis duis sunt pariatur quis sint eiusmod adipisicing duis quis anim aute.",
-    "description": "Aliquip ad sunt do eu duis nulla deserunt."
+    "chall": {"image" : "this is map image"},
+    "description": "Aliquip ad sunt do eu duis nulla deserunt.",
+    "perfectScore" : 500,
+    "numberOfCompletions" : 0,
+    "toleratedDestruction" : 50,
+    "map": "[[0,0,0]]"
   },
   {
     "day": 9,
     "challName": "Est aliquip in ut ex velit.",
     "challType": "CODE",
-    "chall": "Labore magna occaecat consectetur reprehenderit nostrud aliqua nostrud occaecat occaecat aliquip cillum anim ullamco.",
-    "description": "Commodo ex adipisicing dolore aliqua adipisicing laboris duis ad irure mollit."
+    "chall": {
+      "cpp" : "This is cpp code",
+      "java" : "This is Java Code",
+      "python" : "This is python code"
+    },
+    "description": "Commodo ex adipisicing dolore aliqua adipisicing laboris duis ad irure mollit.",
+    "perfectScore" : 500,
+    "numberOfCompletions" : 0,
+    "toleratedDestruction" : 50,
+    "map": ""
   }
 ]

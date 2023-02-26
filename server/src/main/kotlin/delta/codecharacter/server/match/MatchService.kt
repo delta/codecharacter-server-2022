@@ -25,6 +25,7 @@ import delta.codecharacter.server.game.GameStatusEnum
 import delta.codecharacter.server.game_map.latest_map.LatestMapService
 import delta.codecharacter.server.game_map.locked_map.LockedMapService
 import delta.codecharacter.server.game_map.map_revision.MapRevisionService
+import delta.codecharacter.server.logic.validation.MapValidator
 import delta.codecharacter.server.logic.verdict.VerdictAlgorithm
 import delta.codecharacter.server.notifications.NotificationService
 import delta.codecharacter.server.user.public_user.PublicUserService
@@ -36,6 +37,7 @@ import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder
 import org.springframework.messaging.simp.SimpMessagingTemplate
 import org.springframework.stereotype.Service
 import java.math.BigDecimal
+import java.time.Duration
 import java.time.Instant
 import java.util.UUID
 
@@ -57,6 +59,7 @@ class MatchService(
     @Autowired private val dailyChallengeMatchRepository: DailyChallengeMatchRepository,
     @Autowired private val jackson2ObjectMapperBuilder: Jackson2ObjectMapperBuilder,
     @Autowired private val simpMessagingTemplate: SimpMessagingTemplate,
+    @Autowired private val mapValidator: MapValidator
 ) {
     private var mapper: ObjectMapper = jackson2ObjectMapperBuilder.build()
 
@@ -142,22 +145,27 @@ class MatchService(
     }
 
     fun createDCMatch(userId: UUID, dailyChallengeMatchRequestDto: DailyChallengeMatchRequestDto) {
-        val (_, chall, challType, _, completionStatus) = dailyChallengeService.getDailyChallengeByDate()
-        val (value, _) = dailyChallengeMatchRequestDto
+        val (_, chall, challType, _, completionStatus) =
+            dailyChallengeService.getDailyChallengeByDateForUser(userId)
         if (completionStatus != null && completionStatus) {
-            throw CustomException(HttpStatus.ACCEPTED, "You have already completed your daily Challenge")
+            throw CustomException(
+                HttpStatus.BAD_REQUEST, "You have already completed your daily challenge"
+            )
         }
+        val dc = dailyChallengeService.getDailyChallengeByDate()
+        val (value, _) = dailyChallengeMatchRequestDto
         val language: LanguageEnum
         val map: String
         val code: String
         when (challType) {
             ChallengeTypeDto.CODE -> { // code as question and map as answer
-                code = chall
+                mapValidator.validateMap(value)
+                code = chall.cpp.toString()
                 language = LanguageEnum.CPP
                 map = value
             }
             ChallengeTypeDto.MAP -> {
-                map = chall
+                map = dc.map
                 language = LanguageEnum.valueOf(dailyChallengeMatchRequestDto.language.toString())
                 code = value
             }
@@ -187,6 +195,9 @@ class MatchService(
                     throw CustomException(HttpStatus.BAD_REQUEST, "Opponent ID is required")
                 }
                 createDualMatch(userId, createMatchRequestDto.opponentUsername!!)
+            }
+            else -> {
+                throw CustomException(HttpStatus.BAD_REQUEST, "MatchMode Is Not Correct")
             }
         }
     }
@@ -232,6 +243,37 @@ class MatchService(
         }
     }
 
+    private fun mapDailyChallengeMatchEntitiesToDtos(
+        dailyChallengeMatchEntities: List<DailyChallengeMatchEntity>
+    ): List<MatchDto> {
+        return dailyChallengeMatchEntities.map { entity ->
+            MatchDto(
+                id = entity.id,
+                matchMode = MatchModeDto.valueOf("DAILYCHALLENGE"),
+                matchVerdict = VerdictDto.valueOf(entity.verdict.name),
+                createdAt = entity.createdAt,
+                games =
+                setOf(
+                    GameDto(
+                        id = entity.game.id,
+                        destruction = BigDecimal(entity.game.destruction),
+                        coinsUsed = entity.game.coinsUsed,
+                        status = GameStatusDto.valueOf(entity.game.status.name)
+                    )
+                ),
+                user1 =
+                PublicUserDto(
+                    username = entity.user.username,
+                    name = entity.user.name,
+                    tier = TierTypeDto.valueOf(entity.user.tier.name),
+                    country = entity.user.country,
+                    college = entity.user.college,
+                    avatarId = entity.user.avatarId,
+                ),
+            )
+        }
+    }
+
     fun getTopMatches(): List<MatchDto> {
         val matches = matchRepository.findTop10ByOrderByTotalPointsDesc()
         return mapMatchEntitiesToDtos(matches)
@@ -240,7 +282,12 @@ class MatchService(
     fun getUserMatches(userId: UUID): List<MatchDto> {
         val publicUser = publicUserService.getPublicUser(userId)
         val matches = matchRepository.findByPlayer1OrderByCreatedAtDesc(publicUser)
-        return mapMatchEntitiesToDtos(matches)
+        val dcMatches =
+            dailyChallengeMatchRepository.findByUserOrderByCreatedAtDesc(publicUser).takeWhile {
+                Duration.between(it.createdAt, Instant.now()).toHours() < 24 &&
+                    it.verdict != DailyChallengeMatchVerdictEnum.STARTED
+            }
+        return mapDailyChallengeMatchEntitiesToDtos(dcMatches) + mapMatchEntitiesToDtos(matches)
     }
 
     @RabbitListener(queues = ["gameStatusUpdateQueue"], ackMode = "AUTO")
@@ -312,17 +359,38 @@ class MatchService(
                 matchRepository.save(finishedMatch)
             }
         } else if (dailyChallengeMatchRepository.findById(matchId).isPresent) {
-            println(updatedGame.destruction)
-            println(updatedGame.matchId)
-      /*
-       * Get the DCMatch with help of the matchId
-       * pass the game parameters into the daily-challenge-verdict-algorithm
-       * Game-Parameters :- GameStatus, destruction,coinsUsed
-       * Store the verdict back in verdict in daily-challenge entity
-       * websocket for sending game status /updates/{userId} -> userId from dcMatchEntity
-       * store the finsished DC Match
-       * If verdict-> success make isDailyChallengeComplete-true
-       */
+            val match = dailyChallengeMatchRepository.findById(matchId).get()
+            simpMessagingTemplate.convertAndSend(
+                "/updates/${match.user.userId}",
+                mapper.writeValueAsString(
+                    GameDto(
+                        id = updatedGame.id,
+                        destruction = BigDecimal(updatedGame.destruction),
+                        coinsUsed = updatedGame.coinsUsed,
+                        status = GameStatusDto.valueOf(updatedGame.status.name),
+                    )
+                )
+            )
+            if (updatedGame.status != GameStatusEnum.EXECUTING) {
+                val updatedMatch =
+                    match.copy(
+                        verdict =
+                        dailyChallengeService.completeDailyChallenge(updatedGame, match.user.userId)
+                    )
+                notificationService.sendNotification(
+                    match.user.userId,
+                    title = "Daily Challenge Results",
+                    content =
+                    when (updatedMatch.verdict) {
+                        DailyChallengeMatchVerdictEnum.SUCCESS -> "Successfully completed challenge"
+                        DailyChallengeMatchVerdictEnum.FAILURE -> "Failed to complete challenge"
+                        else -> {
+                            "Some error occurred. Try again!"
+                        }
+                    }
+                )
+                dailyChallengeMatchRepository.save(updatedMatch)
+            }
         }
     }
 }

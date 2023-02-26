@@ -39,7 +39,7 @@ de:
   flapdoodle:
     mongodb:
       embedded:
-        version: 5.0.5
+        version: 6.0.4
 
 debug: false
 

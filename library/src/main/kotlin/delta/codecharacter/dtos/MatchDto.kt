@@ -46,8 +46,8 @@ data class MatchDto(
     @get:JsonProperty("user1", required = true) val user1: PublicUserDto,
 
     @field:Valid
-    @Schema(example = "null", required = true, description = "")
-    @get:JsonProperty("user2", required = true) val user2: PublicUserDto
+    @Schema(example = "null", description = "")
+    @get:JsonProperty("user2") val user2: PublicUserDto? = null
 ) {
 
 }
