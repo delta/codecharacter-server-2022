@@ -8,6 +8,7 @@ import delta.codecharacter.dtos.DailyChallengeMatchRequestDto
 import delta.codecharacter.dtos.GameMapRevisionDto
 import delta.codecharacter.dtos.LanguageDto
 import delta.codecharacter.dtos.MatchModeDto
+import delta.codecharacter.dtos.TierTypeDto
 import delta.codecharacter.server.TestAttributes
 import delta.codecharacter.server.code.LanguageEnum
 import delta.codecharacter.server.code.code_revision.CodeRevisionService
@@ -278,6 +279,42 @@ internal class MatchServiceTest {
         confirmVerified(
             codeRevisionService, mapRevisionService, gameService, matchRepository, gameService
         )
+    }
+
+    @Test
+    @Throws(CustomException::class)
+    fun `should throw bad request if the opponent player belongs to tier 1 in manual match`() {
+        val playerId = UUID.randomUUID()
+        val opponentId = UUID.randomUUID()
+        val opponentPublicUser =
+            TestAttributes.publicUser.copy(
+                userId = opponentId, username = "opponent", tier = TierTypeDto.TIER1
+            )
+        val userCode = Pair(LanguageEnum.CPP, "user-code")
+        val opponentCode = Pair(LanguageEnum.PYTHON, "opponent-code")
+        val userMap = "user-map"
+        val opponentMap = "opponent-map"
+        every { publicUserService.getPublicUserByUsername(opponentPublicUser.username) } returns
+            opponentPublicUser
+        every { lockedCodeService.getLockedCode(playerId) } returns userCode
+        every { lockedCodeService.getLockedCode(opponentId) } returns opponentCode
+        every { lockedMapService.getLockedMap(playerId) } returns userMap
+        every { lockedMapService.getLockedMap(opponentId) } returns opponentMap
+        every { gameService.createGame(any()) } returns mockk()
+        every { matchRepository.save(any()) } returns mockk()
+        every { gameService.sendGameRequest(any(), userCode.second, userCode.first, userMap) } returns
+            Unit
+        every {
+            gameService.sendGameRequest(any(), opponentCode.second, opponentCode.first, opponentMap)
+        } returns Unit
+
+        val exception =
+            assertThrows<CustomException> {
+                matchService.createDualMatch(playerId, opponentPublicUser.username)
+            }
+
+        assertThat(exception.status).isEqualTo(HttpStatus.BAD_REQUEST)
+        assertThat(exception.message).isEqualTo("Opponent cannot be a tier 1 player in manual match")
     }
 
     @Test

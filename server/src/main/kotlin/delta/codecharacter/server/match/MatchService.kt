@@ -115,7 +115,11 @@ class MatchService(
         if (userId == opponentId) {
             throw CustomException(HttpStatus.BAD_REQUEST, "You cannot play against yourself")
         }
-
+        if (publicOpponent.tier == TierTypeDto.TIER1) {
+            throw CustomException(
+                HttpStatus.BAD_REQUEST, "Opponent cannot be a tier 1 player in manual match"
+            )
+        }
         val (userLanguage, userCode) = lockedCodeService.getLockedCode(userId)
         val userMap = lockedMapService.getLockedMap(userId)
 
@@ -328,20 +332,21 @@ class MatchService(
                 val finishedMatch = match.copy(verdict = verdict)
                 val (newUserRating, newOpponentRating) =
                     ratingHistoryService.updateRating(match.player1.userId, match.player2.userId, verdict)
+                if (!(match.mode == MatchModeEnum.MANUAL && (match.player1.tier == TierTypeDto.TIER1))) {
 
-                publicUserService.updatePublicRating(
-                    userId = match.player1.userId,
-                    isInitiator = true,
-                    verdict = verdict,
-                    newRating = newUserRating
-                )
-                publicUserService.updatePublicRating(
-                    userId = match.player2.userId,
-                    isInitiator = false,
-                    verdict = verdict,
-                    newRating = newOpponentRating
-                )
-
+                    publicUserService.updatePublicRating(
+                        userId = match.player1.userId,
+                        isInitiator = true,
+                        verdict = verdict,
+                        newRating = newUserRating
+                    )
+                    publicUserService.updatePublicRating(
+                        userId = match.player2.userId,
+                        isInitiator = false,
+                        verdict = verdict,
+                        newRating = newOpponentRating
+                    )
+                }
                 if (match.mode == MatchModeEnum.MANUAL) {
                     notificationService.sendNotification(
                         match.player1.userId,

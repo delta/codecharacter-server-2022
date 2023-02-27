@@ -10,8 +10,9 @@ import delta.codecharacter.dtos.UpdateCurrentUserProfileDto
 import delta.codecharacter.dtos.UserStatsDto
 import delta.codecharacter.server.daily_challenge.DailyChallengeEntity
 import delta.codecharacter.server.exception.CustomException
-import delta.codecharacter.server.leaderboard.LeaderBoardEnum
 import delta.codecharacter.server.match.MatchVerdictEnum
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.data.domain.PageRequest
@@ -25,6 +26,10 @@ import java.util.UUID
 class PublicUserService(@Autowired private val publicUserRepository: PublicUserRepository) {
 
     @Value("\${environment.no-of-tutorial-level}") private lateinit var totalTutorialLevels: Number
+    @Value("\${environment.tier-1-players}") private var tier1Players: Number = 1
+    @Value("\${environment.top-players}") private var topPlayer: Number = 1
+    private val logger: Logger = LoggerFactory.getLogger(PublicUserService::class.java)
+
     fun create(
         userId: UUID,
         username: String,
@@ -46,16 +51,76 @@ class PublicUserService(@Autowired private val publicUserRepository: PublicUserR
                 losses = 0,
                 ties = 0,
                 score = 0.0,
-                tier = LeaderBoardEnum.TIER_PRACTICE,
+                tier = TierTypeDto.TIER_PRACTICE,
                 tutorialLevel = 1,
                 dailyChallengeHistory = HashMap()
             )
         publicUserRepository.save(publicUser)
     }
 
+    fun updateLeaderboardAfterPracticePhase() {
+        val publicUsers = publicUserRepository.findAll()
+        publicUsers.forEachIndexed { index, user ->
+            if (index < tier1Players.toInt()) {
+                publicUserRepository.save(user.copy(tier = TierTypeDto.TIER1))
+            } else {
+                publicUserRepository.save(user.copy(tier = TierTypeDto.TIER2))
+            }
+        }
+        logger.info("Leaderboard tier set during the start of game phase")
+    }
+
+    fun resetRatingsAfterPracticePhase() {
+        logger.info("Reset ratings after practice phase starts")
+        val users = publicUserRepository.findAll()
+        users.forEach { user ->
+            publicUserRepository.save(user.copy(rating = 1500.0, wins = 0, ties = 0, losses = 0))
+        }
+        logger.info("Reset ratings after practice phase has ended")
+    }
+
+    fun promoteTiers() {
+        val topPlayersInTier2 =
+            publicUserRepository.findAllByTier(
+                TierTypeDto.TIER2,
+                PageRequest.of(0, topPlayer.toInt(), Sort.by(Sort.Order.desc("rating")))
+            )
+        val bottomPlayersInTier1 =
+            publicUserRepository.findAllByTier(
+                TierTypeDto.TIER1,
+                PageRequest.of(0, topPlayer.toInt(), Sort.by(Sort.Order.asc("rating")))
+            )
+        topPlayersInTier2.forEach { users ->
+            val updatedToTier1User = publicUserRepository.save(users.copy(tier = TierTypeDto.TIER1))
+            if (updatedToTier1User.tier == TierTypeDto.TIER1) {
+                logger.info("UserName ${updatedToTier1User.username} got promoted to TIER1")
+            } else {
+                logger.error(
+                    "Error occurred while updating ${updatedToTier1User.username} (UserName) to TIER1"
+                )
+            }
+        }
+        bottomPlayersInTier1.forEach { users ->
+            val updateToTier2User = publicUserRepository.save(users.copy(tier = TierTypeDto.TIER2))
+            if (updateToTier2User.tier == TierTypeDto.TIER2) {
+                logger.info("UserName ${updateToTier2User.username} got demoted to TIER2")
+            } else {
+                logger.error(
+                    "Error occurred while updating ${updateToTier2User.username} (UserName) to TIER2"
+                )
+            }
+        }
+    }
+
     fun getLeaderboard(page: Int?, size: Int?, tier: TierTypeDto?): List<LeaderboardEntryDto> {
-        val pageRequest = PageRequest.of(page ?: 0, size ?: 10, Sort.by(Sort.Direction.DESC, "rating"))
-        return publicUserRepository.findAll(pageRequest).content.map {
+        val pageRequest = PageRequest.of(page ?: 0, size ?: 10, Sort.by(Sort.Order.desc("rating")))
+        val publicUsers =
+            if (tier == null) {
+                publicUserRepository.findAll(pageRequest).content
+            } else {
+                publicUserRepository.findAllByTier(tier, pageRequest)
+            }
+        return publicUsers.map {
             LeaderboardEntryDto(
                 user =
                 PublicUserDto(
@@ -72,7 +137,7 @@ class PublicUserService(@Autowired private val publicUserRepository: PublicUserR
                     wins = it.wins,
                     losses = it.losses,
                     ties = it.ties
-                )
+                ),
             )
         }
     }

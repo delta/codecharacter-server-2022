@@ -179,8 +179,11 @@ class UserService(
                     .POST(HttpRequest.BodyPublishers.noBody())
                     .build()
             val response = client.send(request, HttpResponse.BodyHandlers.ofString())
-            val json = JsonObject(response.body())
-            return json.toBsonDocument().getBoolean("success").value
+            val json = JsonObject(response.body()).toBsonDocument()
+            return (
+                json.getBoolean("success").value &&
+                    (json.getDouble("score").value.compareTo(0.5) >= 0)
+                )
         } catch (e: Exception) {
             e.printStackTrace()
             return false

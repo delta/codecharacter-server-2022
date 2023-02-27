@@ -28,6 +28,11 @@ environment:
   event-start-date: YYYY-MM-DDTHH:MM:SSZ
   reCaptcha-key: your-recaptcha-key
   no-of-tutorial-level: 0
+  registration-time: "* * * * * *"
+  game-start-time: "* * * * * *"
+  tier-1-players: 20
+  top-players: 5
+  update-time: "*/20 * * * * *"
 
 server:
   compression:

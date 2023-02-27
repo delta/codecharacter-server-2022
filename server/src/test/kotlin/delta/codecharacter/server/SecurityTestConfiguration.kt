@@ -2,8 +2,8 @@ package delta.codecharacter.server
 
 import delta.codecharacter.dtos.ChallengeTypeDto
 import delta.codecharacter.dtos.DailyChallengeObjectDto
+import delta.codecharacter.dtos.TierTypeDto
 import delta.codecharacter.server.daily_challenge.DailyChallengeEntity
-import delta.codecharacter.server.leaderboard.LeaderBoardEnum
 import delta.codecharacter.server.user.LoginType
 import delta.codecharacter.server.user.UserEntity
 import delta.codecharacter.server.user.public_user.DailyChallengeHistory
@@ -58,7 +58,7 @@ class TestAttributes {
                 wins = 4,
                 losses = 2,
                 ties = 1,
-                tier = LeaderBoardEnum.TIER_PRACTICE,
+                tier = TierTypeDto.TIER_PRACTICE,
                 score = 0.0,
                 dailyChallengeHistory = hashMapOf(0 to DailyChallengeHistory(0.0, dailyChallengeCode)),
                 tutorialLevel = 1
