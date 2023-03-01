@@ -26,8 +26,8 @@ import java.util.UUID
 class PublicUserService(@Autowired private val publicUserRepository: PublicUserRepository) {
 
     @Value("\${environment.no-of-tutorial-level}") private lateinit var totalTutorialLevels: Number
-    @Value("\${environment.tier-1-players}") private var tier1Players: Number = 1
-    @Value("\${environment.top-players}") private var topPlayer: Number = 1
+    @Value("\${environment.no-of-tier-1-players}") private var tier1Players: Number = 1
+    @Value("\${environment.no-of-players-for-promotion}") private var topPlayer: Number = 1
     private val logger: Logger = LoggerFactory.getLogger(PublicUserService::class.java)
 
     fun create(
