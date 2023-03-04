@@ -31,7 +31,7 @@ environment:
   registration-time: "* * * * * *"
   no-of-tier-1-players: 20
   no-of-players-for-promotion: 5
-  update-time: "*/20 * * * * *"
+  promote-demote-time: "* * */6 * * *"
 
 server:
   compression:

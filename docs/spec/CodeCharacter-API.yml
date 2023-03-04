@@ -303,6 +303,7 @@ paths:
           description: Leaderboard Tier
       description: Get leaderboard
     parameters: []
+
   /top-matches:
     get:
       summary: Get top matches
@@ -1934,6 +1935,7 @@ components:
         - user
         - stats
       description: Leaderboard entry model
+
     DailyChallengeGetRequest:
       title: Get daily challenge
       description: Get current-user daily challenge

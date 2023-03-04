@@ -282,4 +282,9 @@ class PublicUserService(@Autowired private val publicUserRepository: PublicUserR
         val updatedUser = user.copy(score = user.score + score, dailyChallengeHistory = current)
         publicUserRepository.save(updatedUser)
     }
+
+    fun getTopNUsers(): List<PublicUserEntity> {
+        val pageRequest = PageRequest.of(0, tier1Players.toInt(), Sort.by("rating"))
+        return publicUserRepository.findTopnByOrderByRatingDesc(pageRequest)
+    }
 }
