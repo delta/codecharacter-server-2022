@@ -40,6 +40,15 @@ server:
     enabled: true
   http2:
     enabled: true
+# Set below configurations only for production (Done for oauth redirect)
+#  forward-headers-strategy: framework
+#  tomcat:
+#    remoteip:
+#      host-header: x-forward-for
+#      protocol-header: x-forwarded-proto
+#      internal-proxies: .*
+#    use-relative-redirects: true
+
 
 de:
   flapdoodle:

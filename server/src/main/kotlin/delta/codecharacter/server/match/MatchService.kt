@@ -371,7 +371,15 @@ class MatchService(
                 val (newUserRating, newOpponentRating) =
                     ratingHistoryService.updateRating(match.player1.userId, match.player2.userId, verdict)
                 if (match.mode == MatchModeEnum.MANUAL) {
-                    if (match.player1.tier == TierTypeDto.TIER2 && match.player2.tier == TierTypeDto.TIER2) {
+                    if ((
+                        match.player1.tier == TierTypeDto.TIER2 &&
+                            match.player2.tier == TierTypeDto.TIER2
+                        ) ||
+                        (
+                            match.player1.tier == TierTypeDto.TIER_PRACTICE &&
+                                match.player2.tier == TierTypeDto.TIER_PRACTICE
+                            )
+                    ) {
                         publicUserService.updatePublicRating(
                             userId = match.player1.userId,
                             isInitiator = true,
