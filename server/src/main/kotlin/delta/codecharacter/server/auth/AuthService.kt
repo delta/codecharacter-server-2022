@@ -43,6 +43,11 @@ class AuthService(
 
     fun forgotPassword(forgotPasswordRequestDto: ForgotPasswordRequestDto) {
         val email = forgotPasswordRequestDto.email
+        if (!forgotPasswordRequestDto.recaptchaCode.isNullOrEmpty() &&
+            !userService.verifyReCaptcha(forgotPasswordRequestDto.recaptchaCode!!)
+        ) {
+            throw CustomException(HttpStatus.BAD_REQUEST, "Invalid Recaptcha")
+        }
         val user =
             userService.getUserByEmail(email).orElseThrow {
                 throw CustomException(HttpStatus.BAD_REQUEST, "Invalid credentials")

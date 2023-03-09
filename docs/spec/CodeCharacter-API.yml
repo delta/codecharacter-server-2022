@@ -145,6 +145,7 @@ paths:
               Example:
                 value:
                   email: user@example.com
+                  recaptchaCode: example recaptch code
   /leaderboard:
     get:
       summary: Get leaderboard
@@ -1359,6 +1360,9 @@ components:
           format: email
           pattern: '[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}'
           example: test@test.com
+        recaptchaCode:
+          type: string
+          example: 'example recaptcha-code'
       required:
         - email
     RatingHistory:
