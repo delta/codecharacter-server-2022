@@ -200,6 +200,12 @@ class UserService(
     fun completeUserProfile(userId: UUID, completeProfileRequestDto: CompleteProfileRequestDto) {
         val (username, name, country, college, avatarId) = completeProfileRequestDto
         val user = userRepository.findFirstById(userId).get()
+        if (user.isProfileComplete) {
+            throw CustomException(HttpStatus.BAD_REQUEST, "User profile is already complete")
+        }
+        if (!publicUserService.isUsernameUnique(username)) {
+            throw CustomException(HttpStatus.BAD_REQUEST, "Username already taken")
+        }
         publicUserService.create(userId, username, name, country, college, avatarId)
         userRepository.save(
             user.copy(
