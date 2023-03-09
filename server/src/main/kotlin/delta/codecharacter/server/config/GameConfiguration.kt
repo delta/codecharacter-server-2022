@@ -35,21 +35,21 @@ class GameConfiguration {
                 Attacker(
                     id = 3,
                     hp = 15,
-                    range = 6,
+                    range = 4,
                     attackPower = 2,
-                    speed = 6,
+                    speed = 4,
                     price = 4,
                     aerial = 1,
                 ),
             ),
             defenders =
             setOf(
-                Defender(id = 1, hp = 10, range = 4, attackPower = 10, price = 25, aerial = 0),
-                Defender(id = 2, hp = 15, range = 6, attackPower = 20, price = 50, aerial = 0),
-                Defender(id = 3, hp = 20, range = 6, attackPower = 5, price = 75, aerial = 1),
+                Defender(id = 1, hp = 400, range = 4, attackPower = 10, price = 25, aerial = 0),
+                Defender(id = 2, hp = 600, range = 6, attackPower = 20, price = 50, aerial = 0),
+                Defender(id = 3, hp = 400, range = 6, attackPower = 15, price = 100, aerial = 1),
             ),
             numberOfTurns = 500,
-            numberOfCoins = 1000,
+            numberOfCoins = 1800,
         )
     }
 }
