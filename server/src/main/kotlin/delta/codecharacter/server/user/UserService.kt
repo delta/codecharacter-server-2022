@@ -7,7 +7,9 @@ import delta.codecharacter.server.exception.CustomException
 import delta.codecharacter.server.user.activate_user.ActivateUserService
 import delta.codecharacter.server.user.public_user.PublicUserService
 import delta.codecharacter.server.user.rating_history.RatingHistoryService
+import org.bson.json.JsonObject
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Lazy
 import org.springframework.dao.DuplicateKeyException
 import org.springframework.http.HttpStatus
@@ -16,6 +18,10 @@ import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
+import java.net.URI
+import java.net.http.HttpClient
+import java.net.http.HttpRequest
+import java.net.http.HttpResponse
 import java.util.Optional
 import java.util.UUID
 
@@ -28,6 +34,7 @@ class UserService(
 ) : UserDetailsService {
 
     @Lazy @Autowired private lateinit var passwordEncoder: BCryptPasswordEncoder
+    @Value("\${environment.reCaptcha-key}") private lateinit var secretKey: String
 
     override fun loadUserByUsername(email: String?): UserEntity {
         if (email == null) {
@@ -109,9 +116,34 @@ class UserService(
     }
 
     fun registerUser(registerUserRequestDto: RegisterUserRequestDto) {
-        val (username, name, email, password, passwordConfirmation, country, college, avatarId) =
+        val (
+            username,
+            name,
+            email,
+            password,
+            passwordConfirmation,
+            country,
+            college,
+            avatarId,
+            recaptchaCode
+        ) =
             registerUserRequestDto
 
+        if (username.trim().length < 5) {
+            throw CustomException(HttpStatus.BAD_REQUEST, "Username must be minimum 5 characters long")
+        }
+        if (name.trim().length < 5) {
+            throw CustomException(HttpStatus.BAD_REQUEST, "Name must be minimum 5 characters long")
+        }
+        if (avatarId !in 0..19) {
+            throw CustomException(HttpStatus.BAD_REQUEST, "Selected Avatar is invalid")
+        }
+        if (college.trim().isEmpty()) {
+            throw CustomException(HttpStatus.BAD_REQUEST, "College can not be empty")
+        }
+        if (country.trim().isEmpty()) {
+            throw CustomException(HttpStatus.BAD_REQUEST, "Country can not be empty")
+        }
         if (password != passwordConfirmation) {
             throw CustomException(
                 HttpStatus.BAD_REQUEST, "Password and password confirmation don't match"
@@ -122,6 +154,9 @@ class UserService(
             throw CustomException(HttpStatus.BAD_REQUEST, "Username already taken")
         }
 
+        if (!verifyReCaptcha(recaptchaCode))
+            throw CustomException(HttpStatus.BAD_REQUEST, "Invalid ReCaptcha")
+
         val userId = UUID.randomUUID()
         try {
             createUserWithPassword(userId, password, email)
@@ -130,6 +165,28 @@ class UserService(
             activateUserService.sendActivationToken(userId, name, email)
         } catch (duplicateError: DuplicateKeyException) {
             throw CustomException(HttpStatus.BAD_REQUEST, "Username/Email already exists")
+        }
+    }
+
+    fun verifyReCaptcha(reCaptchaResponse: String): Boolean {
+        val url =
+            "https://www.google.com/recaptcha/api/siteverify?secret=$secretKey&response=$reCaptchaResponse"
+        try {
+            val client = HttpClient.newBuilder().build()
+            val request =
+                HttpRequest.newBuilder()
+                    .uri(URI.create(url))
+                    .POST(HttpRequest.BodyPublishers.noBody())
+                    .build()
+            val response = client.send(request, HttpResponse.BodyHandlers.ofString())
+            val json = JsonObject(response.body()).toBsonDocument()
+            return (
+                json.getBoolean("success").value &&
+                    (json.getDouble("score").value.compareTo(0.5) >= 0)
+                )
+        } catch (e: Exception) {
+            e.printStackTrace()
+            return false
         }
     }
 
@@ -143,6 +200,12 @@ class UserService(
     fun completeUserProfile(userId: UUID, completeProfileRequestDto: CompleteProfileRequestDto) {
         val (username, name, country, college, avatarId) = completeProfileRequestDto
         val user = userRepository.findFirstById(userId).get()
+        if (user.isProfileComplete) {
+            throw CustomException(HttpStatus.BAD_REQUEST, "User profile is already complete")
+        }
+        if (!publicUserService.isUsernameUnique(username)) {
+            throw CustomException(HttpStatus.BAD_REQUEST, "Username already taken")
+        }
         publicUserService.create(userId, username, name, country, college, avatarId)
         userRepository.save(
             user.copy(

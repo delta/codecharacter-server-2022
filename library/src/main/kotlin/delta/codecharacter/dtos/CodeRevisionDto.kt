@@ -1,50 +1,43 @@
 package delta.codecharacter.dtos
 
+import java.util.Objects
 import com.fasterxml.jackson.annotation.JsonProperty
-import io.swagger.annotations.ApiModelProperty
-import javax.validation.Valid
+import com.fasterxml.jackson.annotation.JsonValue
+import delta.codecharacter.dtos.LanguageDto
+import jakarta.validation.constraints.*
+import jakarta.validation.Valid
+import io.swagger.v3.oas.annotations.media.Schema
 
 /**
  * Code revision model
- * @param id
- * @param code
- * @param message
- * @param language
- * @param createdAt
- * @param parentRevision
+ * @param id 
+ * @param code 
+ * @param message 
+ * @param language 
+ * @param createdAt 
+ * @param parentRevision 
  */
 data class CodeRevisionDto(
 
-    @ApiModelProperty(
-        example = "123e4567-e89b-12d3-a456-426614174000",
-        required = true,
-        value = ""
-    )
-    @field:JsonProperty("id", required = true) val id: java.util.UUID,
+    @Schema(example = "123e4567-e89b-12d3-a456-426614174000", required = true, description = "")
+    @get:JsonProperty("id", required = true) val id: java.util.UUID,
 
-    @ApiModelProperty(
-        example = "#include <iostream>",
-        required = true,
-        value = ""
-    )
-    @field:JsonProperty("code", required = true) val code: String,
+    @Schema(example = "#include <iostream>", required = true, description = "")
+    @get:JsonProperty("code", required = true) val code: kotlin.String,
 
-    @ApiModelProperty(example = "message", required = true, value = "")
-    @field:JsonProperty("message", required = true) val message: String,
+    @Schema(example = "message", required = true, description = "")
+    @get:JsonProperty("message", required = true) val message: kotlin.String,
 
     @field:Valid
-    @ApiModelProperty(example = "null", required = true, value = "")
-    @field:JsonProperty("language", required = true) val language: LanguageDto,
+    @Schema(example = "null", required = true, description = "")
+    @get:JsonProperty("language", required = true) val language: LanguageDto,
 
-    @ApiModelProperty(example = "null", required = true, value = "")
-    @field:JsonProperty(
-        "createdAt",
-        required = true
-    ) val createdAt: java.time.Instant,
+    @Schema(example = "null", required = true, description = "")
+    @get:JsonProperty("createdAt", required = true) val createdAt: java.time.Instant,
 
-    @ApiModelProperty(
-        example = "123e4567-e89b-12d3-a456-426614174111",
-        value = ""
-    )
-    @field:JsonProperty("parentRevision") val parentRevision: java.util.UUID? = null
-)
+    @Schema(example = "123e4567-e89b-12d3-a456-426614174111", description = "")
+    @get:JsonProperty("parentRevision") val parentRevision: java.util.UUID? = null
+) {
+
+}
+

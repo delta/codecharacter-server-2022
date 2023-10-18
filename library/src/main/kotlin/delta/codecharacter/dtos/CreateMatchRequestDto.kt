@@ -1,12 +1,16 @@
 package delta.codecharacter.dtos
 
+import java.util.Objects
 import com.fasterxml.jackson.annotation.JsonProperty
-import io.swagger.annotations.ApiModelProperty
-import javax.validation.Valid
+import com.fasterxml.jackson.annotation.JsonValue
+import delta.codecharacter.dtos.MatchModeDto
+import jakarta.validation.constraints.*
+import jakarta.validation.Valid
+import io.swagger.v3.oas.annotations.media.Schema
 
 /**
  * Create match request  If mode is SELF: either/both of mapRevisionId and codeRevisionId have to be provided, or else latest code will be used to initiate the match If mode is MANUAL: only opponentUsername should be provided
- * @param mode
+ * @param mode 
  * @param opponentUsername Username of the opponent
  * @param mapRevisionId Revision ID of the map
  * @param codeRevisionId Revision of the code
@@ -14,15 +18,18 @@ import javax.validation.Valid
 data class CreateMatchRequestDto(
 
     @field:Valid
-    @ApiModelProperty(example = "null", required = true, value = "")
-    @field:JsonProperty("mode", required = true) val mode: MatchModeDto,
+    @Schema(example = "null", required = true, description = "")
+    @get:JsonProperty("mode", required = true) val mode: MatchModeDto,
 
-    @ApiModelProperty(example = "null", value = "Username of the opponent")
-    @field:JsonProperty("opponentUsername") val opponentUsername: String? = null,
+    @Schema(example = "null", description = "Username of the opponent")
+    @get:JsonProperty("opponentUsername") val opponentUsername: kotlin.String? = null,
 
-    @ApiModelProperty(example = "null", value = "Revision ID of the map")
-    @field:JsonProperty("mapRevisionId") val mapRevisionId: java.util.UUID? = null,
+    @Schema(example = "null", description = "Revision ID of the map")
+    @get:JsonProperty("mapRevisionId") val mapRevisionId: java.util.UUID? = null,
 
-    @ApiModelProperty(example = "null", value = "Revision of the code")
-    @field:JsonProperty("codeRevisionId") val codeRevisionId: java.util.UUID? = null
-)
+    @Schema(example = "null", description = "Revision of the code")
+    @get:JsonProperty("codeRevisionId") val codeRevisionId: java.util.UUID? = null
+) {
+
+}
+

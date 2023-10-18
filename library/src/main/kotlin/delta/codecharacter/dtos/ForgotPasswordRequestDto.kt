@@ -1,15 +1,26 @@
 package delta.codecharacter.dtos
 
+import java.util.Objects
 import com.fasterxml.jackson.annotation.JsonProperty
-import io.swagger.annotations.ApiModelProperty
-import javax.validation.constraints.Pattern
+import jakarta.validation.constraints.*
+import jakarta.validation.Valid
+import io.swagger.v3.oas.annotations.media.Schema
 
 /**
  * Forgot password request
- * @param email
+ * @param email 
+ * @param recaptchaCode 
  */
 data class ForgotPasswordRequestDto(
-    @get:Pattern(regexp = "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}")
-    @ApiModelProperty(example = "test@test.com", required = true, value = "")
-    @field:JsonProperty("email", required = true) val email: String
-)
+
+    @get:Email
+    @get:Pattern(regexp="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}")
+    @Schema(example = "test@test.com", required = true, description = "")
+    @get:JsonProperty("email", required = true) val email: kotlin.String,
+
+    @Schema(example = "example recaptcha-code", description = "")
+    @get:JsonProperty("recaptchaCode") val recaptchaCode: kotlin.String? = null
+) {
+
+}
+

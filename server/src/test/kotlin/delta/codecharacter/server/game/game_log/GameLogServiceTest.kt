@@ -1,6 +1,5 @@
 package delta.codecharacter.server.game.game_log
 
-import delta.codecharacter.server.game.GameEntity
 import io.mockk.confirmVerified
 import io.mockk.every
 import io.mockk.mockk
@@ -24,7 +23,6 @@ internal class GameLogServiceTest {
     @Test
     fun `should return game log`() {
         val gameId = UUID.randomUUID()
-        val gameEntity = mockk<GameEntity>()
         val gameLogEntity = mockk<GameLogEntity>()
         val expectedGameLog = "game log"
 

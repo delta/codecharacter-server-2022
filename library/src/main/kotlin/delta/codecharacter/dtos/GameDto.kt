@@ -1,35 +1,35 @@
 package delta.codecharacter.dtos
 
+import java.util.Objects
 import com.fasterxml.jackson.annotation.JsonProperty
-import io.swagger.annotations.ApiModelProperty
-import javax.validation.Valid
+import com.fasterxml.jackson.annotation.JsonValue
+import delta.codecharacter.dtos.GameStatusDto
+import jakarta.validation.constraints.*
+import jakarta.validation.Valid
+import io.swagger.v3.oas.annotations.media.Schema
 
 /**
  * Game model
- * @param id
- * @param destruction
- * @param coinsUsed
- * @param status
+ * @param id 
+ * @param destruction 
+ * @param coinsUsed 
+ * @param status 
  */
 data class GameDto(
 
-    @ApiModelProperty(
-        example = "123e4567-e89b-12d3-a456-426614174000",
-        required = true,
-        value = ""
-    )
-    @field:JsonProperty("id", required = true) val id: java.util.UUID,
+    @Schema(example = "123e4567-e89b-12d3-a456-426614174000", required = true, description = "")
+    @get:JsonProperty("id", required = true) val id: java.util.UUID,
 
-    @ApiModelProperty(example = "100", required = true, value = "")
-    @field:JsonProperty(
-        "destruction",
-        required = true
-    ) val destruction: java.math.BigDecimal,
+    @Schema(example = "100", required = true, description = "")
+    @get:JsonProperty("destruction", required = true) val destruction: java.math.BigDecimal,
 
-    @ApiModelProperty(example = "null", required = true, value = "")
-    @field:JsonProperty("coinsUsed", required = true) val coinsUsed: Int,
+    @Schema(example = "null", required = true, description = "")
+    @get:JsonProperty("coinsUsed", required = true) val coinsUsed: kotlin.Int,
 
     @field:Valid
-    @ApiModelProperty(example = "null", required = true, value = "")
-    @field:JsonProperty("status", required = true) val status: GameStatusDto
-)
+    @Schema(example = "null", required = true, description = "")
+    @get:JsonProperty("status", required = true) val status: GameStatusDto
+) {
+
+}
+

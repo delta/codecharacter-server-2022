@@ -1,6 +1,6 @@
 apiPackage: delta.codecharacter.core
 artifactId: codecharacter-core
-artifactVersion: 2022.0.1
+artifactVersion: 2023.0.1
 basePackage: delta.codecharacter
 delegatePattern: false
 enumPropertyNaming: UPPERCASE
@@ -21,3 +21,6 @@ swaggerAnnotations: true
 title: CodeCharacter Core API
 useBeanValidation: true
 useTags: true
+useJakartaEe: true
+springVersion: 3.0.0
+useSpringBoot3: true

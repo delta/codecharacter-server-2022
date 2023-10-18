@@ -1,14 +1,14 @@
-<h1 align="center">CodeCharacter Server 2022</h1>
+<h1 align="center">CodeCharacter Server 2023</h1>
 
 <p align="center">
-  <a href="https://github.com/delta/codecharacter-server-2022/actions/workflows/ci.yml">
-    <img src="https://github.com/delta/codecharacter-server-2022/actions/workflows/ci.yml/badge.svg"/>
+  <a href="https://github.com/delta/codecharacter-server-2023/actions/workflows/ci.yml">
+    <img src="https://github.com/delta/codecharacter-server-2023/actions/workflows/ci.yml/badge.svg"/>
   </a>
-  <a href="https://github.com/delta/codecharacter-server-2022/actions/workflows/docs.yml">
-    <img src="https://github.com/delta/codecharacter-server-2022/actions/workflows/docs.yml/badge.svg"/>
+  <a href="https://github.com/delta/codecharacter-server-2023/actions/workflows/docs.yml">
+    <img src="https://github.com/delta/codecharacter-server-2023/actions/workflows/docs.yml/badge.svg"/>
   </a>
-  <a href="https://codecov.io/gh/delta/codecharacter-server-2022">
-    <img src="https://codecov.io/gh/delta/codecharacter-server-2022/branch/main/graph/badge.svg?token=DW315MJFHY"/>
+  <a href="https://codecov.io/gh/delta/codecharacter-server-2023">
+    <img src="https://codecov.io/gh/delta/codecharacter-server-2023/branch/main/graph/badge.svg"/>
   </a>
 </p>
 
@@ -20,10 +20,14 @@
 ### Setup
 
 1. Clone the repo and open in IntelliJ Ultimate.
-2. Press `Ctrl+Alt+Shift+S` and make sure the JDK version is 17.
-3. Press `Ctrl+Alt+S` and go to `Build, Execution, Deployment -> Docker` and make sure docker is configured correctly/
-4. Copy `server/src/main/resources/application.example.yml` to `server/src/main/resources/application.yml`. If you want to use docker instead, copy the `server/src/main/resources/application.docker.example.yml` to `server/src/main/resources/application.yml`.
-5. The run configurations will be available in the top bar:
+2. From the project root directory,run ```./gradlew installGitHooks``` to install git-hooks
+3. Press `Ctrl+Alt+Shift+S` and make sure the JDK version is 17.
+4. Press `Ctrl+Alt+S` and go to `Build, Execution, Deployment -> Docker` and make sure docker is configured correctly/
+5. Copy `server/src/main/resources/application.example.yml` to `server/src/main/resources/application.yml`. If you want to use docker instead, copy the `server/src/main/resources/application.docker.example.yml` to `server/src/main/resources/application.yml`.
+6. Run `git submodule update --init`
+7. Run `cp server/src/main/resources/dcConstans.example.json server/src/main/resources/dcConstans.json`
+8. The run configurations will be available in the top bar:
+
    ![Run Configurations](https://i.imgur.com/pO2SrPd.png)
 
 ### Run Configurations

@@ -1,4 +1,4 @@
-FROM gradle:7.3.3-jdk17 as base
+FROM gradle:7.6-jdk17 as base
 WORKDIR /server
 COPY build.gradle.kts settings.gradle.kts gradlew ./
 COPY library/build.gradle.kts library/settings.gradle.kts ./library/

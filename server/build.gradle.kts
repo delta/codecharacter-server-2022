@@ -2,7 +2,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 
 plugins {
-    id("org.springframework.boot") version "2.6.2"
+    id("org.springframework.boot") version "3.0.0"
     id("io.spring.dependency-management") version "1.0.11.RELEASE"
     id("org.asciidoctor.convert") version "1.5.8"
     jacoco
@@ -29,34 +29,34 @@ repositories {
 val snippetsDir by extra { file("build/generated-snippets") }
 
 dependencies {
-
-    implementation("org.springframework.boot:spring-boot-starter-amqp:2.6.3")
-    implementation("org.springframework.boot:spring-boot-starter-data-mongodb:2.6.3")
-    implementation("org.springframework.boot:spring-boot-starter-oauth2-client:2.6.3")
-    implementation("org.springframework.boot:spring-boot-starter-security:2.6.3")
-    implementation("org.springframework.boot:spring-boot-starter-validation:2.6.3")
-    implementation("org.springframework.boot:spring-boot-starter-web:2.6.3")
-    implementation("org.springframework.boot:spring-boot-starter-websocket:2.6.3")
+    runtimeOnly("org.springframework.boot:spring-boot-properties-migrator")
+    implementation("org.springframework.boot:spring-boot-starter-amqp:3.0.0")
+    implementation("org.springframework.boot:spring-boot-starter-data-mongodb:3.0.0")
+    implementation("org.springframework.boot:spring-boot-starter-oauth2-client:3.0.0")
+    implementation("org.springframework.boot:spring-boot-starter-security:3.0.0")
+    implementation("org.springframework.boot:spring-boot-starter-validation:3.0.0")
+    implementation("org.springframework.boot:spring-boot-starter-web:3.0.0")
+    implementation("org.springframework.boot:spring-boot-starter-websocket:3.0.0")
     implementation("io.springfox:springfox-boot-starter:3.0.0")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.1")
-    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.13.1")
-    implementation("org.jetbrains.kotlin:kotlin-reflect:1.6.0")
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.6.0")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.14.1")
+    implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.14.1")
+    implementation("org.jetbrains.kotlin:kotlin-reflect:1.7.21")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.7.21")
     implementation("io.jsonwebtoken:jjwt:0.9.1")
     implementation("javax.xml.bind:jaxb-api:2.4.0-b180830.0359")
     implementation("com.sendgrid:sendgrid-java:4.8.3")
     implementation(project(":library"))
     implementation("org.junit.jupiter:junit-jupiter:5.8.2")
-    testImplementation("com.ninja-squad:springmockk:3.1.0")
-    developmentOnly("org.springframework.boot:spring-boot-devtools:2.6.3")
-    annotationProcessor("org.springframework.boot:spring-boot-configuration-processor:2.6.3")
-    testImplementation("org.springframework.boot:spring-boot-starter-test:2.6.3") {
+    testImplementation("com.ninja-squad:springmockk:4.0.0")
+    developmentOnly("org.springframework.boot:spring-boot-devtools:3.0.0")
+    annotationProcessor("org.springframework.boot:spring-boot-configuration-processor:3.0.0")
+    testImplementation("org.springframework.boot:spring-boot-starter-test:3.0.0") {
         exclude(module = "mockito-core")
     }
-    testRuntimeOnly("de.flapdoodle.embed:de.flapdoodle.embed.mongo:3.3.1")
-    testImplementation("org.springframework.amqp:spring-rabbit-test:2.4.2")
+    testRuntimeOnly("de.flapdoodle.embed:de.flapdoodle.embed.mongo.spring30x:4.5.2")
+    testImplementation("org.springframework.amqp:spring-rabbit-test:2.4.7")
     testImplementation("org.springframework.restdocs:spring-restdocs-mockmvc:2.0.6.RELEASE")
-    testImplementation("org.springframework.security:spring-security-test:5.5.1")
+    testImplementation("org.springframework.security:spring-security-test:6.0.0")
 }
 
 allOpen {

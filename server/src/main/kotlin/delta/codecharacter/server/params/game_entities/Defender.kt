@@ -8,4 +8,5 @@ data class Defender(
     @field:JsonProperty("range", required = true) val range: Int,
     @field:JsonProperty("attack_power", required = true) val attackPower: Int,
     @field:JsonProperty("price", required = true) val price: Int,
+    @field:JsonProperty("is_aerial", required = true) val aerial: Int,
 )

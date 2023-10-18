@@ -12,18 +12,19 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod
 import org.springframework.security.authentication.AuthenticationManager
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
+import org.springframework.security.config.annotation.web.invoke
 import org.springframework.security.config.http.SessionCreationPolicy
-import org.springframework.security.config.web.servlet.invoke
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
+import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 import org.springframework.security.web.firewall.HttpStatusRequestRejectedHandler
 import org.springframework.security.web.firewall.RequestRejectedHandler
 
 @Configuration
-class WebSecurityConfiguration : WebSecurityConfigurerAdapter() {
+class WebSecurityConfiguration {
 
     @Autowired private lateinit var jwtRequestFilter: JwtRequestFilter
     @Autowired private lateinit var userService: UserService
@@ -34,33 +35,44 @@ class WebSecurityConfiguration : WebSecurityConfigurerAdapter() {
 
     @Value("\${cors.enabled}") private val corsEnabled: Boolean = false
 
-    override fun configure(http: HttpSecurity?) {
-        http {
-            csrf { disable() }
-            oauth2Login {
-                userInfoEndpoint {
-                    oidcUserService = customOidcUserService
-                    userService = customOAuth2UserService
-                }
-                authenticationSuccessHandler = customOAuth2SuccessHandler
-                authenticationFailureHandler = customOAuth2FailureHandler
-            }
-            authorizeRequests { authorize(HttpMethod.OPTIONS, "/**", permitAll) }
-            cors { if (!corsEnabled) disable() }
-            sessionManagement { sessionCreationPolicy = SessionCreationPolicy.STATELESS }
-            addFilterBefore<UsernamePasswordAuthenticationFilter>(jwtRequestFilter)
-        }
-    }
-
-    override fun configure(auth: AuthenticationManagerBuilder?) {
-        auth?.userDetailsService(userService)?.passwordEncoder(passwordEncoder())
-    }
-
     @Bean
-    override fun authenticationManagerBean(): AuthenticationManager {
-        return super.authenticationManagerBean()
-    }
+    fun filterChain(http: HttpSecurity?): SecurityFilterChain? {
 
+        if (http != null) {
+            http.invoke {
+                csrf { disable() }
+                oauth2Login {
+                    userInfoEndpoint {
+                        oidcUserService = customOidcUserService
+                        userService = customOAuth2UserService
+                    }
+                    authenticationSuccessHandler = customOAuth2SuccessHandler
+                    authenticationFailureHandler = customOAuth2FailureHandler
+                }
+                authorizeRequests { authorize(HttpMethod.OPTIONS, "/**", permitAll) }
+                cors { if (!corsEnabled) disable() }
+                sessionManagement { sessionCreationPolicy = SessionCreationPolicy.STATELESS }
+                addFilterBefore<UsernamePasswordAuthenticationFilter>(jwtRequestFilter)
+            }
+            return http.build()
+        }
+        return null
+    }
+    @Bean
+    fun authenticationProvider(): DaoAuthenticationProvider {
+        val daoAuthenticationProvider =
+            DaoAuthenticationProvider().also {
+                it.setUserDetailsService(userService)
+                it.setPasswordEncoder(passwordEncoder())
+            }
+        return daoAuthenticationProvider
+    }
+    @Bean
+    fun authenticationManager(
+        authenticationConfiguration: AuthenticationConfiguration
+    ): AuthenticationManager {
+        return authenticationConfiguration.authenticationManager
+    }
     @Bean fun passwordEncoder() = BCryptPasswordEncoder()
 
     @Bean

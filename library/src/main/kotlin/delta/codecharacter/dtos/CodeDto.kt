@@ -1,34 +1,31 @@
 package delta.codecharacter.dtos
 
+import java.util.Objects
 import com.fasterxml.jackson.annotation.JsonProperty
-import io.swagger.annotations.ApiModelProperty
-import javax.validation.Valid
+import com.fasterxml.jackson.annotation.JsonValue
+import delta.codecharacter.dtos.LanguageDto
+import jakarta.validation.constraints.*
+import jakarta.validation.Valid
+import io.swagger.v3.oas.annotations.media.Schema
 
 /**
  * Code model
- * @param code
- * @param lastSavedAt
- * @param language
+ * @param code 
+ * @param lastSavedAt 
+ * @param language 
  */
 data class CodeDto(
 
-    @ApiModelProperty(
-        example = "#include <iostream>",
-        required = true,
-        value = ""
-    )
-    @field:JsonProperty("code", required = true) val code: String,
+    @Schema(example = "#include <iostream>", required = true, description = "")
+    @get:JsonProperty("code", required = true) val code: kotlin.String,
 
-    @ApiModelProperty(
-        required = true,
-        value = ""
-    )
-    @field:JsonProperty(
-        "lastSavedAt",
-        required = true
-    ) val lastSavedAt: java.time.Instant,
+    @Schema(example = "2021-01-01T00:00Z", required = true, description = "")
+    @get:JsonProperty("lastSavedAt", required = true) val lastSavedAt: java.time.Instant,
 
     @field:Valid
-    @ApiModelProperty(example = "null", required = true, value = "")
-    @field:JsonProperty("language", required = true) val language: LanguageDto
-)
+    @Schema(example = "null", required = true, description = "")
+    @get:JsonProperty("language", required = true) val language: LanguageDto
+) {
+
+}
+

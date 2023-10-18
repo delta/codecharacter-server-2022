@@ -1,7 +1,12 @@
 package delta.codecharacter.server
 
+import delta.codecharacter.dtos.ChallengeTypeDto
+import delta.codecharacter.dtos.DailyChallengeObjectDto
+import delta.codecharacter.dtos.TierTypeDto
+import delta.codecharacter.server.daily_challenge.DailyChallengeEntity
 import delta.codecharacter.server.user.LoginType
 import delta.codecharacter.server.user.UserEntity
+import delta.codecharacter.server.user.public_user.DailyChallengeHistory
 import delta.codecharacter.server.user.public_user.PublicUserEntity
 import org.springframework.amqp.rabbit.connection.ConnectionFactory
 import org.springframework.amqp.rabbit.core.RabbitAdmin
@@ -28,6 +33,19 @@ class TestAttributes {
                 loginType = LoginType.PASSWORD,
                 isProfileComplete = true,
             )
+        val dailyChallengeCode =
+            DailyChallengeEntity(
+                id = UUID.randomUUID(),
+                day = 0,
+                challName = "challengeName",
+                challType = ChallengeTypeDto.CODE,
+                chall = DailyChallengeObjectDto(cpp = "example cpp code"),
+                perfectScore = 500,
+                numberOfCompletions = 2,
+                toleratedDestruction = 60,
+                map = "",
+                description = "description"
+            )
         val publicUser =
             PublicUserEntity(
                 userId = user.id,
@@ -40,6 +58,10 @@ class TestAttributes {
                 wins = 4,
                 losses = 2,
                 ties = 1,
+                tier = TierTypeDto.TIER_PRACTICE,
+                score = 0.0,
+                dailyChallengeHistory = hashMapOf(0 to DailyChallengeHistory(0.0, dailyChallengeCode)),
+                tutorialLevel = 1
             )
     }
 }

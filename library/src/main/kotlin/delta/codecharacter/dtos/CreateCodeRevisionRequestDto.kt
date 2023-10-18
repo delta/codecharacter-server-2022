@@ -1,28 +1,37 @@
 package delta.codecharacter.dtos
 
+import java.util.Objects
 import com.fasterxml.jackson.annotation.JsonProperty
-import io.swagger.annotations.ApiModelProperty
-import javax.validation.Valid
+import com.fasterxml.jackson.annotation.JsonValue
+import delta.codecharacter.dtos.CodeTypeDto
+import delta.codecharacter.dtos.LanguageDto
+import jakarta.validation.constraints.*
+import jakarta.validation.Valid
+import io.swagger.v3.oas.annotations.media.Schema
 
 /**
  * Create code revision request
- * @param code
- * @param message
- * @param language
+ * @param code 
+ * @param message 
+ * @param language 
+ * @param codeType 
  */
 data class CreateCodeRevisionRequestDto(
 
-    @ApiModelProperty(
-        example = "#include <iostream>",
-        required = true,
-        value = ""
-    )
-    @field:JsonProperty("code", required = true) val code: String,
+    @Schema(example = "#include <iostream>", required = true, description = "")
+    @get:JsonProperty("code", required = true) val code: kotlin.String,
 
-    @ApiModelProperty(example = "message", required = true, value = "")
-    @field:JsonProperty("message", required = true) val message: String,
+    @Schema(example = "message", required = true, description = "")
+    @get:JsonProperty("message", required = true) val message: kotlin.String,
 
     @field:Valid
-    @ApiModelProperty(example = "null", required = true, value = "")
-    @field:JsonProperty("language", required = true) val language: LanguageDto
-)
+    @Schema(example = "null", required = true, description = "")
+    @get:JsonProperty("language", required = true) val language: LanguageDto,
+
+    @field:Valid
+    @Schema(example = "null", description = "")
+    @get:JsonProperty("codeType") val codeType: CodeTypeDto? = CodeTypeDto.NORMAL
+) {
+
+}
+

@@ -29,6 +29,11 @@
       "name": "spring.sendgrid.template-id",
       "type": "java.lang.String",
       "description": "Sendgrid Template ID"
+    },
+    {
+      "name": "environment.reCaptcha-key",
+      "type": "java.lang.String",
+      "description": "User reCaptcha key."
     }
   ]
 }

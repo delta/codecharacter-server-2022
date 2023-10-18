@@ -1,33 +1,43 @@
 package delta.codecharacter.dtos
 
+import java.util.Objects
 import com.fasterxml.jackson.annotation.JsonProperty
-import io.swagger.annotations.ApiModelProperty
+import com.fasterxml.jackson.annotation.JsonValue
+import delta.codecharacter.dtos.TierTypeDto
+import jakarta.validation.constraints.*
+import jakarta.validation.Valid
+import io.swagger.v3.oas.annotations.media.Schema
 
 /**
  * Public user model
- * @param username
- * @param name
- * @param country
- * @param college
- * @param avatarId
+ * @param username 
+ * @param name 
+ * @param country 
+ * @param tier 
+ * @param college 
+ * @param avatarId 
  */
 data class PublicUserDto(
 
-    @ApiModelProperty(example = "test", required = true, value = "")
-    @field:JsonProperty(
-        "username",
-        required = true
-    ) val username: String,
+    @Schema(example = "test", required = true, description = "")
+    @get:JsonProperty("username", required = true) val username: kotlin.String,
 
-    @ApiModelProperty(example = "Test User", required = true, value = "")
-    @field:JsonProperty("name", required = true) val name: String,
+    @Schema(example = "Test User", required = true, description = "")
+    @get:JsonProperty("name", required = true) val name: kotlin.String,
 
-    @ApiModelProperty(example = "IN", required = true, value = "")
-    @field:JsonProperty("country", required = true) val country: String,
+    @Schema(example = "IN", required = true, description = "")
+    @get:JsonProperty("country", required = true) val country: kotlin.String,
 
-    @ApiModelProperty(example = "Test", required = true, value = "")
-    @field:JsonProperty("college", required = true) val college: String,
+    @field:Valid
+    @Schema(example = "null", required = true, description = "")
+    @get:JsonProperty("tier", required = true) val tier: TierTypeDto,
 
-    @ApiModelProperty(example = "1", required = true, value = "")
-    @field:JsonProperty("avatarId", required = true) val avatarId: Int
-)
+    @Schema(example = "Test", required = true, description = "")
+    @get:JsonProperty("college", required = true) val college: kotlin.String,
+
+    @Schema(example = "1", required = true, description = "")
+    @get:JsonProperty("avatarId", required = true) val avatarId: kotlin.Int
+) {
+
+}
+

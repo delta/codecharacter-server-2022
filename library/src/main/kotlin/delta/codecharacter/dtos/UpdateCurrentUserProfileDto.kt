@@ -1,26 +1,39 @@
 package delta.codecharacter.dtos
 
+import java.util.Objects
 import com.fasterxml.jackson.annotation.JsonProperty
-import io.swagger.annotations.ApiModelProperty
+import com.fasterxml.jackson.annotation.JsonValue
+import delta.codecharacter.dtos.TutorialUpdateTypeDto
+import jakarta.validation.constraints.*
+import jakarta.validation.Valid
+import io.swagger.v3.oas.annotations.media.Schema
 
 /**
  * Update current user profile request
- * @param name
- * @param country
- * @param college
- * @param avatarId
+ * @param name 
+ * @param country 
+ * @param college 
+ * @param avatarId 
+ * @param updateTutorialLevel 
  */
 data class UpdateCurrentUserProfileDto(
 
-    @ApiModelProperty(example = "Test", value = "")
-    @field:JsonProperty("name") val name: String? = null,
+    @Schema(example = "Test", description = "")
+    @get:JsonProperty("name") val name: kotlin.String? = null,
 
-    @ApiModelProperty(example = "IN", value = "")
-    @field:JsonProperty("country") val country: String? = null,
+    @Schema(example = "IN", description = "")
+    @get:JsonProperty("country") val country: kotlin.String? = null,
 
-    @ApiModelProperty(example = "Test", value = "")
-    @field:JsonProperty("college") val college: String? = null,
+    @Schema(example = "Test", description = "")
+    @get:JsonProperty("college") val college: kotlin.String? = null,
 
-    @ApiModelProperty(example = "1", value = "")
-    @field:JsonProperty("avatarId") val avatarId: Int? = null
-)
+    @Schema(example = "1", description = "")
+    @get:JsonProperty("avatarId") val avatarId: kotlin.Int? = null,
+
+    @field:Valid
+    @Schema(example = "null", description = "")
+    @get:JsonProperty("updateTutorialLevel") val updateTutorialLevel: TutorialUpdateTypeDto? = null
+) {
+
+}
+
